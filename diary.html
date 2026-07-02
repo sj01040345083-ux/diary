@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하루 한 줄 — 일기 가계부</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f3e9;
+    --paper-2: #fffdf7;
+    --ink: #3a352c;
+    --ink-soft: #6f685a;
+    --ink-faint: #a39b88;
+    --line: #e4ddca;
+    --line-soft: #efe9d8;
+    --accent: #c4622d;
+    --accent-soft: #f0d9c4;
+    --teal: #4a7a6f;
+    --teal-soft: #d9e8e2;
+    --rule: #d8cfb6;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(58,53,44,.05), 0 8px 24px rgba(58,53,44,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Gowun Dodum', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    padding: 0 0 4rem;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    text-align: center;
+    padding: 3rem 20px 2rem;
+  }
+  header .date-today {
+    font-family: 'Gaegu', cursive;
+    font-size: 17px;
+    color: var(--accent);
+    letter-spacing: .5px;
+    margin-bottom: 2px;
+  }
+  header h1 {
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    font-size: 44px;
+    margin: 0;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  header p {
+    font-family: 'Gowun Batang', serif;
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 10px 0 0;
+  }
+
+  .card {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+  }
+  .card-title {
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  label.fld { display: block; font-size: 13px; color: var(--ink-soft); margin: 0 0 6px; }
+  input, textarea, select, button {
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  input[type=date], input[type=text], input[type=number], textarea, select {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 9px 12px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  textarea { resize: vertical; line-height: 1.7; }
+
+  .moods { display: flex; gap: 7px; margin-bottom: 16px; }
+  .mood {
+    flex: 1; cursor: pointer;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 8px 0;
+    font-size: 22px;
+    text-align: center;
+    transition: transform .12s, border-color .15s, background .15s;
+  }
+  .mood:hover { transform: translateY(-2px); }
+  .mood.on { border-color: var(--accent); background: var(--accent-soft); }
+
+  .exp-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .exp-row .exp-cat { flex: 0 0 96px; }
+  .exp-row .exp-name { flex: 1; }
+  .exp-row .exp-amt { flex: 0 0 110px; }
+  .exp-row .del {
+    flex: 0 0 auto; cursor: pointer;
+    border: 1px solid var(--line); background: var(--paper);
+    border-radius: 8px; width: 34px; height: 34px;
+    color: var(--ink-faint); font-size: 16px; line-height: 1;
+    transition: color .15s, border-color .15s;
+  }
+  .exp-row .del:hover { color: var(--accent); border-color: var(--accent); }
+
+  .btn {
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    border-radius: 9px;
+    padding: 9px 14px;
+    font-size: 14px;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .btn:hover { border-color: var(--ink-faint); }
+  .btn-ghost { width: 100%; margin-bottom: 16px; }
+  .btn-save {
+    width: 100%;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-family: 'Gaegu', cursive;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 11px;
+  }
+  .btn-save:hover { background: #ad5526; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  .stat {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .stat .v { font-family: 'Gaegu', cursive; font-weight: 700; font-size: 26px; color: var(--ink); line-height: 1.1; }
+  .stat .l { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .feed-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin: 0 0 14px; padding: 0 2px;
+  }
+  .feed-head h2 {
+    font-family: 'Gaegu', cursive; font-weight: 700; font-size: 24px; margin: 0;
+  }
+  .feed-head .month-pick { font-size: 13px; color: var(--ink-soft); border: 1px solid var(--line); background: var(--paper-2); border-radius: 8px; padding: 6px 10px; width: auto; }
+
+  .entry {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .entry .e-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .entry .e-date {
+    font-family: 'Gaegu', cursive; font-weight: 700; font-size: 19px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .entry .e-mood { font-size: 21px; }
+  .entry .e-del { cursor: pointer; background: none; border: none; color: var(--ink-faint); font-size: 15px; padding: 4px; }
+  .entry .e-del:hover { color: var(--accent); }
+  .entry .e-note {
+    font-family: 'Gowun Batang', serif;
+    font-size: 16px; line-height: 1.85; color: var(--ink);
+    white-space: pre-wrap; word-break: break-word;
+    padding: 4px 0 2px;
+    background-image: repeating-linear-gradient(transparent, transparent 30px, var(--line-soft) 30px, var(--line-soft) 31px);
+  }
+  .entry .e-exp { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 12px; }
+  .e-exp .row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding: 3px 0; color: var(--ink-soft); }
+  .e-exp .row .left { display: flex; align-items: center; gap: 8px; }
+  .e-exp .tag {
+    font-size: 11px; padding: 1px 8px; border-radius: 20px;
+    background: var(--teal-soft); color: var(--teal); white-space: nowrap;
+  }
+  .e-exp .total { display: flex; justify-content: space-between; font-weight: 700; color: var(--ink); margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line-soft); font-size: 15px; }
+
+  .empty { text-align: center; color: var(--ink-faint); padding: 3rem 1rem; font-family: 'Gowun Batang', serif; font-size: 16px; }
+  .empty .big { font-size: 38px; display: block; margin-bottom: 10px; opacity: .7; }
+
+  .footer-note { text-align: center; font-size: 12px; color: var(--ink-faint); margin-top: 30px; }
+
+  .quote-card {
+    background: linear-gradient(160deg, #4a7a6f 0%, #3f6c61 100%);
+    color: #fdfcf5;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px 24px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-card .quote-mark {
+    font-family: 'Gowun Batang', serif;
+    position: absolute; top: -18px; left: 14px;
+    font-size: 110px; color: rgba(255,255,255,.13);
+    line-height: 1;
+  }
+  .quote-text {
+    font-family: 'Gowun Batang', serif;
+    font-size: 18px; line-height: 1.85; margin: 0;
+    position: relative; word-break: keep-all;
+  }
+  .quote-author {
+    font-family: 'Gaegu', cursive; font-weight: 700;
+    text-align: right; margin: 12px 0 0; font-size: 16px;
+    color: rgba(253,252,245,.85);
+  }
+
+  .card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+  .edit-banner {
+    display: none; align-items: center; justify-content: space-between;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 9px; padding: 8px 12px; margin-bottom: 14px; font-size: 13px;
+  }
+  .card.editing .edit-banner { display: flex; }
+  .edit-banner button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; text-decoration: underline; padding: 0; }
+
+  .e-edit { cursor: pointer; background: none; border: none; color: var(--ink-faint); font-size: 15px; padding: 4px; margin-right: 2px; }
+  .e-edit:hover { color: var(--teal); }
+  .e-actions { display: flex; align-items: center; }
+
+  .backup { display: flex; gap: 12px; margin-top: 34px; }
+  .btn-backup {
+    flex: 1; padding: 12px; font-size: 14px;
+    background: var(--paper-2); color: var(--ink-soft);
+  }
+  .btn-backup:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-soft); }
+
+  @media (max-width: 520px) {
+    header h1 { font-size: 36px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stats .stat:last-child { grid-column: 1 / -1; }
+    .exp-row { flex-wrap: wrap; }
+    .exp-row .exp-cat { flex: 1 1 90px; }
+    .exp-row .exp-name { flex: 1 1 120px; }
+    .exp-row .exp-amt { flex: 1 1 90px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="date-today" id="todayLabel"></div>
+  <h1>하루 한 줄</h1>
+  <p>오늘의 마음과 씀씀이를 한자리에</p>
+</header>
+
+<div class="wrap">
+
+  <div class="quote-card" id="quoteCard">
+    <div class="quote-mark">“</div>
+    <p class="quote-text" id="quoteText"></p>
+    <p class="quote-author" id="quoteAuthor"></p>
+  </div>
+
+  <div class="card" id="formCard">
+    <h2 class="card-title" id="formTitle">✍️ 오늘의 기록</h2>
+
+    <div class="edit-banner" id="editBanner">
+      <span id="editBannerText">지난 기록을 수정 중이에요</span>
+      <button id="cancelEdit">새 기록으로</button>
+    </div>
+
+    <label class="fld">날짜</label>
+    <input type="date" id="entryDate" style="margin-bottom:16px">
+
+    <label class="fld">오늘 기분은?</label>
+    <div class="moods" id="moods">
+      <div class="mood" data-m="😄">😄</div>
+      <div class="mood" data-m="🙂">🙂</div>
+      <div class="mood" data-m="😐">😐</div>
+      <div class="mood" data-m="😔">😔</div>
+      <div class="mood" data-m="😴">😴</div>
+    </div>
+
+    <label class="fld">한 줄 일기</label>
+    <textarea id="entryNote" rows="3" placeholder="오늘 어땠나요? 짧아도 괜찮아요." style="margin-bottom:18px"></textarea>
+
+    <label class="fld">지출 내역</label>
+    <div id="expInputs"></div>
+    <button class="btn btn-ghost" id="addExp">＋ 항목 추가</button>
+
+    <button class="btn btn-save" id="saveBtn">오늘 저장하기</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="v" id="stMonth">₩0</div><div class="l">이번 달 지출</div></div>
+    <div class="stat"><div class="v" id="stDays">0일</div><div class="l">기록한 날</div></div>
+    <div class="stat"><div class="v" id="stAvg">₩0</div><div class="l">하루 평균</div></div>
+  </div>
+
+  <div class="feed-head">
+    <h2>지난 날들</h2>
+    <select class="month-pick" id="monthPick"></select>
+  </div>
+  <div id="feed"></div>
+
+  <div class="backup">
+    <button class="btn btn-backup" id="exportBtn">⬇ 백업 파일 저장</button>
+    <button class="btn btn-backup" id="importBtn">⬆ 백업 불러오기</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+  <div class="footer-note">기록은 이 브라우저에 저장돼요 · 가끔 백업 파일을 저장해 두면 안전해요</div>
+</div>
+
+<script>
+// ===== Supabase 자동 동기화 설정 =====
+const SUPABASE_URL = 'https://ipwsndtqmpqrmtikkevm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JQGRMNOrBzf82vPiXy7YnA_s9GoWNVY';
+const SB_HEAD = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+const SB_TABLE = SUPABASE_URL + '/rest/v1/diary';
+
+// 클라우드에 한 건 저장(있으면 덮어쓰기)
+async function cloudSave(entry){
+  try {
+    await fetch(SB_TABLE, {
+      method: 'POST',
+      headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify(entry)
+    });
+  } catch(e){ /* 오프라인이면 로컬에만 남음 */ }
+}
+// 클라우드에서 한 건 삭제
+async function cloudDelete(date){
+  try {
+    await fetch(SB_TABLE + '?date=eq.' + encodeURIComponent(date), {
+      method: 'DELETE', headers: SB_HEAD
+    });
+  } catch(e){}
+}
+// 클라우드에서 전체 불러오기
+async function cloudLoadAll(){
+  try {
+    const res = await fetch(SB_TABLE + '?select=*', { headers: SB_HEAD });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e){ return null; }
+}
+
+const KEY = 'haru_diary_v1';
+const CATS = ['식비','교통','생활','쇼핑','여가','건강','기타'];
+let entries = load();
+let mood = '';
+let editingDate = null;
+
+const QUOTES = [
+  ['행복은 이미 가진 것을 충분히 누리는 데 있지, 더 많이 갖는 데 있지 않다.', '에피쿠로스'],
+  ['오늘 할 수 있는 일에 전력을 다하면 내일은 한 걸음 나아가 있다.', '아이작 뉴턴'],
+  ['우리가 반복하는 것이 곧 우리 자신이다. 탁월함은 행위가 아니라 습관이다.', '아리스토텔레스'],
+  ['가장 큰 영광은 한 번도 넘어지지 않는 것이 아니라 넘어질 때마다 일어서는 것이다.', '공자'],
+  ['작은 일을 꾸준히 하는 사람이 큰일을 해낸다.', '벤저민 프랭클린'],
+  ['바꿀 수 없는 것은 받아들이고, 바꿀 수 있는 것에 용기를 내라.', '라인홀드 니버'],
+  ['지나간 일에 마음을 두지 말고, 오지 않은 일에 미리 애태우지 마라.', '장자'],
+  ['천 리 길도 한 걸음에서 시작된다.', '노자'],
+  ['삶이 있는 한 희망은 있다.', '키케로'],
+  ['남과 비교하는 순간 평온은 사라진다. 어제의 나하고만 견주어라.', '톨스토이'],
+  ['검소함은 큰 수입과 같다. 아끼는 만큼 버는 것이다.', '키케로'],
+  ['하루를 잘 보낸 뒤의 잠이 달듯, 잘 산 인생 끝의 죽음도 편안하다.', '레오나르도 다 빈치'],
+  ['친절은 귀머거리도 듣고 장님도 볼 수 있는 말이다.', '마크 트웨인'],
+  ['완벽을 기다리지 마라. 시작이 완성으로 가는 유일한 길이다.', '괴테'],
+  ['돈을 잃으면 조금 잃은 것이고, 마음을 잃으면 많이 잃은 것이다.', '서양 속담'],
+  ['감사할 줄 아는 마음은 가장 작은 부도 가장 큰 풍요로 바꾼다.', '이솝'],
+  ['고요한 물이 깊다. 조용한 사람의 내면이 가장 단단하다.', '서양 격언'],
+  ['오늘 뿌린 씨앗이 내일의 그늘을 만든다.', '인도 속담'],
+  ['걱정은 내일의 슬픔을 덜어주지 않고 오늘의 힘만 앗아간다.', '레오 버스카글리아'],
+  ['배움에는 끝이 없고, 그래서 삶은 늘 새롭다.', '공자'],
+  ['행복은 습관이다. 그것을 몸에 지녀라.', '허버드'],
+  ['지혜로운 이는 더 많이 가진 자가 아니라 더 적게 바라는 자다.', '소크라테스'],
+  ['실패는 넘어지는 것이 아니라 넘어진 자리에 머무는 것이다.', '메리 픽포드'],
+  ['오늘이라는 선물, 그래서 우리는 그것을 present라 부른다.', '앨리스 모스 얼'],
+  ['작은 절약이 모여 든든한 내일이 된다.', '벤저민 프랭클린'],
+  ['말은 적게, 행동은 많이.', '서양 격언'],
+  ['남을 아는 것은 지혜이고, 자신을 아는 것은 밝음이다.', '노자'],
+  ['좋은 책 한 권은 좋은 친구 한 명과 같다.', '서양 속담'],
+  ['느리게 가도 괜찮다. 멈추지만 않으면 된다.', '공자'],
+  ['오늘 누군가 그늘에 앉아 쉴 수 있는 건, 오래전 누군가 나무를 심었기 때문이다.', '워런 버핏'],
+  ['마음이 평온하면 어디에 있든 그곳이 안식처다.', '동양 격언']
+];
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e){ return []; } }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch(e){} }
+const won = n => '₩' + Math.round(n).toLocaleString('ko-KR');
+const DOW = ['일','월','화','수','목','금','토'];
+
+// header + default date
+const now = new Date();
+document.getElementById('todayLabel').textContent =
+  now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+document.getElementById('entryDate').value = now.toISOString().slice(0,10);
+
+// quote of the day — 날짜 기준으로 매일 하나씩
+(function(){
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  const q = QUOTES[dayOfYear % QUOTES.length];
+  document.getElementById('quoteText').textContent = q[0];
+  document.getElementById('quoteAuthor').textContent = '— ' + q[1];
+})();
+
+// moods
+document.querySelectorAll('.mood').forEach(el => {
+  el.addEventListener('click', () => {
+    const was = el.classList.contains('on');
+    document.querySelectorAll('.mood').forEach(x => x.classList.remove('on'));
+    if (!was){ el.classList.add('on'); mood = el.dataset.m; } else { mood = ''; }
+  });
+});
+
+// expense rows
+const expWrap = document.getElementById('expInputs');
+function catOptions(sel){ return CATS.map(c => '<option'+(c===sel?' selected':'')+'>'+c+'</option>').join(''); }
+function addExpRow(cat='식비', name='', amt=''){
+  const row = document.createElement('div');
+  row.className = 'exp-row';
+  row.innerHTML =
+    '<select class="exp-cat">'+catOptions(cat)+'</select>'+
+    '<input class="exp-name" type="text" placeholder="내용 (예: 점심)">'+
+    '<input class="exp-amt" type="number" inputmode="numeric" placeholder="금액">'+
+    '<button class="del" title="삭제">✕</button>';
+  row.querySelector('.exp-name').value = name;
+  row.querySelector('.exp-amt').value = amt;
+  row.querySelector('.del').addEventListener('click', () => row.remove());
+  expWrap.appendChild(row);
+}
+addExpRow();
+document.getElementById('addExp').addEventListener('click', () => addExpRow());
+
+// save
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const date = document.getElementById('entryDate').value;
+  if (!date){ alert('날짜를 선택해 주세요.'); return; }
+  const note = document.getElementById('entryNote').value.trim();
+  const expenses = [];
+  expWrap.querySelectorAll('.exp-row').forEach(r => {
+    const cat = r.querySelector('.exp-cat').value;
+    const name = r.querySelector('.exp-name').value.trim();
+    const a = parseFloat(r.querySelector('.exp-amt').value);
+    if (name || a) expenses.push({ cat, name: name || cat, amount: isNaN(a) ? 0 : a });
+  });
+  if (!note && !expenses.length && !mood){ alert('기분, 일기, 지출 중 하나는 적어주세요.'); return; }
+  // 수정 중 날짜를 바꿨다면 원래 날짜 기록을 옮기는 형태
+  if (editingDate && editingDate !== date){
+    entries = entries.filter(e => e.date !== editingDate);
+    cloudDelete(editingDate);
+  }
+  entries = entries.filter(e => e.date !== date);
+  const newEntry = { date, mood, note, expenses };
+  entries.push(newEntry);
+  entries.sort((a,b) => b.date.localeCompare(a.date));
+  persist();
+  cloudSave(newEntry);
+  // reset form + 수정 모드 해제
+  if (editingDate) exitEditMode();
+  else {
+    document.getElementById('entryNote').value = '';
+    mood = '';
+    document.querySelectorAll('.mood').forEach(x => x.classList.remove('on'));
+    expWrap.innerHTML = ''; addExpRow();
+  }
+  render();
+});
+
+const monthPick = document.getElementById('monthPick');
+function monthsAvailable(){
+  const set = new Set(entries.map(e => e.date.slice(0,7)));
+  set.add(now.toISOString().slice(0,7));
+  return [...set].sort().reverse();
+}
+
+function render(){
+  // month picker
+  const months = monthsAvailable();
+  const cur = monthPick.value && months.includes(monthPick.value) ? monthPick.value : months[0];
+  monthPick.innerHTML = months.map(m => {
+    const [y,mo] = m.split('-');
+    return '<option value="'+m+'"'+(m===cur?' selected':'')+'>'+y+'년 '+(+mo)+'월</option>';
+  }).join('');
+
+  // stats for current month
+  const inMonth = entries.filter(e => e.date.slice(0,7) === cur);
+  const total = inMonth.reduce((s,e) => s + e.expenses.reduce((a,x)=>a+x.amount,0), 0);
+  const spendDays = inMonth.filter(e => e.expenses.some(x=>x.amount>0)).length;
+  document.getElementById('stMonth').textContent = won(total);
+  document.getElementById('stDays').textContent = inMonth.length + '일';
+  document.getElementById('stAvg').textContent = won(spendDays ? total/spendDays : 0);
+
+  // feed
+  const feed = document.getElementById('feed');
+  if (!inMonth.length){
+    feed.innerHTML = '<div class="empty"><span class="big">🌱</span>이 달에는 아직 기록이 없어요.<br>위에서 첫 하루를 적어보세요.</div>';
+    return;
+  }
+  feed.innerHTML = inMonth.map(e => {
+    const d = new Date(e.date + 'T00:00');
+    const dateStr = (d.getMonth()+1) + '월 ' + d.getDate() + '일 · ' + DOW[d.getDay()] + '요일';
+    const t = e.expenses.reduce((a,x)=>a+x.amount,0);
+    const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const exps = e.expenses.map(x =>
+      '<div class="row"><span class="left"><span class="tag">'+esc(x.cat)+'</span>'+esc(x.name)+'</span><span>'+won(x.amount)+'</span></div>'
+    ).join('');
+    return '<div class="entry">'+
+      '<div class="e-head"><span class="e-date">'+(e.mood?'<span class="e-mood">'+e.mood+'</span>':'')+dateStr+'</span>'+
+      '<span class="e-actions"><button class="e-edit" data-e="'+e.date+'" title="수정">✎</button>'+
+      '<button class="e-del" data-d="'+e.date+'" title="삭제">🗑</button></span></div>'+
+      (e.note ? '<div class="e-note">'+esc(e.note)+'</div>' : '')+
+      (e.expenses.length ? '<div class="e-exp">'+exps+'<div class="total"><span>합계</span><span>'+won(t)+'</span></div></div>' : '')+
+    '</div>';
+  }).join('');
+
+  feed.querySelectorAll('.e-del').forEach(b => b.addEventListener('click', () => {
+    if (confirm('이 날의 기록을 지울까요?')){
+      entries = entries.filter(e => e.date !== b.dataset.d);
+      cloudDelete(b.dataset.d);
+      if (editingDate === b.dataset.d) exitEditMode();
+      persist(); render();
+    }
+  }));
+  feed.querySelectorAll('.e-edit').forEach(b => b.addEventListener('click', () => {
+    loadIntoForm(b.dataset.e);
+  }));
+}
+monthPick.addEventListener('change', render);
+render();
+
+// ---- 시작 시 클라우드에서 최신 기록 가져와 병합 ----
+async function syncFromCloud(){
+  const remote = await cloudLoadAll();
+  if (!remote) return; // 오프라인이거나 실패하면 로컬 그대로 사용
+  const byDate = {};
+  // 로컬 먼저 깔고, 클라우드 값으로 덮어써 최신 반영
+  entries.forEach(e => byDate[e.date] = e);
+  remote.forEach(e => byDate[e.date] = {
+    date: e.date, mood: e.mood || '', note: e.note || '',
+    expenses: Array.isArray(e.expenses) ? e.expenses : []
+  });
+  // 로컬에만 있고 클라우드엔 없던 기록은 클라우드로 올려줌
+  const remoteDates = new Set(remote.map(e => e.date));
+  entries.forEach(e => { if (!remoteDates.has(e.date)) cloudSave(e); });
+  entries = Object.values(byDate).sort((a,b) => b.date.localeCompare(a.date));
+  persist();
+  render();
+}
+syncFromCloud();
+
+const formCard = document.getElementById('formCard');
+const formTitle = document.getElementById('formTitle');
+const saveBtn = document.getElementById('saveBtn');
+
+function loadIntoForm(date){
+  const e = entries.find(x => x.date === date);
+  if (!e) return;
+  document.getElementById('entryDate').value = e.date;
+  document.getElementById('entryNote').value = e.note || '';
+  mood = e.mood || '';
+  document.querySelectorAll('.mood').forEach(x =>
+    x.classList.toggle('on', !!mood && x.dataset.m === mood));
+  expWrap.innerHTML = '';
+  if (e.expenses && e.expenses.length) e.expenses.forEach(x => addExpRow(x.cat, x.name, x.amount));
+  else addExpRow();
+  editingDate = date;
+  const d = new Date(date + 'T00:00');
+  document.getElementById('editBannerText').textContent =
+    (d.getMonth()+1) + '월 ' + d.getDate() + '일 기록을 수정 중이에요';
+  formCard.classList.add('editing');
+  formTitle.textContent = '✏️ 기록 수정';
+  saveBtn.textContent = '수정 내용 저장';
+  formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function exitEditMode(){
+  editingDate = null;
+  formCard.classList.remove('editing');
+  formTitle.textContent = '✍️ 오늘의 기록';
+  saveBtn.textContent = '오늘 저장하기';
+  document.getElementById('entryDate').value = now.toISOString().slice(0,10);
+  document.getElementById('entryNote').value = '';
+  mood = '';
+  document.querySelectorAll('.mood').forEach(x => x.classList.remove('on'));
+  expWrap.innerHTML = ''; addExpRow();
+}
+document.getElementById('cancelEdit').addEventListener('click', exitEditMode);
+
+// ---- backup: export / import ----
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!entries.length){ alert('아직 저장된 기록이 없어요.'); return; }
+  const payload = { app: 'haru_diary', version: 1, exportedAt: new Date().toISOString(), entries };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = '하루한줄-백업-' + stamp + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+const importFile = document.getElementById('importFile');
+document.getElementById('importBtn').addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', () => {
+  const file = importFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const incoming = Array.isArray(data) ? data : data.entries;
+      if (!Array.isArray(incoming)) throw new Error('형식 오류');
+      const valid = incoming.filter(e => e && typeof e.date === 'string');
+      if (!valid.length) throw new Error('기록 없음');
+      const mode = entries.length
+        ? confirm('확인 = 지금 기록에 합치기\n취소 = 백업으로 전부 덮어쓰기')
+        : true;
+      if (mode){
+        const byDate = {};
+        entries.forEach(e => byDate[e.date] = e);
+        valid.forEach(e => byDate[e.date] = e);
+        entries = Object.values(byDate);
+      } else {
+        entries = valid;
+      }
+      entries.sort((a,b) => b.date.localeCompare(a.date));
+      persist(); render();
+      // 불러온 기록을 클라우드에도 올려 다른 기기와 맞춤
+      entries.forEach(e => cloudSave(e));
+      alert('불러왔어요. 총 ' + entries.length + '일의 기록이 있어요.');
+    } catch(err){
+      alert('이 파일을 읽을 수 없어요. 하루 한 줄에서 저장한 백업 파일인지 확인해 주세요.');
+    }
+    importFile.value = '';
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
