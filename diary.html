@@ -650,14 +650,7 @@ document.getElementById('todayLabel').textContent =
   now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일 (' + DOW[now.getDay()] + ')';
 document.getElementById('entryDate').value = now.toISOString().slice(0,10);
 
-// quote of the day — 날짜 기준으로 매일 하나씩
-(function(){
-  const start = new Date(now.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((now - start) / 86400000);
-  const q = QUOTES[dayOfYear % QUOTES.length];
-  document.getElementById('quoteText').textContent = q[0];
-  document.getElementById('quoteAuthor').textContent = '— ' + q[1];
-})();
+
 
 // moods
 document.querySelectorAll('.mood').forEach(el => {
