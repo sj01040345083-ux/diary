@@ -1,5 +1,6 @@
 authScreen
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -1004,8 +1005,8 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.access_token && saved.email && saved.user_id){
       accessToken = saved.access_token;
-      currentUser = { id: saved.user_id, email: saved.email };\n      enterApp(saved.email);
-    }
+currentUser = { id: saved.user_id, email: saved.email };
+        enterApp(saved.email);    }
   } catch(e){}
 })();
 </script>
