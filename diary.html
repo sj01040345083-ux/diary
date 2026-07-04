@@ -1006,6 +1006,7 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     if (saved && saved.access_token && saved.email && saved.user_id){
 currentUser = { id: saved.user_id, email: saved.email };
       enterApp(saved.email);
+    }     
   } catch(e){}
 })();
 </script>
