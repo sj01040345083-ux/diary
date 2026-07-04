@@ -1,0 +1,288 @@
+/* ─────────────────────────────────────────────
+   로그인 / 회원가입 화면 전용 스타일
+   ───────────────────────────────────────────── */
+
+/* 전체 배경 (숲 이미지 + 따뜻한 반투명 덮개) */
+.auth-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* 배경 위에 크림색 막을 덮어 글자가 잘 보이게 함 */
+.auth-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    155deg,
+    rgba(248, 243, 231, 0.9) 0%,
+    rgba(238, 244, 231, 0.86) 100%
+  );
+  backdrop-filter: blur(2px);
+}
+
+/* 로그인 카드 */
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 2.5rem 2.25rem 2.25rem;
+  animation: card-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 상단 로고/이름 영역 */
+.auth-brand {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.auth-logo {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 0.85rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  font-size: 1.6rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.auth-title {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* 이름 아래 짧은 부제 (한글이 편안하게 보이도록 자간을 넓히지 않음) */
+.auth-subtitle {
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  margin: 0.35rem 0 0;
+}
+
+/* 폼 */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  padding-left: 0.15rem;
+}
+
+.field input {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.field input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* 입력 필드 포커스 시 부드러운 색 변화 */
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--paper-2);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* 오류가 있는 입력 필드 */
+.field input.has-error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 4px var(--danger-soft);
+}
+
+/* 오류 메시지 */
+.field-error {
+  font-size: 0.8rem;
+  color: var(--danger);
+  padding-left: 0.15rem;
+  min-height: 0.9rem;
+}
+
+/* 체크박스(동의) 줄 */
+.field-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.field-check input {
+  margin-top: 0.2rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* 메인 버튼 (로그인/가입 — 가장 강조) */
+.btn-primary {
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-soft);
+  margin-top: 0.35rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+/* 버튼 클릭 시 자연스러운 눌림 애니메이션 */
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* 로딩 스피너 */
+.spinner {
+  display: inline-block;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 2.5px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: -0.2rem;
+  margin-right: 0.4rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 하단 링크 영역 */
+.auth-foot {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.link-btn {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--accent-strong);
+  font-weight: 700;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-btn:hover {
+  color: var(--accent);
+}
+
+/* 비밀번호 찾기 링크 (로그인 화면) */
+.auth-forgot {
+  text-align: right;
+  margin-top: -0.4rem;
+}
+
+.auth-forgot .link-btn {
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+/* 안내 문구 (미리보기 알림 등) */
+.auth-notice {
+  margin: 0.4rem 0 0;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.86rem;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 구분선 */
+.auth-divider {
+  height: 1px;
+  background: var(--line-soft);
+  margin: 1.5rem 0 0;
+}
+
+/* 임시 홈 화면 설명 문구 */
+.home-desc {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+
+/* 카드 맨 아래 슬로건 — 작고 옅은 색으로 은은하게 */
+.auth-slogan {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+  line-height: 1.55;
+  opacity: 0.85;
+}
