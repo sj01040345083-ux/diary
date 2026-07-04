@@ -1004,9 +1004,8 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   try {
     const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
     if (saved && saved.access_token && saved.email && saved.user_id){
-      accessToken = saved.access_token;
 currentUser = { id: saved.user_id, email: saved.email };
-        enterApp(saved.email);    }
+      enterApp(saved.email);
   } catch(e){}
 })();
 </script>
