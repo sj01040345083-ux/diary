@@ -998,16 +998,15 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   authEmail.value = ''; authPassword.value = '';
   setAuthMode('login');
 });
-
 // 이전에 로그인했으면 자동으로 이어서 열기
 (function restoreSession(){
   try {
     const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
-    if (saved && saved.access_token && saved.email && saved.user_id){
-currentUser = { id: saved.user_id, email: saved.email };
+    if (saved && saved.access_token && saved.email && saved.user_id) {
+      currentUser = { id: saved.user_id, email: saved.email };
       enterApp(saved.email);
-    }     
-  } catch(e){}
+    }
+  } catch (e) {}
 })();
 </script>
 </body>
