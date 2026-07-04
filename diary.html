@@ -1,56 +1,75 @@
+authScreen
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>하루 한 줄 — 일기 가계부</title>
+<title>마음 한 줄 (A Line a Day)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f7f3e9;
-    --paper-2: #fffdf7;
-    --ink: #3a352c;
-    --ink-soft: #6f685a;
-    --ink-faint: #a39b88;
-    --line: #e4ddca;
-    --line-soft: #efe9d8;
-    --accent: #c4622d;
-    --accent-soft: #f0d9c4;
+    --paper: #f6f3eb;
+    --paper-2: #fffdf8;
+    --ink: #314437;
+    --ink-soft: #5f6e61;
+    --ink-faint: #8a9886;
+    --line: #dfe8d8;
+    --line-soft: #edf3e8;
+    --accent: #5d8b4b;
+    --accent-soft: #e8f2df;
+    --accent-strong: #426c35;
     --teal: #4a7a6f;
-    --teal-soft: #d9e8e2;
-    --rule: #d8cfb6;
-    --radius: 14px;
-    --shadow: 0 1px 2px rgba(58,53,44,.05), 0 8px 24px rgba(58,53,44,.06);
+    --teal-soft: #dfeee8;
+    --rule: #d8dfcf;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(49,68,55,.06), 0 10px 24px rgba(49,68,55,.08);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: 'Gowun Dodum', sans-serif;
-    background: var(--paper);
+    font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, #f8f3e7 0%, #eef4e7 100%);
     color: var(--ink);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
-    padding: 0 0 4rem;
+    padding: 0 0 5rem;
   }
-  .wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url('forest3.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+    opacity: 0.16;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(248, 243, 231, 0.82);
+    z-index: -1;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px 2rem; }
 
   header {
     text-align: center;
-    padding: 3rem 20px 2rem;
+    padding: 2.5rem 20px 1.3rem;
   }
   header .date-today {
     font-family: 'Gaegu', cursive;
     font-size: 17px;
     color: var(--accent);
     letter-spacing: .5px;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
   }
   header h1 {
     font-family: 'Gaegu', cursive;
     font-weight: 700;
-    font-size: 44px;
+    font-size: 42px;
     margin: 0;
     color: var(--ink);
     line-height: 1.1;
@@ -63,22 +82,25 @@
   }
 
   .card {
-    background: var(--paper-2);
+    background: rgba(255,253,248,.92);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 22px 24px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
   }
   .card-title {
     font-family: 'Gaegu', cursive;
     font-weight: 700;
     font-size: 22px;
-    margin: 0 0 16px;
+    margin: 0 0 15px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
+  .section-label { font-size: 13px; font-weight: 700; color: var(--accent); margin: 0 0 6px; letter-spacing: .02em; }
+  .subtle-note { font-size: 13px; color: var(--ink-soft); margin: -2px 0 12px; }
 
   label.fld { display: block; font-size: 13px; color: var(--ink-soft); margin: 0 0 6px; }
   input, textarea, select, button {
@@ -90,8 +112,8 @@
     width: 100%;
     background: var(--paper);
     border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 9px 12px;
+    border-radius: 10px;
+    padding: 10px 12px;
     transition: border-color .15s, box-shadow .15s;
   }
   input:focus, textarea:focus, select:focus {
@@ -101,19 +123,20 @@
   }
   textarea { resize: vertical; line-height: 1.7; }
 
-  .moods { display: flex; gap: 7px; margin-bottom: 16px; }
+  .moods { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: wrap; }
   .mood {
-    flex: 1; cursor: pointer;
+    flex: 1 1 48px; cursor: pointer;
     background: var(--paper);
     border: 1px solid var(--line);
-    border-radius: 9px;
+    border-radius: 12px;
     padding: 8px 0;
-    font-size: 22px;
+    font-size: 21px;
     text-align: center;
     transition: transform .12s, border-color .15s, background .15s;
+    min-width: 46px;
   }
   .mood:hover { transform: translateY(-2px); }
-  .mood.on { border-color: var(--accent); background: var(--accent-soft); }
+  .mood.on { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.04); }
 
   .exp-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
   .exp-row .exp-cat { flex: 0 0 96px; }
@@ -133,28 +156,29 @@
     border: 1px solid var(--line);
     background: var(--paper);
     color: var(--ink-soft);
-    border-radius: 9px;
+    border-radius: 999px;
     padding: 9px 14px;
     font-size: 14px;
     transition: background .15s, border-color .15s, color .15s;
   }
-  .btn:hover { border-color: var(--ink-faint); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
   .btn-ghost { width: 100%; margin-bottom: 16px; }
   .btn-save {
     width: 100%;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--teal) 100%);
     border-color: var(--accent);
     color: #fff;
     font-family: 'Gaegu', cursive;
     font-weight: 700;
     font-size: 18px;
-    padding: 11px;
+    padding: 12px;
+    box-shadow: 0 10px 22px rgba(93,139,75,.2);
   }
-  .btn-save:hover { background: #ad5526; }
+  .btn-save:hover { filter: brightness(1.03); color: #fff; }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
   .stat {
-    background: var(--paper-2);
+    background: rgba(255,253,248,.9);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 16px;
@@ -170,10 +194,10 @@
   .feed-head h2 {
     font-family: 'Gaegu', cursive; font-weight: 700; font-size: 24px; margin: 0;
   }
-  .feed-head .month-pick { font-size: 13px; color: var(--ink-soft); border: 1px solid var(--line); background: var(--paper-2); border-radius: 8px; padding: 6px 10px; width: auto; }
+  .feed-head .month-pick { font-size: 13px; color: var(--ink-soft); border: 1px solid var(--line); background: var(--paper-2); border-radius: 999px; padding: 6px 10px; width: auto; }
 
   .entry {
-    background: var(--paper-2);
+    background: rgba(255,253,248,.92);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -196,6 +220,11 @@
     padding: 4px 0 2px;
     background-image: repeating-linear-gradient(transparent, transparent 30px, var(--line-soft) 30px, var(--line-soft) 31px);
   }
+  .entry .e-gratitude {
+    font-family: 'Gowun Batang', serif;
+    font-size: 15px; line-height: 1.8; color: var(--ink-soft);
+    margin-top: 8px; padding: 8px 10px; border-left: 3px solid var(--accent-soft); background: rgba(232,242,223,.5); border-radius: 8px;
+  }
   .entry .e-exp { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 12px; }
   .e-exp .row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding: 3px 0; color: var(--ink-soft); }
   .e-exp .row .left { display: flex; align-items: center; gap: 8px; }
@@ -210,25 +239,125 @@
 
   .footer-note { text-align: center; font-size: 12px; color: var(--ink-faint); margin-top: 30px; }
 
+  .auth-wrap { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card {
+    background: rgba(255,253,248,.95); border: 1px solid var(--line);
+    border-radius: 18px; box-shadow: var(--shadow);
+    padding: 34px 30px; width: 100%; max-width: 380px;
+  }
+  .auth-brand {
+    font-family: 'Gaegu', cursive; font-weight: 700; font-size: 34px;
+    text-align: center; color: var(--ink);
+  }
+  .auth-sub {
+    font-family: 'Gowun Batang', serif; text-align: center;
+    color: var(--ink-soft); font-size: 14px; margin: 6px 0 24px;
+  }
+  .auth-error { color: #b0361f; font-size: 13px; margin-bottom: 12px; min-height: 18px; line-height: 1.5; }
+  .auth-toggle { text-align: center; margin-top: 16px; font-size: 13px; color: var(--ink-soft); }
+  .auth-toggle button {
+    background: none; border: none; color: var(--accent);
+    font-family: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0 0 0 4px;
+  }
+  .userbar { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; font-size: 13px; color: var(--ink-soft); }
+  .userbar button { padding: 5px 12px; font-size: 13px; }
+
+  #homeSection .quote-card,
+  #homeSection .card {
+    position: relative;
+    z-index: 1;
+  }
+  #homeSection {
+    position: relative;
+  }
+  #homeSection::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    background-image: url('forest1.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.18;
+    filter: saturate(0.95);
+  }
+  #homeSection::after {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    background: rgba(248, 243, 231, 0.82);
+    border-radius: 24px;
+    z-index: -1;
+  }
+  #historySection {
+    position: relative;
+  }
+  #historySection::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background-image: url('forest2.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.16;
+    filter: saturate(0.95);
+  }
+  #historySection::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background: rgba(248, 243, 231, 0.82);
+    border-radius: 24px;
+    z-index: -1;
+  }
+  #settingsSection,
+  #reportSection {
+    position: relative;
+  }
+  #settingsSection::before,
+  #reportSection::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    background-image: url('forest3.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.14;
+    filter: saturate(0.95);
+  }
+  #settingsSection::after,
+  #reportSection::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    background: rgba(248, 243, 231, 0.82);
+    border-radius: 24px;
+    z-index: -1;
+  }
   .quote-card {
-    background: linear-gradient(160deg, #4a7a6f 0%, #3f6c61 100%);
+    background: linear-gradient(135deg, #7aa66c 0%, #5d8b4b 100%);
     color: #fdfcf5;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 26px 28px 24px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
     position: relative;
     overflow: hidden;
   }
   .quote-card .quote-mark {
     font-family: 'Gowun Batang', serif;
     position: absolute; top: -18px; left: 14px;
-    font-size: 110px; color: rgba(255,255,255,.13);
+    font-size: 110px; color: rgba(255,255,255,.14);
     line-height: 1;
   }
   .quote-text {
     font-family: 'Gowun Batang', serif;
-    font-size: 18px; line-height: 1.85; margin: 0;
+    font-size: 17px; line-height: 1.8; margin: 0;
     position: relative; word-break: keep-all;
   }
   .quote-author {
@@ -237,11 +366,34 @@
     color: rgba(253,252,245,.85);
   }
 
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 12px 16px 16px;
+    margin-top: 24px;
+    background: rgba(246,243,235,.9);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(223,232,216,.8);
+  }
+  .nav-pill {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 6px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .nav-pill.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
+
   .card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
   .edit-banner {
     display: none; align-items: center; justify-content: space-between;
     background: var(--accent-soft); color: var(--accent);
-    border-radius: 9px; padding: 8px 12px; margin-bottom: 14px; font-size: 13px;
+    border-radius: 10px; padding: 8px 12px; margin-bottom: 14px; font-size: 13px;
   }
   .card.editing .edit-banner { display: flex; }
   .edit-banner button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 13px; text-decoration: underline; padding: 0; }
@@ -250,7 +402,7 @@
   .e-edit:hover { color: var(--teal); }
   .e-actions { display: flex; align-items: center; }
 
-  .backup { display: flex; gap: 12px; margin-top: 34px; }
+  .backup { display: flex; gap: 12px; margin-top: 24px; }
   .btn-backup {
     flex: 1; padding: 12px; font-size: 14px;
     background: var(--paper-2); color: var(--ink-soft);
@@ -265,161 +417,236 @@
     .exp-row .exp-cat { flex: 1 1 90px; }
     .exp-row .exp-name { flex: 1 1 120px; }
     .exp-row .exp-amt { flex: 1 1 90px; }
+    .bottom-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); font-size: 12px; }
   }
 </style>
 </head>
 <body>
+
+<div id="authScreen" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-brand">마음 한 줄</div>
+    <p class="auth-sub" id="authSub">오늘의 감정을 한 줄로 남기고, 마음을 천천히 정리해보세요</p>
+    <label class="fld">이메일</label>
+    <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="username" style="margin-bottom:14px">
+    <label class="fld">비밀번호</label>
+    <input type="password" id="authPassword" placeholder="6자 이상" autocomplete="current-password" style="margin-bottom:18px">
+    <div id="authError" class="auth-error"></div>
+    <button class="btn btn-save" id="authSubmit" style="width:100%">로그인</button>
+    <div class="auth-toggle">
+      <span id="authToggleText">계정이 없으신가요?</span>
+      <button id="authToggle">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen" style="display:none;">
 <header>
   <div class="date-today" id="todayLabel"></div>
-  <h1>하루 한 줄</h1>
-  <p>오늘의 마음과 씀씀이를 한자리에</p>
+  <h1>마음 한 줄 (A Line a Day)</h1>
+  <p>오늘의 감정, 한 줄의 기록, 그리고 작은 소비를 함께 남겨보세요.</p>
+  <div class="userbar">
+    <span id="userEmail"></span>
+    <button class="btn" id="logoutBtn"><i class="ti ti-logout" style="font-size:14px;vertical-align:-2px"></i> 로그아웃</button>
+  </div>
 </header>
 
 <div class="wrap">
-
-  <div class="quote-card" id="quoteCard">
-    <div class="quote-mark">“</div>
-    <p class="quote-text" id="quoteText"></p>
-    <p class="quote-author" id="quoteAuthor"></p>
-  </div>
-
-  <div class="card" id="formCard">
-    <h2 class="card-title" id="formTitle">✍️ 오늘의 기록</h2>
-
-    <div class="edit-banner" id="editBanner">
-      <span id="editBannerText">지난 기록을 수정 중이에요</span>
-      <button id="cancelEdit">새 기록으로</button>
+  <section id="homeSection">
+    <div class="quote-card" id="quoteCard">
+      <div class="quote-mark">“</div>
+      <p class="section-label" style="color: rgba(255,253,245,.8); margin-bottom:8px;">오늘의 명언</p>
+      <p class="quote-text" id="quoteText"></p>
+      <p class="quote-author" id="quoteAuthor"></p>
     </div>
 
-    <label class="fld">날짜</label>
-    <input type="date" id="entryDate" style="margin-bottom:16px">
+    <div class="card" id="formCard">
+      <h2 class="card-title" id="formTitle">🌿 오늘의 기록</h2>
 
-    <label class="fld">오늘 기분은?</label>
-    <div class="moods" id="moods">
-      <div class="mood" data-m="😄">😄</div>
-      <div class="mood" data-m="🙂">🙂</div>
-      <div class="mood" data-m="😐">😐</div>
-      <div class="mood" data-m="😔">😔</div>
-      <div class="mood" data-m="😴">😴</div>
+      <div class="edit-banner" id="editBanner">
+        <span id="editBannerText">지난 기록을 수정 중이에요</span>
+        <button id="cancelEdit">새 기록으로</button>
+      </div>
+
+      <label class="fld">오늘 날짜</label>
+      <input type="date" id="entryDate" style="margin-bottom:16px">
+
+      <label class="fld">오늘 기분은?</label>
+      <div class="moods" id="moods">
+        <div class="mood" data-m="😀">😀</div>
+        <div class="mood" data-m="😄">😄</div>
+        <div class="mood" data-m="😊">😊</div>
+        <div class="mood" data-m="😌">😌</div>
+        <div class="mood" data-m="😐">😐</div>
+        <div class="mood" data-m="😢">😢</div>
+        <div class="mood" data-m="😭">😭</div>
+        <div class="mood" data-m="😡">😡</div>
+        <div class="mood" data-m="😴">😴</div>
+        <div class="mood" data-m="😍">😍</div>
+        <div class="mood" data-m="😰">😰</div>
+      </div>
+
+      <label class="fld">오늘의 한 줄</label>
+      <textarea id="entryNote" rows="3" placeholder="오늘은 어떤 하루였나요?" style="margin-bottom:18px"></textarea>
+
+      <label class="fld">오늘 감사한 일(선택)</label>
+      <textarea id="entryGratitude" rows="2" placeholder="오늘 감사했던 일을 적어보세요." style="margin-bottom:18px"></textarea>
+
+      <div class="section-label">오늘의 소비</div>
+      <div class="subtle-note">카테고리와 금액을 함께 적으면 하루를 더 편안하게 돌아볼 수 있어요.</div>
+      <div id="expInputs"></div>
+      <button class="btn btn-ghost" id="addExp">＋ 소비 항목 추가</button>
+
+      <button class="btn btn-save" id="saveBtn">오늘 저장하기</button>
     </div>
+  </section>
 
-    <label class="fld">한 줄 일기</label>
-    <textarea id="entryNote" rows="3" placeholder="오늘 어땠나요? 짧아도 괜찮아요." style="margin-bottom:18px"></textarea>
+  <section id="reportSection">
+    <div class="stats">
+      <div class="stat"><div class="v" id="stMonth">₩0</div><div class="l">이번 달 지출</div></div>
+      <div class="stat"><div class="v" id="stDays">0일</div><div class="l">기록한 날</div></div>
+      <div class="stat"><div class="v" id="stAvg">₩0</div><div class="l">하루 평균</div></div>
+    </div>
+  </section>
 
-    <label class="fld">지출 내역</label>
-    <div id="expInputs"></div>
-    <button class="btn btn-ghost" id="addExp">＋ 항목 추가</button>
+  <section id="historySection">
+    <div class="feed-head">
+      <h2>기록 보기</h2>
+      <select class="month-pick" id="monthPick"></select>
+    </div>
+    <div id="feed"></div>
+  </section>
 
-    <button class="btn btn-save" id="saveBtn">오늘 저장하기</button>
-  </div>
+  <section id="settingsSection">
+    <div class="card">
+      <h2 class="card-title">🛟 설정과 백업</h2>
+      <div class="subtle-note">기록은 이 브라우저에 저장되고, 필요하면 백업 파일로 보관할 수 있어요.</div>
+      <div class="backup">
+        <button class="btn btn-backup" id="exportBtn">⬇ 백업 파일 저장</button>
+        <button class="btn btn-backup" id="importBtn">⬆ 백업 불러오기</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </section>
 
-  <div class="stats">
-    <div class="stat"><div class="v" id="stMonth">₩0</div><div class="l">이번 달 지출</div></div>
-    <div class="stat"><div class="v" id="stDays">0일</div><div class="l">기록한 날</div></div>
-    <div class="stat"><div class="v" id="stAvg">₩0</div><div class="l">하루 평균</div></div>
-  </div>
+  <div class="footer-note">마음 한 줄은 오늘의 기분과 소비를 가볍게 남기도록 설계된 따뜻한 기록 앱입니다.</div>
+</div>
 
-  <div class="feed-head">
-    <h2>지난 날들</h2>
-    <select class="month-pick" id="monthPick"></select>
-  </div>
-  <div id="feed"></div>
-
-  <div class="backup">
-    <button class="btn btn-backup" id="exportBtn">⬇ 백업 파일 저장</button>
-    <button class="btn btn-backup" id="importBtn">⬆ 백업 불러오기</button>
-    <input type="file" id="importFile" accept="application/json,.json" hidden>
-  </div>
-  <div class="footer-note">기록은 이 브라우저에 저장돼요 · 가끔 백업 파일을 저장해 두면 안전해요</div>
+<nav class="bottom-nav" aria-label="하단 메뉴">
+  <button class="nav-pill active" data-target="homeSection">🏠 홈</button>
+  <button class="nav-pill" data-target="historySection">📖 기록</button>
+  <button class="nav-pill" data-target="homeSection">➕ 추가</button>
+  <button class="nav-pill" data-target="reportSection">📊 리포트</button>
+  <button class="nav-pill" data-target="settingsSection">⚙ 설정</button>
+</nav>
 </div>
 
 <script>
-// ===== Supabase 자동 동기화 설정 =====
-const SUPABASE_URL = 'https://ipwsndtqmpqrmtikkevm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_JQGRMNOrBzf82vPiXy7YnA_s9GoWNVY';
-const SB_HEAD = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY,
-  'Content-Type': 'application/json'
-};
+// ===== Supabase 설정 =====
+const SUPABASE_URL = 'https://ujfvpnqojrqjxhxcyhyt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_9r-0dl_C_UY7T9AyGsg3Mg_ovJA5PS5';
 const SB_TABLE = SUPABASE_URL + '/rest/v1/diary';
+const SB_AUTH = SUPABASE_URL + '/auth/v1';
 
-// 클라우드에 한 건 저장(있으면 덮어쓰기)
+// 로그인한 사용자의 토큰(로그인하면 채워짐)
+let accessToken = null;
+let currentUser = null;
+
+// 로그인 상태에서 쓰는 헤더
+function authHead(){
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + (accessToken || SUPABASE_KEY),
+    'Content-Type': 'application/json'
+  };
+}
+
+// ----- 인증(로그인/회원가입) -----
+async function signUp(email, password){
+  const res = await fetch(SB_AUTH + '/signup', {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || data.error_description || data.error || '가입에 실패했어요.');
+  return data;
+}
+async function signIn(email, password){
+  const res = await fetch(SB_AUTH + '/token?grant_type=password', {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || data.error_description || data.error || '로그인에 실패했어요.');
+  return data;
+}
+
+// ----- 클라우드 데이터(로그인 토큰 사용) -----
 async function cloudSave(entry){
   try {
+    const payload = { ...entry, user_id: currentUser.id };
     await fetch(SB_TABLE, {
       method: 'POST',
-      headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify(entry)
+      headers: { ...authHead(), 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify(payload)
     });
-  } catch(e){ /* 오프라인이면 로컬에만 남음 */ }
+  } catch(e){ console.error('cloudSave error:', e); }
 }
-// 클라우드에서 한 건 삭제
 async function cloudDelete(date){
   try {
-    await fetch(SB_TABLE + '?date=eq.' + encodeURIComponent(date), {
-      method: 'DELETE', headers: SB_HEAD
+    // user_id와 date로 필터링해서 삭제 (RLS에 의해 자동으로 본인 데이터만 삭제됨)
+    await fetch(SB_TABLE + '?date=eq.' + encodeURIComponent(date) + '&user_id=eq.' + encodeURIComponent(currentUser.id), {
+      method: 'DELETE', headers: authHead()
     });
-  } catch(e){}
+  } catch(e){ console.error('cloudDelete error:', e); }
 }
-// 클라우드에서 전체 불러오기
 async function cloudLoadAll(){
   try {
-    const res = await fetch(SB_TABLE + '?select=*', { headers: SB_HEAD });
+    // 사용자 본인의 데이터만 로드 (user_id로 필터링)
+    const res = await fetch(SB_TABLE + '?user_id=eq.' + encodeURIComponent(currentUser.id) + '&select=*', { headers: authHead() });
     if (!res.ok) return null;
     return await res.json();
-  } catch(e){ return null; }
+  } catch(e){ console.error('cloudLoadAll error:', e); return null; }
 }
 
-const KEY = 'haru_diary_v1';
-const CATS = ['식비','교통','생활','쇼핑','여가','건강','기타'];
-let entries = load();
+let userKey = null; // 로그인한 사용자별 로컬 저장 키
+const CATS = ['식비','교통','쇼핑','카페','문화','병원','생활','취미','기타'];
+let entries = [];
 let mood = '';
 let editingDate = null;
+let quotesData = []; // 외부 quotes.json에서 로드할 명언 데이터
 
-const QUOTES = [
-  ['행복은 이미 가진 것을 충분히 누리는 데 있지, 더 많이 갖는 데 있지 않다.', '에피쿠로스'],
-  ['오늘 할 수 있는 일에 전력을 다하면 내일은 한 걸음 나아가 있다.', '아이작 뉴턴'],
-  ['우리가 반복하는 것이 곧 우리 자신이다. 탁월함은 행위가 아니라 습관이다.', '아리스토텔레스'],
-  ['가장 큰 영광은 한 번도 넘어지지 않는 것이 아니라 넘어질 때마다 일어서는 것이다.', '공자'],
-  ['작은 일을 꾸준히 하는 사람이 큰일을 해낸다.', '벤저민 프랭클린'],
-  ['바꿀 수 없는 것은 받아들이고, 바꿀 수 있는 것에 용기를 내라.', '라인홀드 니버'],
-  ['지나간 일에 마음을 두지 말고, 오지 않은 일에 미리 애태우지 마라.', '장자'],
-  ['천 리 길도 한 걸음에서 시작된다.', '노자'],
-  ['삶이 있는 한 희망은 있다.', '키케로'],
-  ['남과 비교하는 순간 평온은 사라진다. 어제의 나하고만 견주어라.', '톨스토이'],
-  ['검소함은 큰 수입과 같다. 아끼는 만큼 버는 것이다.', '키케로'],
-  ['하루를 잘 보낸 뒤의 잠이 달듯, 잘 산 인생 끝의 죽음도 편안하다.', '레오나르도 다 빈치'],
-  ['친절은 귀머거리도 듣고 장님도 볼 수 있는 말이다.', '마크 트웨인'],
-  ['완벽을 기다리지 마라. 시작이 완성으로 가는 유일한 길이다.', '괴테'],
-  ['돈을 잃으면 조금 잃은 것이고, 마음을 잃으면 많이 잃은 것이다.', '서양 속담'],
-  ['감사할 줄 아는 마음은 가장 작은 부도 가장 큰 풍요로 바꾼다.', '이솝'],
-  ['고요한 물이 깊다. 조용한 사람의 내면이 가장 단단하다.', '서양 격언'],
-  ['오늘 뿌린 씨앗이 내일의 그늘을 만든다.', '인도 속담'],
-  ['걱정은 내일의 슬픔을 덜어주지 않고 오늘의 힘만 앗아간다.', '레오 버스카글리아'],
-  ['배움에는 끝이 없고, 그래서 삶은 늘 새롭다.', '공자'],
-  ['행복은 습관이다. 그것을 몸에 지녀라.', '허버드'],
-  ['지혜로운 이는 더 많이 가진 자가 아니라 더 적게 바라는 자다.', '소크라테스'],
-  ['실패는 넘어지는 것이 아니라 넘어진 자리에 머무는 것이다.', '메리 픽포드'],
-  ['오늘이라는 선물, 그래서 우리는 그것을 present라 부른다.', '앨리스 모스 얼'],
-  ['작은 절약이 모여 든든한 내일이 된다.', '벤저민 프랭클린'],
-  ['말은 적게, 행동은 많이.', '서양 격언'],
-  ['남을 아는 것은 지혜이고, 자신을 아는 것은 밝음이다.', '노자'],
-  ['좋은 책 한 권은 좋은 친구 한 명과 같다.', '서양 속담'],
-  ['느리게 가도 괜찮다. 멈추지만 않으면 된다.', '공자'],
-  ['오늘 누군가 그늘에 앉아 쉴 수 있는 건, 오래전 누군가 나무를 심었기 때문이다.', '워런 버핏'],
-  ['마음이 평온하면 어디에 있든 그곳이 안식처다.', '동양 격언']
-];
+// quotes.json에서 명언 로드
+async function loadQuotes() {
+  try {
+    const res = await fetch('quotes.json');
+    const data = await res.json();
+    quotesData = data.quotes || [];
+  } catch (e) {
+    console.error('Failed to load quotes:', e);
+  }
+}
 
-function load(){ try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e){ return []; } }
-function persist(){ try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch(e){} }
+function displayQuoteOfDay() {
+  if (quotesData.length === 0) return;
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  const q = quotesData[dayOfYear % quotesData.length];
+  document.getElementById('quoteText').textContent = q.text;
+  document.getElementById('quoteAuthor').textContent = '— ' + q.author;
+}
+
+function load(){ try { return userKey ? JSON.parse(localStorage.getItem(userKey) || '[]') : []; } catch(e){ return []; } }
+function persist(){ try { if (userKey) localStorage.setItem(userKey, JSON.stringify(entries)); } catch(e){} }
 const won = n => '₩' + Math.round(n).toLocaleString('ko-KR');
 const DOW = ['일','월','화','수','목','금','토'];
 
 // header + default date
 const now = new Date();
 document.getElementById('todayLabel').textContent =
-  now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0');
+  now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일 (' + DOW[now.getDay()] + ')';
 document.getElementById('entryDate').value = now.toISOString().slice(0,10);
 
 // quote of the day — 날짜 기준으로 매일 하나씩
@@ -464,6 +691,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   const date = document.getElementById('entryDate').value;
   if (!date){ alert('날짜를 선택해 주세요.'); return; }
   const note = document.getElementById('entryNote').value.trim();
+  const gratitude = document.getElementById('entryGratitude').value.trim();
   const expenses = [];
   expWrap.querySelectorAll('.exp-row').forEach(r => {
     const cat = r.querySelector('.exp-cat').value;
@@ -471,14 +699,14 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     const a = parseFloat(r.querySelector('.exp-amt').value);
     if (name || a) expenses.push({ cat, name: name || cat, amount: isNaN(a) ? 0 : a });
   });
-  if (!note && !expenses.length && !mood){ alert('기분, 일기, 지출 중 하나는 적어주세요.'); return; }
+  if (!note && !gratitude && !expenses.length && !mood){ alert('기분, 한 줄 일기, 감사한 일, 또는 소비 중 하나는 적어주세요.'); return; }
   // 수정 중 날짜를 바꿨다면 원래 날짜 기록을 옮기는 형태
   if (editingDate && editingDate !== date){
     entries = entries.filter(e => e.date !== editingDate);
     cloudDelete(editingDate);
   }
   entries = entries.filter(e => e.date !== date);
-  const newEntry = { date, mood, note, expenses };
+  const newEntry = { date, mood, note, gratitude, expenses };
   entries.push(newEntry);
   entries.sort((a,b) => b.date.localeCompare(a.date));
   persist();
@@ -487,6 +715,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   if (editingDate) exitEditMode();
   else {
     document.getElementById('entryNote').value = '';
+    document.getElementById('entryGratitude').value = '';
     mood = '';
     document.querySelectorAll('.mood').forEach(x => x.classList.remove('on'));
     expWrap.innerHTML = ''; addExpRow();
@@ -537,6 +766,7 @@ function render(){
       '<span class="e-actions"><button class="e-edit" data-e="'+e.date+'" title="수정">✎</button>'+
       '<button class="e-del" data-d="'+e.date+'" title="삭제">🗑</button></span></div>'+
       (e.note ? '<div class="e-note">'+esc(e.note)+'</div>' : '')+
+      (e.gratitude ? '<div class="e-gratitude">🌼 '+esc(e.gratitude)+'</div>' : '')+
       (e.expenses.length ? '<div class="e-exp">'+exps+'<div class="total"><span>합계</span><span>'+won(t)+'</span></div></div>' : '')+
     '</div>';
   }).join('');
@@ -554,27 +784,23 @@ function render(){
   }));
 }
 monthPick.addEventListener('change', render);
-render();
 
-// ---- 시작 시 클라우드에서 최신 기록 가져와 병합 ----
+// ---- 클라우드에서 최신 기록 가져와 병합 ----
 async function syncFromCloud(){
   const remote = await cloudLoadAll();
-  if (!remote) return; // 오프라인이거나 실패하면 로컬 그대로 사용
+  if (!remote) return;
   const byDate = {};
-  // 로컬 먼저 깔고, 클라우드 값으로 덮어써 최신 반영
   entries.forEach(e => byDate[e.date] = e);
   remote.forEach(e => byDate[e.date] = {
-    date: e.date, mood: e.mood || '', note: e.note || '',
+    date: e.date, mood: e.mood || '', note: e.note || '', gratitude: e.gratitude || '',
     expenses: Array.isArray(e.expenses) ? e.expenses : []
   });
-  // 로컬에만 있고 클라우드엔 없던 기록은 클라우드로 올려줌
   const remoteDates = new Set(remote.map(e => e.date));
   entries.forEach(e => { if (!remoteDates.has(e.date)) cloudSave(e); });
   entries = Object.values(byDate).sort((a,b) => b.date.localeCompare(a.date));
   persist();
   render();
 }
-syncFromCloud();
 
 const formCard = document.getElementById('formCard');
 const formTitle = document.getElementById('formTitle');
@@ -585,6 +811,7 @@ function loadIntoForm(date){
   if (!e) return;
   document.getElementById('entryDate').value = e.date;
   document.getElementById('entryNote').value = e.note || '';
+  document.getElementById('entryGratitude').value = e.gratitude || '';
   mood = e.mood || '';
   document.querySelectorAll('.mood').forEach(x =>
     x.classList.toggle('on', !!mood && x.dataset.m === mood));
@@ -608,11 +835,21 @@ function exitEditMode(){
   saveBtn.textContent = '오늘 저장하기';
   document.getElementById('entryDate').value = now.toISOString().slice(0,10);
   document.getElementById('entryNote').value = '';
+  document.getElementById('entryGratitude').value = '';
   mood = '';
   document.querySelectorAll('.mood').forEach(x => x.classList.remove('on'));
   expWrap.innerHTML = ''; addExpRow();
 }
 document.getElementById('cancelEdit').addEventListener('click', exitEditMode);
+
+document.querySelectorAll('.nav-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-pill').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 
 // ---- backup: export / import ----
 document.getElementById('exportBtn').addEventListener('click', () => {
@@ -664,6 +901,113 @@ importFile.addEventListener('change', () => {
   };
   reader.readAsText(file);
 });
+
+// ================= 로그인 화면 로직 =================
+let authMode = 'login'; // 'login' 또는 'signup'
+const SESSION_KEY = 'haru_session_v1';
+
+const authScreen = document.getElementById('authScreen');
+const appScreen = document.getElementById('appScreen');
+const authEmail = document.getElementById('authEmail');
+const authPassword = document.getElementById('authPassword');
+const authError = document.getElementById('authError');
+const authSubmit = document.getElementById('authSubmit');
+
+function setAuthMode(mode){
+  authMode = mode;
+  authError.textContent = '';
+  if (mode === 'login'){
+    authSubmit.textContent = '로그인';
+    document.getElementById('authSub').textContent = '로그인해서 오늘의 감정과 마음을 기록하세요';
+    document.getElementById('authToggleText').textContent = '계정이 없으신가요?';
+    document.getElementById('authToggle').textContent = '회원가입';
+    authPassword.setAttribute('autocomplete', 'current-password');
+  } else {
+    authSubmit.textContent = '회원가입';
+    document.getElementById('authSub').textContent = '이메일과 비밀번호로 새 계정을 만들어요';
+    document.getElementById('authToggleText').textContent = '이미 계정이 있으신가요?';
+    document.getElementById('authToggle').textContent = '로그인';
+    authPassword.setAttribute('autocomplete', 'new-password');
+  }
+}
+document.getElementById('authToggle').addEventListener('click', () => {
+  setAuthMode(authMode === 'login' ? 'signup' : 'login');
+});
+
+async function doAuth(){
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+  authError.textContent = '';
+  if (!email || !password){ authError.textContent = '이메일과 비밀번호를 모두 입력해 주세요.'; return; }
+  if (password.length < 6){ authError.textContent = '비밀번호는 6자 이상이어야 해요.'; return; }
+  authSubmit.disabled = true;
+  authSubmit.textContent = '잠시만요…';
+  try {
+    let session;
+    if (authMode === 'signup'){
+      const data = await signUp(email, password);
+      session = data.access_token ? data : await signIn(email, password);
+    } else {
+      session = await signIn(email, password);
+    }
+    if (!session.access_token) throw new Error('로그인 정보를 받지 못했어요.');
+    startSession(session);
+  } catch(err){
+    let msg = err.message || '문제가 생겼어요.';
+    if (/invalid login/i.test(msg)) msg = '이메일 또는 비밀번호가 맞지 않아요.';
+    if (/already registered|already been registered/i.test(msg)) msg = '이미 가입된 이메일이에요. 로그인해 주세요.';
+    authError.textContent = msg;
+  } finally {
+    authSubmit.disabled = false;
+    setAuthMode(authMode);
+  }
+}
+authSubmit.addEventListener('click', doAuth);
+authPassword.addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
+
+function startSession(session){
+  accessToken = session.access_token;
+  currentUser = session.user;
+  if (!currentUser || !currentUser.id) {
+    authError.textContent = '사용자 정보를 받지 못했어요. 다시 시도해주세요.';
+    return;
+  }
+  const email = currentUser.email || authEmail.value.trim();
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify({ access_token: session.access_token, refresh_token: session.refresh_token, email, user_id: currentUser.id })); } catch(e){}
+  enterApp(email);
+}
+
+function enterApp(email){
+  userKey = 'haru_diary_' + email;
+  entries = load();
+  authScreen.style.display = 'none';
+  appScreen.style.display = 'block';
+  document.getElementById('userEmail').textContent = email;
+  if (quotesData.length === 0) loadQuotes().then(() => displayQuoteOfDay());
+  else displayQuoteOfDay();
+  render();
+  syncFromCloud();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+  accessToken = null; currentUser = null; userKey = null; entries = [];
+  appScreen.style.display = 'none';
+  authScreen.style.display = 'flex';
+  authEmail.value = ''; authPassword.value = '';
+  setAuthMode('login');
+});
+
+// 이전에 로그인했으면 자동으로 이어서 열기
+(function restoreSession(){
+  try {
+    const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    if (saved && saved.access_token && saved.email && saved.user_id){
+      accessToken = saved.access_token;
+      currentUser = { id: saved.user_id, email: saved.email };\n      enterApp(saved.email);
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>
