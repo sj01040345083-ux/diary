@@ -7,6 +7,7 @@ import WritePage from '../pages/WritePage'
 import GratitudePage from '../pages/GratitudePage'
 import TransactionsPage from '../pages/TransactionsPage'
 import FavoritesPage from '../pages/FavoritesPage'
+import ReportPage from '../pages/ReportPage'
 import PlaceholderPage from '../pages/PlaceholderPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
@@ -63,7 +64,7 @@ export default function AppShell({ session }: Props) {
         />
       )}
       {tab === 'records' && <PlaceholderPage title="기록" />}
-      {tab === 'report' && <PlaceholderPage title="리포트" />}
+      {tab === 'report' && <ReportPage />}
       {tab === 'settings' && <PlaceholderPage title="설정" />}
 
       <TabBar active={tab} onChange={setTab} onAdd={() => setOverlay('write')} />

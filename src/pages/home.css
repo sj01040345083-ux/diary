@@ -398,6 +398,117 @@
   color: #c0674f;
 }
 
+/* ── 탭 화면 공통 헤더 (리포트·설정 등) ── */
+.tab-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.4rem;
+  background: rgba(255, 253, 248, 0.72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(220, 228, 214, 0.6);
+}
+.tab-header .write-title {
+  font-size: 1.05rem;
+}
+
+/* ── 리포트 ── */
+.report-grid {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: rgba(255, 254, 250, 0.9);
+  border: 1px solid rgba(223, 232, 216, 0.7);
+  border-radius: 18px;
+  padding: 1.1rem 0.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.stat-value {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  margin-top: 0.25rem;
+}
+
+.report-section-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin: 1.75rem 0 0.9rem;
+}
+
+.money-card {
+  background: rgba(255, 254, 250, 0.9);
+  border: 1px solid rgba(223, 232, 216, 0.7);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.mood-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+.mood-stat-row:last-child {
+  margin-bottom: 0;
+}
+.mood-stat-emoji {
+  font-size: 1.2rem;
+  width: 1.8rem;
+}
+.mood-stat-bar {
+  flex: 1;
+  height: 0.6rem;
+  background: var(--line-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mood-stat-fill {
+  display: block;
+  height: 100%;
+  background: #8aa07f;
+  border-radius: 999px;
+}
+.mood-stat-count {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  width: 2rem;
+  text-align: right;
+}
+
+.money-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+.money-row.total {
+  border-top: 1px solid var(--line-soft);
+  margin-top: 0.4rem;
+  padding-top: 0.8rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
 /* ── 일기 목록 영역 ── */
 .diary-section {
   margin-top: 2.75rem;
