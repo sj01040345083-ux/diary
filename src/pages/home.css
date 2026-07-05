@@ -505,6 +505,37 @@
   color: var(--ink);
 }
 
+/* ── 기록/검색 ── */
+.search-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: rgba(255, 254, 250, 0.95);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #8aa07f;
+  box-shadow: 0 0 0 4px rgba(232, 242, 223, 0.6);
+}
+
+.record-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  margin-right: 0.5rem;
+  letter-spacing: 0;
+}
+
 /* ── 설정: 선택 버튼 ── */
 .opt-row {
   display: flex;

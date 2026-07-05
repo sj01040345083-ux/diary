@@ -10,7 +10,7 @@ import TransactionsPage from '../pages/TransactionsPage'
 import FavoritesPage from '../pages/FavoritesPage'
 import ReportPage from '../pages/ReportPage'
 import SettingsPage from '../pages/SettingsPage'
-import PlaceholderPage from '../pages/PlaceholderPage'
+import RecordsPage from '../pages/RecordsPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
 // 아래 탭바로 화면을 오가고, 전체 화면(작성·감사일기)은 위에 덮어서 띄웁니다.
@@ -72,7 +72,7 @@ export default function AppShell({ session }: Props) {
           onFavorites={() => setOverlay('favorites')}
         />
       )}
-      {tab === 'records' && <PlaceholderPage title="기록" />}
+      {tab === 'records' && <RecordsPage />}
       {tab === 'report' && <ReportPage />}
       {tab === 'settings' && <SettingsPage session={session} />}
 
