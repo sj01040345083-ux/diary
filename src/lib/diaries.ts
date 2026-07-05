@@ -39,6 +39,12 @@ export async function getTodayDiary(): Promise<Diary | null> {
   return data
 }
 
+// 일기 하나를 삭제합니다. (보안 규칙 덕분에 내 일기만 지워집니다)
+export async function deleteDiary(id: string): Promise<void> {
+  const { error } = await supabase.from('diaries').delete().eq('id', id)
+  if (error) throw error
+}
+
 // 오늘 일기를 저장합니다.
 // 같은 날짜 일기가 이미 있으면 새로 쌓지 않고 기존 것을 수정합니다. (upsert)
 export async function saveTodayDiary(userId: string, content: string): Promise<void> {

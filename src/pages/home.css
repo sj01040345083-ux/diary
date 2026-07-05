@@ -208,12 +208,39 @@
 }
 
 .diary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
   background: rgba(255, 254, 250, 0.9);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 18px;
   box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 8px 22px rgba(49, 68, 55, 0.05);
   padding: 1.1rem 1.25rem;
   text-align: left;
+}
+
+.diary-item-main {
+  flex: 1;
+  min-width: 0; /* 긴 내용이 줄바꿈되도록 */
+}
+
+/* 각 일기의 은은한 삭제 버튼 (평소엔 옅게, 올리면 부드러운 빨강) */
+.diary-delete-btn {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.diary-delete-btn:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .diary-item-date {
@@ -313,4 +340,126 @@
   background: var(--danger-soft);
   border-radius: 14px;
   text-align: center;
+}
+
+/* ── 삭제 확인창 (모달) ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(49, 68, 55, 0.28);
+  backdrop-filter: blur(3px);
+  animation: modal-fade 0.2s ease;
+}
+
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--paper-2);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(49, 68, 55, 0.22);
+  padding: 1.75rem 1.5rem 1.5rem;
+  text-align: center;
+  animation: modal-pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.modal-title {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0 0 1rem;
+}
+
+.modal-preview {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.6;
+  text-align: left;
+  max-height: 4.8rem;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.modal-error {
+  font-size: 0.84rem;
+  color: var(--danger);
+  margin: 0 0 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.modal-btn-cancel,
+.modal-btn-delete {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.modal-btn-cancel {
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.modal-btn-cancel:hover:not(:disabled) {
+  background: #eef3e8;
+}
+
+.modal-btn-delete {
+  color: #fff;
+  background: var(--danger);
+  border: none;
+}
+
+.modal-btn-delete:hover:not(:disabled) {
+  background: #a9573f;
+}
+
+.modal-btn-cancel:disabled,
+.modal-btn-delete:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

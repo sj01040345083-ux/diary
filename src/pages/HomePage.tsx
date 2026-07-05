@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
 import { formatToday, getTodaysQuote, formatEntryDate } from '../lib/today'
-import { getMyDiaries } from '../lib/diaries'
+import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import Header from '../components/Header'
 import './home.css'
@@ -24,6 +24,11 @@ export default function HomePage({ session, onWrite }: Props) {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loadingDiaries, setLoadingDiaries] = useState(true)
 
+  // 삭제 확인창 상태
+  const [confirmTarget, setConfirmTarget] = useState<Diary | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
   useEffect(() => {
     // 홈 화면이 열릴 때 내 일기 목록을 불러옵니다.
     getMyDiaries()
@@ -31,6 +36,22 @@ export default function HomePage({ session, onWrite }: Props) {
       .catch(() => setDiaries([]))
       .finally(() => setLoadingDiaries(false))
   }, [])
+
+  async function handleDelete() {
+    if (!confirmTarget) return
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      await deleteDiary(confirmTarget.id)
+      // 화면 목록에서도 제거
+      setDiaries((prev) => prev.filter((d) => d.id !== confirmTarget.id))
+      setConfirmTarget(null)
+    } catch {
+      setDeleteError('삭제에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
     <div
@@ -77,14 +98,59 @@ export default function HomePage({ session, onWrite }: Props) {
             <div className="diary-list">
               {diaries.map((d) => (
                 <article key={d.id} className="diary-item">
-                  <p className="diary-item-date">{formatEntryDate(d.entry_date)}</p>
-                  <p className="diary-item-content">{d.content}</p>
+                  <div className="diary-item-main">
+                    <p className="diary-item-date">{formatEntryDate(d.entry_date)}</p>
+                    <p className="diary-item-content">{d.content}</p>
+                  </div>
+                  <button
+                    className="diary-delete-btn"
+                    onClick={() => {
+                      setDeleteError('')
+                      setConfirmTarget(d)
+                    }}
+                    aria-label="일기 삭제"
+                  >
+                    삭제
+                  </button>
                 </article>
               ))}
             </div>
           )}
         </section>
       </main>
+
+      {/* 삭제 확인창 (모달) */}
+      {confirmTarget && (
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            if (!deleting) setConfirmTarget(null)
+          }}
+        >
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">일기를 삭제할까요?</h3>
+            <p className="modal-desc">삭제한 일기는 되돌릴 수 없어요.</p>
+            <p className="modal-preview">“{confirmTarget.content}”</p>
+            {deleteError && <p className="modal-error">{deleteError}</p>}
+            <div className="modal-actions">
+              <button
+                className="modal-btn-cancel"
+                onClick={() => setConfirmTarget(null)}
+                disabled={deleting}
+              >
+                취소
+              </button>
+              <button
+                className="modal-btn-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? '삭제 중…' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
