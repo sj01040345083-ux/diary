@@ -4,6 +4,11 @@ import { authBackground } from '../config/backgrounds'
 import { formatToday, getTodaysQuote, formatEntryDate } from '../lib/today'
 import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
+import {
+  isFavorited,
+  addFavorite,
+  removeFavoriteByQuoteId,
+} from '../lib/favorites'
 import Header from '../components/Header'
 import './home.css'
 
@@ -13,6 +18,7 @@ type Props = {
   onWrite: () => void // "오늘 일기 쓰기" 버튼 → 작성 화면으로
   onGratitude: () => void // "감사일기" 바로가기
   onTransactions: () => void // "소비·수입" 바로가기
+  onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
 }
 
 export default function HomePage({
@@ -20,6 +26,7 @@ export default function HomePage({
   onWrite,
   onGratitude,
   onTransactions,
+  onFavorites,
 }: Props) {
   // 가입 때 저장한 이름이 있으면 이름을, 없으면 이메일을 사용합니다.
   const name =
@@ -30,6 +37,10 @@ export default function HomePage({
 
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loadingDiaries, setLoadingDiaries] = useState(true)
+
+  // 오늘의 명언 즐겨찾기 상태
+  const [isFav, setIsFav] = useState(false)
+  const [favBusy, setFavBusy] = useState(false)
 
   // 삭제 확인창 상태
   const [confirmTarget, setConfirmTarget] = useState<Diary | null>(null)
@@ -43,6 +54,31 @@ export default function HomePage({
       .catch(() => setDiaries([]))
       .finally(() => setLoadingDiaries(false))
   }, [])
+
+  useEffect(() => {
+    // 오늘의 명언이 이미 즐겨찾기 되어 있는지 확인
+    isFavorited(quote.id)
+      .then(setIsFav)
+      .catch(() => setIsFav(false))
+  }, [quote.id])
+
+  async function toggleFav() {
+    if (favBusy) return
+    setFavBusy(true)
+    try {
+      if (isFav) {
+        await removeFavoriteByQuoteId(quote.id)
+        setIsFav(false)
+      } else {
+        await addFavorite(session.user.id, quote)
+        setIsFav(true)
+      }
+    } catch {
+      // 무시 (다음에 다시 시도)
+    } finally {
+      setFavBusy(false)
+    }
+  }
 
   async function handleDelete() {
     if (!confirmTarget) return
@@ -78,9 +114,20 @@ export default function HomePage({
 
         {/* 오늘의 명언 */}
         <section className="quote-card">
+          <button
+            className={`quote-fav ${isFav ? 'is-fav' : ''}`}
+            onClick={toggleFav}
+            disabled={favBusy}
+            aria-label="오늘의 명언 즐겨찾기"
+          >
+            {isFav ? '♥' : '♡'}
+          </button>
           <p className="quote-label">오늘의 명언</p>
           <blockquote className="quote-text">“{quote.text}”</blockquote>
           <p className="quote-author">— {quote.author}</p>
+          <button className="quote-fav-link" onClick={onFavorites}>
+            ⭐ 즐겨찾은 명언 보기
+          </button>
         </section>
 
         {/* 일기 쓰기 버튼 → 작성 화면으로 이동 */}

@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage'
 import WritePage from '../pages/WritePage'
 import GratitudePage from '../pages/GratitudePage'
 import TransactionsPage from '../pages/TransactionsPage'
+import FavoritesPage from '../pages/FavoritesPage'
 import PlaceholderPage from '../pages/PlaceholderPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
@@ -15,7 +16,7 @@ type Props = {
 }
 
 // 탭바 위에 전체 화면으로 덮이는 화면들
-type Overlay = null | 'write' | 'gratitude' | 'transactions'
+type Overlay = null | 'write' | 'gratitude' | 'transactions' | 'favorites'
 
 export default function AppShell({ session }: Props) {
   const [tab, setTab] = useState<Tab>('home')
@@ -45,6 +46,11 @@ export default function AppShell({ session }: Props) {
     return <TransactionsPage session={session} onBack={() => setOverlay(null)} />
   }
 
+  // 명언 즐겨찾기 모음 화면
+  if (overlay === 'favorites') {
+    return <FavoritesPage onBack={() => setOverlay(null)} />
+  }
+
   return (
     <div className="app-shell">
       {tab === 'home' && (
@@ -53,6 +59,7 @@ export default function AppShell({ session }: Props) {
           onWrite={() => setOverlay('write')}
           onGratitude={() => setOverlay('gratitude')}
           onTransactions={() => setOverlay('transactions')}
+          onFavorites={() => setOverlay('favorites')}
         />
       )}
       {tab === 'records' && <PlaceholderPage title="기록" />}
