@@ -16,11 +16,7 @@
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(
-    160deg,
-    rgba(249, 245, 237, 0.94) 0%,
-    rgba(240, 245, 236, 0.92) 100%
-  );
+  background: linear-gradient(160deg, var(--tint-1) 0%, var(--tint-2) 100%);
 }
 
 /* ── 상단 바 ── */
@@ -507,6 +503,49 @@
   padding-top: 0.8rem;
   font-weight: 700;
   color: var(--ink);
+}
+
+/* ── 설정: 선택 버튼 ── */
+.opt-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.opt-btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  background: rgba(255, 254, 250, 0.9);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.opt-btn.is-active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: #cfe0c6;
+  font-weight: 700;
+}
+
+.settings-logout {
+  width: 100%;
+  margin-top: 1.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: none;
+  border-radius: 16px;
+  padding: 0.9rem;
+  cursor: pointer;
+}
+.settings-logout:hover {
+  background: #f2ddd4;
 }
 
 /* ── 일기 목록 영역 ── */

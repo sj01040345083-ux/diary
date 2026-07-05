@@ -30,6 +30,40 @@
   --radius-sm: 12px;
   --shadow-card: 0 1px 2px rgba(49, 68, 55, 0.06), 0 18px 40px rgba(49, 68, 55, 0.14);
   --shadow-soft: 0 1px 2px rgba(49, 68, 55, 0.05), 0 8px 20px rgba(49, 68, 55, 0.08);
+
+  /* 화면 배경 덮개 색 (설정에서 배경색을 바꾸면 아래 값이 교체됩니다) */
+  --tint-1: rgba(249, 245, 237, 0.94);
+  --tint-2: rgba(240, 245, 236, 0.92);
+}
+
+/* ── 설정: 배경색 ── */
+html[data-bg='green'] {
+  --tint-1: rgba(234, 244, 230, 0.94);
+  --tint-2: rgba(224, 240, 222, 0.93);
+}
+html[data-bg='beige'] {
+  --tint-1: rgba(245, 238, 224, 0.95);
+  --tint-2: rgba(240, 231, 214, 0.93);
+}
+html[data-bg='white'] {
+  --tint-1: rgba(252, 251, 248, 0.96);
+  --tint-2: rgba(248, 248, 243, 0.95);
+}
+
+/* ── 설정: 글씨 크기 ── */
+html[data-size='large'] {
+  font-size: 18px;
+}
+html[data-size='xlarge'] {
+  font-size: 20px;
+}
+
+/* ── 설정: 글씨체 ── */
+html[data-font='noto'] body {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+html[data-font='system'] body {
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 * {
