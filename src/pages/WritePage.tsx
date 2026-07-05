@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
 import { formatToday } from '../lib/today'
 import { getTodayDiary, saveTodayDiary } from '../lib/diaries'
+import { emotions } from '../config/emotions'
 import './home.css'
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 
 export default function WritePage({ session, onDone, onCancel }: Props) {
   const [content, setContent] = useState('')
+  const [mood, setMood] = useState('') // '' = 기분 선택 안 함
   const [loadingInitial, setLoadingInitial] = useState(true)
   const [isEditing, setIsEditing] = useState(false) // 오늘 일기가 이미 있으면 '수정'
   const [saving, setSaving] = useState(false)
@@ -24,6 +26,7 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
       .then((diary) => {
         if (diary) {
           setContent(diary.content)
+          setMood(diary.mood ?? '')
           setIsEditing(true)
         }
       })
@@ -39,7 +42,7 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
     }
     setSaving(true)
     try {
-      await saveTodayDiary(session.user.id, content.trim())
+      await saveTodayDiary(session.user.id, content.trim(), mood || null)
       onDone()
     } catch {
       setSaving(false)
@@ -72,6 +75,23 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
           </div>
         ) : (
           <>
+            {/* 오늘의 기분 (선택) */}
+            <p className="mood-label">오늘의 기분 (선택)</p>
+            <div className="mood-row">
+              {emotions.map((e) => (
+                <button
+                  key={e.key}
+                  type="button"
+                  className={`mood-btn ${mood === e.emoji ? 'is-selected' : ''}`}
+                  onClick={() => setMood(mood === e.emoji ? '' : e.emoji)}
+                  title={e.label}
+                  aria-label={e.label}
+                >
+                  {e.emoji}
+                </button>
+              ))}
+            </div>
+
             <textarea
               className="write-textarea"
               placeholder="오늘 하루, 마음에 남은 한 줄을 적어보세요."

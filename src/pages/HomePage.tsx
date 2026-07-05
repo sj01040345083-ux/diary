@@ -99,7 +99,10 @@ export default function HomePage({ session, onWrite }: Props) {
               {diaries.map((d) => (
                 <article key={d.id} className="diary-item">
                   <div className="diary-item-main">
-                    <p className="diary-item-date">{formatEntryDate(d.entry_date)}</p>
+                    <p className="diary-item-date">
+                      {d.mood && <span className="diary-mood">{d.mood}</span>}
+                      {formatEntryDate(d.entry_date)}
+                    </p>
                     <p className="diary-item-content">{d.content}</p>
                   </div>
                   <button
