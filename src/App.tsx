@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import AppShell from './components/AppShell'
 
 // 로그인 안 된 사용자가 볼 화면: 로그인 / 회원가입
@@ -12,6 +13,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [checking, setChecking] = useState(true) // 처음에 로그인 상태를 확인하는 중
   const [view, setView] = useState<View>('login')
+  const [recovering, setRecovering] = useState(false) // 비밀번호 재설정 중
 
   useEffect(() => {
     // 1) 앱을 열 때 이미 로그인돼 있는지 확인 (새로고침해도 로그인 유지)
@@ -28,6 +30,10 @@ export default function App() {
         if (event === 'SIGNED_OUT') {
           setView('login')
         }
+        // 이메일의 재설정 링크로 들어오면 '새 비밀번호' 화면을 띄웁니다.
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecovering(true)
+        }
       },
     )
 
@@ -38,6 +44,11 @@ export default function App() {
   // 로그인 상태를 확인하는 아주 짧은 순간
   if (checking) {
     return <div className="app-loading">불러오는 중…</div>
+  }
+
+  // 비밀번호 재설정 링크로 들어온 경우: 새 비밀번호 설정 화면
+  if (recovering) {
+    return <ResetPasswordPage onDone={() => setRecovering(false)} />
   }
 
   // 로그인된 사용자만 앱 내부(보호된 화면)에 접근할 수 있습니다.

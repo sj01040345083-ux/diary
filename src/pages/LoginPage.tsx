@@ -43,6 +43,23 @@ export default function LoginPage({ onGoSignup }: Props) {
     // 로그인 성공 시: App 이 로그인 상태를 감지해 홈 화면으로 자동 이동합니다.
   }
 
+  // 비밀번호 재설정 메일 보내기 (위 이메일 칸에 적힌 주소로)
+  async function handleForgot() {
+    setNotice('')
+    if (!email.trim() || !EMAIL_RULE.test(email)) {
+      setNotice('비밀번호를 재설정할 이메일을 위 칸에 먼저 입력해주세요.')
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    })
+    if (error) {
+      setNotice(translateAuthError(error.message))
+      return
+    }
+    setNotice('비밀번호 재설정 메일을 보냈어요 🌿 메일의 링크를 눌러주세요.')
+  }
+
   return (
     <AuthLayout>
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
@@ -75,11 +92,7 @@ export default function LoginPage({ onGoSignup }: Props) {
         </div>
 
         <div className="auth-forgot">
-          <button
-            type="button"
-            className="link-btn"
-            onClick={() => setNotice('비밀번호 찾기는 다음 단계에서 연결됩니다.')}
-          >
+          <button type="button" className="link-btn" onClick={handleForgot}>
             비밀번호를 잊으셨나요?
           </button>
         </div>
