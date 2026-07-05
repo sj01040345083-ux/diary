@@ -1,0 +1,201 @@
+/* ─────────────────────────────────────────────
+   홈 화면 전용 스타일 (따뜻하고 깔끔한 감성 + 고급스러운 다듬기)
+   ───────────────────────────────────────────── */
+
+.home-screen {
+  position: relative;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  padding-bottom: 3.5rem;
+}
+
+/* 배경 위 크림색 덮개 (글자가 잘 보이게, 살짝 더 밝고 은은하게) */
+.home-screen::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(249, 245, 237, 0.94) 0%,
+    rgba(240, 245, 236, 0.92) 100%
+  );
+}
+
+/* ── 상단 바 ── */
+.home-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.4rem;
+  background: rgba(255, 253, 248, 0.72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(220, 228, 214, 0.6);
+}
+
+.home-brand {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-weight: 700;
+  font-size: 1.12rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.logout-btn {
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(220, 228, 214, 0.9);
+  border-radius: 999px;
+  padding: 0.42rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-btn:hover:not(:disabled) {
+  background: #eef3e8;
+  color: #5e7d58;
+  border-color: #dbe6d3;
+}
+
+.logout-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── 본문 ── */
+.home-container {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2.25rem 1.4rem 0;
+}
+
+/* 날짜 — 작고 차분하게 */
+.home-date {
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin: 0 0 0.65rem;
+}
+
+/* 인사말 — 크고 우아한 제목 (본문과 대비) */
+.home-greeting {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 2rem;
+}
+
+/* ── 오늘의 명언 카드 (가운데 정렬 + 부드러운 그림자) ── */
+.quote-card {
+  background: rgba(255, 254, 250, 0.9);
+  border: 1px solid rgba(223, 232, 216, 0.7);
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 12px 32px rgba(49, 68, 55, 0.07);
+  padding: 2rem 1.75rem;
+  margin-bottom: 2rem;
+  text-align: center; /* 명언이 줄바꿈돼도 가운데 정렬 */
+}
+
+/* "오늘의 명언" 라벨 — 작고 은은한 세이지 그린 */
+.quote-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: #4f6b4a;
+  font-weight: 800;
+  margin: 0 0 1.1rem;
+}
+
+/* 명언 본문 — 우아한 명조체 */
+.quote-text {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  color: #3f4f43;
+  margin: 0 0 1.1rem;
+}
+
+.quote-author {
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+/* ── 일기 쓰기 버튼 — 차분한 세이지 그린 ── */
+.home-cta {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: #6f9068;
+  border: none;
+  border-radius: 16px;
+  padding: 1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(111, 144, 104, 0.28);
+  transition: background 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.home-cta:hover {
+  background: #628059;
+  box-shadow: 0 8px 22px rgba(111, 144, 104, 0.34);
+}
+
+.home-cta:active {
+  transform: scale(0.99);
+}
+
+.home-notice {
+  margin: 0.85rem 0 0;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.86rem;
+  color: #5e7d58;
+  background: rgba(232, 242, 223, 0.7);
+  border-radius: 14px;
+  text-align: center;
+}
+
+/* ── 일기 목록 영역 ── */
+.diary-section {
+  margin-top: 2.75rem;
+}
+
+/* "내 일기" 라벨 — 작고 차분한 소제목 */
+.diary-heading {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin: 0 0 1rem;
+  padding-left: 0.1rem;
+}
+
+.diary-empty {
+  border: 1.5px dashed rgba(210, 222, 203, 0.9);
+  border-radius: 22px;
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+  color: var(--ink-faint);
+  background: rgba(255, 254, 250, 0.45);
+  line-height: 1.9;
+}
+
+.diary-empty p {
+  margin: 0;
+}
