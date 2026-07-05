@@ -11,6 +11,18 @@ export function formatToday(date = new Date()): string {
   }).format(date)
 }
 
+// 일기 목록에 쓰는 날짜 표시: "2026-07-05" -> "2026년 7월 5일 (일)"
+export function formatEntryDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  }).format(date)
+}
+
 // 날짜를 기준으로 '오늘의 명언'을 하나 고릅니다.
 // 같은 날에는 항상 같은 명언이 나오고, 다음 날이 되면 자동으로 바뀝니다.
 export function getTodaysQuote(date = new Date()): Quote {
