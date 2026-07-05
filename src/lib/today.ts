@@ -11,6 +11,15 @@ export function formatToday(date = new Date()): string {
   }).format(date)
 }
 
+// 저장 시각(예: created_at)을 "2026년 7월 5일"로 표시합니다.
+export function formatDateTime(iso: string): string {
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date(iso))
+}
+
 // 일기 목록에 쓰는 날짜 표시: "2026-07-05" -> "2026년 7월 5일 (일)"
 export function formatEntryDate(dateStr: string): string {
   const [y, m, d] = dateStr.split('-').map(Number)

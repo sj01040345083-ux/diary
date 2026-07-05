@@ -11,9 +11,10 @@ import './home.css'
 type Props = {
   session: Session
   onWrite: () => void // "오늘 일기 쓰기" 버튼 → 작성 화면으로
+  onGratitude: () => void // "감사일기" 바로가기 → 감사일기 화면으로
 }
 
-export default function HomePage({ session, onWrite }: Props) {
+export default function HomePage({ session, onWrite, onGratitude }: Props) {
   // 가입 때 저장한 이름이 있으면 이름을, 없으면 이메일을 사용합니다.
   const name =
     (session.user.user_metadata?.name as string | undefined) || session.user.email
@@ -79,6 +80,11 @@ export default function HomePage({ session, onWrite }: Props) {
         {/* 일기 쓰기 버튼 → 작성 화면으로 이동 */}
         <button className="home-cta" onClick={onWrite}>
           ✏️ 오늘 일기 쓰기
+        </button>
+
+        {/* 감사일기 바로가기 */}
+        <button className="home-shortcut" onClick={onGratitude}>
+          🙏 감사일기
         </button>
 
         {/* 내 일기 목록 */}
