@@ -76,15 +76,16 @@
   padding: 2.25rem 1.4rem 0;
 }
 
-/* 날짜 — 작고 차분하게 */
+/* 날짜 — 작고 차분하게 (숲 위에서도 잘 보이도록 옅은 흰 그림자) */
 .home-date {
   font-size: 0.82rem;
   letter-spacing: 0.04em;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   margin: 0 0 0.65rem;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.75);
 }
 
-/* 인사말 — 크고 우아한 제목 (본문과 대비) */
+/* 인사말 — 크고 우아한 제목 (숲 위에서도 또렷하게) */
 .home-greeting {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
   font-size: 1.7rem;
@@ -93,11 +94,12 @@
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 0 0 2rem;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
 }
 
 /* ── 오늘의 명언 카드 (가운데 정렬 + 부드러운 그림자) ── */
 .quote-card {
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 24px;
   box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 12px 32px rgba(49, 68, 55, 0.07);
@@ -245,7 +247,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #5e7d58;
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1.5px solid rgba(223, 232, 216, 0.9);
   border-radius: 16px;
   padding: 0.9rem;
@@ -272,7 +274,7 @@
 
 .tx-sum-box {
   flex: 1;
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 16px;
   padding: 0.9rem 1rem;
@@ -302,7 +304,7 @@
 }
 
 .tx-form {
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 20px;
   padding: 1.25rem;
@@ -420,7 +422,7 @@
 
 .stat-card {
   flex: 1;
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 18px;
   padding: 1.1rem 0.5rem;
@@ -450,7 +452,7 @@
 }
 
 .money-card {
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 18px;
   padding: 1.25rem;
@@ -547,7 +549,7 @@
   font-family: inherit;
   font-size: 0.9rem;
   color: var(--ink-soft);
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1.5px solid var(--line);
   border-radius: 12px;
   padding: 0.6rem 1rem;
@@ -619,7 +621,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 18px;
   box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 8px 22px rgba(49, 68, 55, 0.05);
@@ -686,7 +688,7 @@
   line-height: 1;
   border-radius: 50%;
   border: 1.5px solid var(--line);
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -764,7 +766,7 @@
   font-size: 1.05rem;
   line-height: 1.8;
   color: var(--ink);
-  background: rgba(255, 254, 250, 0.9);
+  background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
   border-radius: 20px;
   padding: 1.25rem;

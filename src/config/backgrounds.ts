@@ -11,4 +11,4 @@ import forest5 from '../assets/backgrounds/forest5.jpg'
 export const backgrounds = [forest1, forest2, forest3, forest4, forest5]
 
 // 로그인/회원가입 화면에서 실제로 쓸 배경 (여기 숫자만 바꾸면 교체됩니다)
-export const authBackground = forest3
+export const authBackground = forest5
