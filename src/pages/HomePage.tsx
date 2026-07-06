@@ -9,6 +9,7 @@ import {
   addFavorite,
   removeFavoriteByQuoteId,
 } from '../lib/favorites'
+import { getSettings, resolveDisplayName } from '../lib/settings'
 import Header from '../components/Header'
 import './home.css'
 
@@ -28,9 +29,14 @@ export default function HomePage({
   onTransactions,
   onFavorites,
 }: Props) {
-  // 가입 때 저장한 이름이 있으면 이름을, 없으면 이메일을 사용합니다.
-  const name =
-    (session.user.user_metadata?.name as string | undefined) || session.user.email
+  // 설정에서 정한 닉네임을 불러옵니다. (이름 표시에 사용)
+  const [nickname, setNickname] = useState<string | null>(null)
+  // 보여줄 이름: 닉네임 → 가입 때 이름 → 이메일 앞부분 (이메일 전체는 안 보임)
+  const name = resolveDisplayName(
+    nickname,
+    session.user.user_metadata?.name as string | undefined,
+    session.user.email,
+  )
 
   const today = formatToday() // 오늘 날짜
   // 명언은 홈에 들어올 때(이 화면이 처음 그려질 때) 한 번만 랜덤으로 뽑습니다.
@@ -55,6 +61,10 @@ export default function HomePage({
       .then(setDiaries)
       .catch(() => setDiaries([]))
       .finally(() => setLoadingDiaries(false))
+    // 닉네임(불러줄 이름)도 불러옵니다.
+    getSettings()
+      .then((s) => setNickname(s.nickname))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {

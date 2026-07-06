@@ -73,6 +73,16 @@ export default function SettingsPage({ session }: Props) {
           </div>
         ) : (
           <>
+            <p className="report-section-title">불러줄 이름</p>
+            <input
+              className="tx-input"
+              type="text"
+              placeholder="예: 서정 (비우면 이메일 앞부분으로 표시돼요)"
+              value={settings.nickname}
+              onChange={(e) => pick('nickname', e.target.value)}
+              maxLength={20}
+            />
+
             <p className="report-section-title">배경색</p>
             <div className="opt-row">
               {bgOptions.map((o) => (
