@@ -1,38 +1,49 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
-import { formatToday } from '../lib/today'
-import { getTodayDiary, saveTodayDiary } from '../lib/diaries'
+import { formatEntryDate } from '../lib/today'
+import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
 import './home.css'
 
 type Props = {
   session: Session
-  onDone: () => void // 저장 후 홈으로
-  onCancel: () => void // 뒤로 (저장 안 하고 홈으로)
+  onDone: () => void // 저장 후 (홈/기록으로)
+  onCancel: () => void // 뒤로 (저장 안 함)
+  targetDate?: string // 수정할 날짜 (없으면 오늘)
 }
 
-export default function WritePage({ session, onDone, onCancel }: Props) {
+export default function WritePage({
+  session,
+  onDone,
+  onCancel,
+  targetDate,
+}: Props) {
+  const workDate = targetDate ?? todayString() // 작성/수정 대상 날짜
+  const isToday = workDate === todayString()
+
   const [content, setContent] = useState('')
   const [mood, setMood] = useState('') // '' = 기분 선택 안 함
+  const [gratitude, setGratitude] = useState('') // 그날 감사한 일 (선택)
   const [loadingInitial, setLoadingInitial] = useState(true)
-  const [isEditing, setIsEditing] = useState(false) // 오늘 일기가 이미 있으면 '수정'
+  const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    // 오늘 이미 쓴 일기가 있으면 불러와서 채워둡니다 (같은 날 = 수정)
-    getTodayDiary()
+    // 해당 날짜 일기가 이미 있으면 불러와 채워둡니다 (수정)
+    getDiaryByDate(workDate)
       .then((diary) => {
         if (diary) {
           setContent(diary.content)
           setMood(diary.mood ?? '')
+          setGratitude(diary.gratitude ?? '')
           setIsEditing(true)
         }
       })
       .catch(() => {})
       .finally(() => setLoadingInitial(false))
-  }, [])
+  }, [workDate])
 
   async function handleSave() {
     setError('')
@@ -42,7 +53,13 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
     }
     setSaving(true)
     try {
-      await saveTodayDiary(session.user.id, content.trim(), mood || null)
+      await saveDiary(
+        session.user.id,
+        workDate,
+        content.trim(),
+        mood || null,
+        gratitude.trim() || null,
+      )
       onDone()
     } catch {
       setSaving(false)
@@ -59,15 +76,15 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
         <button className="icon-btn" onClick={onCancel} disabled={saving}>
           ← 뒤로
         </button>
-        <div className="write-title">
-          {isEditing ? '오늘 일기 수정' : '오늘 일기 쓰기'}
-        </div>
+        <div className="write-title">{isEditing ? '일기 수정' : '일기 쓰기'}</div>
         <span className="write-spacer" aria-hidden />
       </header>
 
       <main className="home-container">
-        <p className="home-date">{formatToday()}</p>
-        <h1 className="write-heading">오늘, 마음에 남은 한 줄 🌱</h1>
+        <p className="home-date">{formatEntryDate(workDate)}</p>
+        <h1 className="write-heading">
+          {isToday ? '오늘, 마음에 남은 한 줄 🌱' : '이 날의 한 줄 🌱'}
+        </h1>
 
         {loadingInitial ? (
           <div className="diary-empty">
@@ -75,7 +92,7 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
           </div>
         ) : (
           <>
-            {/* 오늘의 기분 (선택) */}
+            {/* 기분 (선택) */}
             <p className="mood-label">오늘의 기분 (선택)</p>
             <div className="mood-row">
               {emotions.map((e) => (
@@ -99,6 +116,18 @@ export default function WritePage({ session, onDone, onCancel }: Props) {
               onChange={(e) => setContent(e.target.value)}
               autoFocus
             />
+
+            {/* 감사한 일 (선택) — 일기 안에 자연스럽게 합침 */}
+            <p className="mood-label" style={{ marginTop: '1.25rem' }}>
+              오늘 감사한 일 (선택) 🙏
+            </p>
+            <textarea
+              className="write-textarea gratitude-input"
+              placeholder="오늘 감사한 일이 있었다면 적어보세요."
+              value={gratitude}
+              onChange={(e) => setGratitude(e.target.value)}
+            />
+
             {error && <p className="write-error">{error}</p>}
             <button
               className="home-cta write-save"

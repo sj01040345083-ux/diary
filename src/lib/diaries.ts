@@ -6,7 +6,8 @@ export type Diary = {
   user_id: string
   entry_date: string // "2026-07-05" 형식
   content: string
-  mood: string | null // 오늘의 기분 이모지 (없으면 null)
+  mood: string | null // 그날의 기분 이모지 (없으면 null)
+  gratitude: string | null // 그날 감사한 일 (없으면 null)
   created_at: string
   updated_at: string
 }
@@ -29,12 +30,12 @@ export async function getMyDiaries(): Promise<Diary[]> {
   return data ?? []
 }
 
-// 오늘 이미 쓴 일기가 있으면 가져옵니다. (없으면 null)
-export async function getTodayDiary(): Promise<Diary | null> {
+// 특정 날짜의 일기를 가져옵니다. (없으면 null)
+export async function getDiaryByDate(date: string): Promise<Diary | null> {
   const { data, error } = await supabase
     .from('diaries')
     .select('*')
-    .eq('entry_date', todayString())
+    .eq('entry_date', date)
     .maybeSingle()
   if (error) throw error
   return data
@@ -46,19 +47,22 @@ export async function deleteDiary(id: string): Promise<void> {
   if (error) throw error
 }
 
-// 오늘 일기를 저장합니다. (기분도 함께)
+// 특정 날짜의 일기를 저장합니다. (기분·감사도 함께)
 // 같은 날짜 일기가 이미 있으면 새로 쌓지 않고 기존 것을 수정합니다. (upsert)
-export async function saveTodayDiary(
+export async function saveDiary(
   userId: string,
+  entryDate: string,
   content: string,
   mood: string | null,
+  gratitude: string | null,
 ): Promise<void> {
   const { error } = await supabase.from('diaries').upsert(
     {
       user_id: userId,
-      entry_date: todayString(),
+      entry_date: entryDate,
       content,
       mood,
+      gratitude,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id,entry_date' },

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { authBackground } from '../config/backgrounds'
 import { getMyDiaries } from '../lib/diaries'
-import { getMyGratitude } from '../lib/gratitude'
 import { getMyTransactions } from '../lib/transactions'
 import './home.css'
 
@@ -22,12 +21,16 @@ export default function ReportPage() {
   const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
-    Promise.all([getMyDiaries(), getMyGratitude(), getMyTransactions()])
-      .then(([diaries, grat, tx]) => {
+    Promise.all([getMyDiaries(), getMyTransactions()])
+      .then(([diaries, tx]) => {
         const moodCounts: Record<string, number> = {}
         diaries.forEach((d) => {
           if (d.mood) moodCounts[d.mood] = (moodCounts[d.mood] || 0) + 1
         })
+        // 감사 개수 = 감사한 일을 적은 일기 수
+        const gratitudeCount = diaries.filter(
+          (d) => d.gratitude && d.gratitude.trim(),
+        ).length
         const income = tx
           .filter((t) => t.type === 'income')
           .reduce((s, t) => s + Number(t.amount), 0)
@@ -36,7 +39,7 @@ export default function ReportPage() {
           .reduce((s, t) => s + Number(t.amount), 0)
         setStats({
           diaryCount: diaries.length,
-          gratitudeCount: grat.length,
+          gratitudeCount,
           moodCounts,
           income,
           expense,

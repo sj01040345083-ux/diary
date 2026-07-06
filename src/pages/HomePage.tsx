@@ -17,7 +17,6 @@ import './home.css'
 type Props = {
   session: Session
   onWrite: () => void // "오늘 일기 쓰기" 버튼 → 작성 화면으로
-  onGratitude: () => void // "감사일기" 바로가기
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
 }
@@ -25,7 +24,6 @@ type Props = {
 export default function HomePage({
   session,
   onWrite,
-  onGratitude,
   onTransactions,
   onFavorites,
 }: Props) {
@@ -147,13 +145,10 @@ export default function HomePage({
           ✏️ 오늘 일기 쓰기
         </button>
 
-        {/* 바로가기들 */}
+        {/* 바로가기 */}
         <div className="home-shortcut-row">
-          <button className="home-shortcut" onClick={onGratitude}>
-            🙏 감사일기
-          </button>
           <button className="home-shortcut" onClick={onTransactions}>
-            💰 소비·수입
+            💰 소비·수입 기록
           </button>
         </div>
 
@@ -180,6 +175,9 @@ export default function HomePage({
                       {formatEntryDate(d.entry_date)}
                     </p>
                     <p className="diary-item-content">{d.content}</p>
+                    {d.gratitude && (
+                      <p className="diary-item-gratitude">🙏 {d.gratitude}</p>
+                    )}
                   </div>
                   <button
                     className="diary-delete-btn"

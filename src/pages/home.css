@@ -538,6 +538,102 @@
   letter-spacing: 0;
 }
 
+/* 월별 필터 */
+.month-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+.month-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: rgba(255, 254, 250, 0.97);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.month-btn.is-active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: #cfe0c6;
+  font-weight: 700;
+}
+
+/* 일기 목록의 감사 한 줄 */
+.diary-item-gratitude {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0.4rem 0 0;
+  line-height: 1.6;
+}
+
+/* 클릭 가능한 기록 아이템 */
+.diary-item-click {
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.diary-item-click:hover {
+  border-color: #cfe0c6;
+}
+.diary-item-click:active {
+  transform: scale(0.995);
+}
+.diary-chevron {
+  align-self: center;
+  font-size: 1.4rem;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+/* 일기 상세 보기 */
+.detail-card {
+  text-align: left;
+  max-width: 400px;
+}
+.detail-date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8aa07f;
+  margin: 0 0 0.75rem;
+}
+.detail-content {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--ink);
+  margin: 0 0 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.detail-gratitude {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.6;
+}
+.modal-btn-edit {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #fff;
+  background: #6f9068;
+  border: none;
+  transition: background 0.18s ease;
+}
+.modal-btn-edit:hover {
+  background: #628059;
+}
+
 /* ── 설정: 선택 버튼 ── */
 .opt-row {
   display: flex;
