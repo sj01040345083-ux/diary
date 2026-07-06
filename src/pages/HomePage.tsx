@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
-import { formatToday, getTodaysQuote, formatEntryDate } from '../lib/today'
+import { formatToday, getRandomQuote, formatEntryDate } from '../lib/today'
 import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import {
@@ -33,7 +33,9 @@ export default function HomePage({
     (session.user.user_metadata?.name as string | undefined) || session.user.email
 
   const today = formatToday() // 오늘 날짜
-  const quote = getTodaysQuote() // 오늘의 명언
+  // 명언은 홈에 들어올 때(이 화면이 처음 그려질 때) 한 번만 랜덤으로 뽑습니다.
+  // useState 초기값으로 뽑아야 이후 다른 동작(즐겨찾기 등)에 다시 안 바뀝니다.
+  const [quote] = useState(getRandomQuote)
 
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loadingDiaries, setLoadingDiaries] = useState(true)

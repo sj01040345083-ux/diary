@@ -32,10 +32,8 @@ export function formatEntryDate(dateStr: string): string {
   }).format(date)
 }
 
-// 날짜를 기준으로 '오늘의 명언'을 하나 고릅니다.
-// 같은 날에는 항상 같은 명언이 나오고, 다음 날이 되면 자동으로 바뀝니다.
-export function getTodaysQuote(date = new Date()): Quote {
-  const dayNumber = Math.floor(date.getTime() / 86_400_000) // 1970년부터 며칠째인지
-  const index = ((dayNumber % quotes.length) + quotes.length) % quotes.length
+// 명언을 무작위로 하나 고릅니다. (홈에 들어올 때마다 다른 명언이 나오게)
+export function getRandomQuote(): Quote {
+  const index = Math.floor(Math.random() * quotes.length)
   return quotes[index]
 }
