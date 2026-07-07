@@ -51,6 +51,22 @@ export async function saveSettings(
   if (error) throw error
 }
 
+// 닉네임만 저장합니다. (가입 시 이름을 설정에 저장하는 용도)
+export async function saveNickname(
+  userId: string,
+  nickname: string,
+): Promise<void> {
+  const { error } = await supabase.from('settings').upsert(
+    {
+      user_id: userId,
+      nickname: nickname.trim(),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' },
+  )
+  if (error) throw error
+}
+
 // 화면에 보여줄 이름을 정합니다.
 // 1) 사용자가 정한 닉네임 → 2) 가입 때 이름 → 3) 이메일의 @ 앞부분
 export function resolveDisplayName(

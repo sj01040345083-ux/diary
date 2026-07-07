@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import AuthLayout from '../components/AuthLayout'
 import { supabase } from '../lib/supabase'
 import { translateAuthError } from '../lib/authErrors'
+import { saveNickname } from '../lib/settings'
 
 const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -62,6 +63,12 @@ export default function SignupPage({ onGoLogin }: Props) {
     if (!data.session) {
       setNotice('가입 확인 메일을 보냈어요 🌿 메일의 링크를 눌러 인증하면 로그인할 수 있어요.')
       return
+    }
+    // 입력한 이름(닉네임)을 설정에도 저장해 홈에서 바로 이름으로 표시되게 합니다.
+    try {
+      await saveNickname(data.session.user.id, name.trim())
+    } catch {
+      // 실패해도 가입은 완료 (가입 시 이름은 계정에 저장돼 있음)
     }
     // 인증이 꺼져 있으면 바로 로그인 상태가 되어 App 이 홈 화면으로 이동합니다.
   }
