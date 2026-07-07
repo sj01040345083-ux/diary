@@ -101,33 +101,33 @@
 .quote-card {
   background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
-  border-radius: 24px;
-  box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 12px 32px rgba(49, 68, 55, 0.07);
-  padding: 2rem 1.75rem;
-  margin-bottom: 2rem;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(49, 68, 55, 0.03), 0 10px 26px rgba(49, 68, 55, 0.06);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.5rem;
   text-align: center; /* 명언이 줄바꿈돼도 가운데 정렬 */
 }
 
 /* "오늘의 명언" 라벨 — 작고 은은한 세이지 그린 */
 .quote-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
   color: #4f6b4a;
   font-weight: 800;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.55rem;
 }
 
-/* 명언 본문 — 우아한 명조체 */
+/* 명언 본문 — 우아한 명조체 (아담하게) */
 .quote-text {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.15rem;
-  line-height: 1.9;
+  font-size: 1rem;
+  line-height: 1.6;
   color: #3f4f43;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.55rem;
 }
 
 .quote-author {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   letter-spacing: 0.02em;
   color: var(--ink-faint);
   margin: 0;
@@ -136,9 +136,9 @@
 /* 오늘의 명언 즐겨찾기 하트 */
 .quote-fav {
   position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  font-size: 1.35rem;
+  top: 0.7rem;
+  right: 0.85rem;
+  font-size: 1.2rem;
   line-height: 1;
   background: none;
   border: none;
@@ -157,9 +157,9 @@
 }
 
 .quote-fav-link {
-  margin-top: 1rem;
+  margin-top: 0.7rem;
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--accent-strong);
   background: none;
   border: none;
