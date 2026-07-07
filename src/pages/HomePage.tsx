@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { authBackground } from '../config/backgrounds'
 import { formatToday, getRandomQuote, formatEntryDate } from '../lib/today'
 import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
@@ -109,7 +108,6 @@ export default function HomePage({
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <Header />
 

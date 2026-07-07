@@ -37,20 +37,6 @@
   --tint-2: rgba(240, 245, 236, 0.34);
 }
 
-/* ── 설정: 배경색 ── */
-html[data-bg='green'] {
-  --tint-1: rgba(234, 244, 230, 0.42);
-  --tint-2: rgba(224, 240, 222, 0.36);
-}
-html[data-bg='beige'] {
-  --tint-1: rgba(245, 238, 224, 0.44);
-  --tint-2: rgba(240, 231, 214, 0.38);
-}
-html[data-bg='white'] {
-  --tint-1: rgba(252, 251, 248, 0.5);
-  --tint-2: rgba(248, 248, 243, 0.44);
-}
-
 /* ── 설정: 글씨 크기 ── */
 html[data-size='large'] {
   font-size: 18px;

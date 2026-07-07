@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { authBackground } from '../config/backgrounds'
 import { APP_NAME, APP_SUBTITLE, APP_SLOGAN } from '../config/appConfig'
 import '../pages/auth.css'
 
@@ -10,7 +9,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div
       className="auth-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <div className="auth-card">
         <div className="auth-brand">

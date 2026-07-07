@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { authBackground } from '../config/backgrounds'
 import { getMyTransactions } from '../lib/transactions'
 import type { Transaction } from '../lib/transactions'
 import { categoryIcon, pastelColor } from '../config/categories'
@@ -70,7 +69,6 @@ export default function StatsPage() {
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <header className="tab-header">
         <div className="write-title">통계</div>

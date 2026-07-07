@@ -5,6 +5,7 @@
 .home-screen {
   position: relative;
   min-height: 100vh;
+  background-image: var(--app-bg);
   background-size: cover;
   background-position: center;
   padding-bottom: 6rem; /* 하단 탭바에 내용이 가리지 않도록 */
@@ -676,6 +677,48 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+/* 배경 사진 선택 썸네일 */
+.bg-thumb-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.bg-thumb {
+  position: relative;
+  width: 4.6rem;
+  height: 3.3rem;
+  border-radius: 12px;
+  border: 2.5px solid transparent;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.18s ease, transform 0.12s ease;
+}
+.bg-thumb:hover {
+  transform: scale(1.03);
+}
+.bg-thumb.is-active {
+  border-color: #4f8a6b;
+}
+.bg-thumb-check {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: #4f8a6b;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .opt-btn {

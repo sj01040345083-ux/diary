@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { authBackground } from '../config/backgrounds'
 import { getMyDiaries } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import { formatEntryDate } from '../lib/today'
@@ -47,7 +46,6 @@ export default function RecordsPage({ onEditDiary }: Props) {
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <header className="tab-header">
         <div className="write-title">기록</div>

@@ -1,16 +1,17 @@
-// 사용자 설정(배경색·글씨체·글씨크기)을 저장/불러오고, 화면에 적용합니다.
+// 사용자 설정(배경 사진·글씨체·글씨크기)을 저장/불러오고, 화면에 적용합니다.
 import { supabase } from './supabase'
+import { backgroundUrl, defaultBackground } from '../config/backgrounds'
 
 export type Settings = {
   nickname: string // 불러줄 이름 (비어 있으면 이메일 앞부분 사용)
-  bg: string
+  bg: string // 배경 사진 (forest1~forest5)
   font: string
   font_size: string
 }
 
 export const defaultSettings: Settings = {
   nickname: '',
-  bg: 'ivory',
+  bg: defaultBackground,
   font: 'gowun',
   font_size: 'normal',
 }
@@ -85,7 +86,8 @@ export function resolveDisplayName(
 // 선택한 설정을 화면 전체에 즉시 적용합니다.
 export function applySettings(s: Settings): void {
   const el = document.documentElement
-  el.setAttribute('data-bg', s.bg)
+  // 배경 사진을 CSS 변수로 지정 → 모든 화면(.home-screen/.auth-screen)이 이 값을 씀
+  el.style.setProperty('--app-bg', `url("${backgroundUrl(s.bg)}")`)
   el.setAttribute('data-font', s.font)
   el.setAttribute('data-size', s.font_size)
 }

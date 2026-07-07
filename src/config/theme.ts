@@ -1,11 +1,5 @@
-// 이 파일을 수정하면 설정 화면의 선택지(배경색·글씨체·글씨크기)가 바뀝니다.
-
-export const bgOptions = [
-  { value: 'ivory', label: '아이보리' },
-  { value: 'green', label: '연두' },
-  { value: 'beige', label: '베이지' },
-  { value: 'white', label: '화이트' },
-]
+// 이 파일을 수정하면 설정 화면의 선택지(글씨체·글씨크기)가 바뀝니다.
+// (배경은 배경 사진 목록 → config/backgrounds.ts 에서 관리)
 
 export const fontOptions = [
   { value: 'gowun', label: '고운돋움 (기본)' },

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { authBackground } from '../config/backgrounds'
 import {
   expenseCategories,
   incomeCategories,
@@ -173,7 +172,6 @@ export default function TransactionsPage({ session, onBack }: Props) {
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <header className="home-header">
         <button className="icon-btn" onClick={onBack} disabled={saving}>

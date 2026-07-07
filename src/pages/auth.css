@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1.25rem;
+  background-image: var(--app-bg);
   background-size: cover;
   background-position: center;
   overflow: hidden;

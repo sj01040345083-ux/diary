@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { authBackground } from '../config/backgrounds'
-import { bgOptions, fontOptions, sizeOptions } from '../config/theme'
+import { backgroundOptions } from '../config/backgrounds'
+import { fontOptions, sizeOptions } from '../config/theme'
 import {
   getSettings,
   saveSettings,
@@ -58,10 +58,7 @@ export default function SettingsPage({ session }: Props) {
   }
 
   return (
-    <div
-      className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
-    >
+    <div className="home-screen">
       <header className="tab-header">
         <div className="write-title">설정</div>
       </header>
@@ -83,15 +80,21 @@ export default function SettingsPage({ session }: Props) {
               maxLength={20}
             />
 
-            <p className="report-section-title">배경색</p>
-            <div className="opt-row">
-              {bgOptions.map((o) => (
+            <p className="report-section-title">배경 사진 선택</p>
+            <div className="bg-thumb-row">
+              {backgroundOptions.map((o) => (
                 <button
                   key={o.value}
-                  className={`opt-btn ${settings.bg === o.value ? 'is-active' : ''}`}
+                  type="button"
+                  className={`bg-thumb ${settings.bg === o.value ? 'is-active' : ''}`}
+                  style={{ backgroundImage: `url(${o.url})` }}
                   onClick={() => pick('bg', o.value)}
+                  aria-label={o.label}
+                  title={o.label}
                 >
-                  {o.label}
+                  {settings.bg === o.value && (
+                    <span className="bg-thumb-check">✓</span>
+                  )}
                 </button>
               ))}
             </div>

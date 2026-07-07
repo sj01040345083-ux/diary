@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { authBackground } from '../config/backgrounds'
 import { getMyFavorites, removeFavorite } from '../lib/favorites'
 import type { FavoriteQuote } from '../lib/favorites'
 import './home.css'
@@ -35,7 +34,6 @@ export default function FavoritesPage({ onBack }: Props) {
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <header className="home-header">
         <button className="icon-btn" onClick={onBack}>

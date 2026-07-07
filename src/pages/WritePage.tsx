@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { authBackground } from '../config/backgrounds'
 import { formatEntryDate } from '../lib/today'
 import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
@@ -105,7 +104,6 @@ export default function WritePage({
   return (
     <div
       className="home-screen"
-      style={{ backgroundImage: `url(${authBackground})` }}
     >
       <header className="home-header">
         <button className="icon-btn" onClick={onCancel} disabled={saving}>
