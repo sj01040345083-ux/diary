@@ -24,7 +24,6 @@ export default function WritePage({
 
   const [content, setContent] = useState('')
   const [mood, setMood] = useState('') // '' = 기분 선택 안 함
-  const [gratitude, setGratitude] = useState('') // 그날 감사한 일 (선택)
   const [loadingInitial, setLoadingInitial] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -37,7 +36,6 @@ export default function WritePage({
         if (diary) {
           setContent(diary.content)
           setMood(diary.mood ?? '')
-          setGratitude(diary.gratitude ?? '')
           setIsEditing(true)
         }
       })
@@ -53,13 +51,7 @@ export default function WritePage({
     }
     setSaving(true)
     try {
-      await saveDiary(
-        session.user.id,
-        workDate,
-        content.trim(),
-        mood || null,
-        gratitude.trim() || null,
-      )
+      await saveDiary(session.user.id, workDate, content.trim(), mood || null)
       onDone()
     } catch {
       setSaving(false)
@@ -116,18 +108,6 @@ export default function WritePage({
               onChange={(e) => setContent(e.target.value)}
               autoFocus
             />
-
-            {/* 감사한 일 (선택) — 일기 안에 자연스럽게 합침 */}
-            <p className="mood-label" style={{ marginTop: '1.25rem' }}>
-              오늘 감사한 일 (선택) 🙏
-            </p>
-            <textarea
-              className="write-textarea gratitude-input"
-              placeholder="오늘 감사한 일이 있었다면 적어보세요."
-              value={gratitude}
-              onChange={(e) => setGratitude(e.target.value)}
-            />
-
             {error && <p className="write-error">{error}</p>}
             <button
               className="home-cta write-save"

@@ -175,9 +175,6 @@ export default function HomePage({
                       {formatEntryDate(d.entry_date)}
                     </p>
                     <p className="diary-item-content">{d.content}</p>
-                    {d.gratitude && (
-                      <p className="diary-item-gratitude">🙏 {d.gratitude}</p>
-                    )}
                   </div>
                   <button
                     className="diary-delete-btn"

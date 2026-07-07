@@ -10,7 +10,7 @@ function won(n: number): string {
 
 type Stats = {
   diaryCount: number
-  gratitudeCount: number
+  moodDays: number
   moodCounts: Record<string, number>
   income: number
   expense: number
@@ -27,10 +27,8 @@ export default function ReportPage() {
         diaries.forEach((d) => {
           if (d.mood) moodCounts[d.mood] = (moodCounts[d.mood] || 0) + 1
         })
-        // 감사 개수 = 감사한 일을 적은 일기 수
-        const gratitudeCount = diaries.filter(
-          (d) => d.gratitude && d.gratitude.trim(),
-        ).length
+        // 기분을 기록한 일기 수
+        const moodDays = diaries.filter((d) => d.mood).length
         const income = tx
           .filter((t) => t.type === 'income')
           .reduce((s, t) => s + Number(t.amount), 0)
@@ -39,7 +37,7 @@ export default function ReportPage() {
           .reduce((s, t) => s + Number(t.amount), 0)
         setStats({
           diaryCount: diaries.length,
-          gratitudeCount,
+          moodDays,
           moodCounts,
           income,
           expense,
@@ -83,8 +81,8 @@ export default function ReportPage() {
                 <div className="stat-label">일기</div>
               </div>
               <div className="stat-card">
-                <div className="stat-value">{stats.gratitudeCount}</div>
-                <div className="stat-label">감사</div>
+                <div className="stat-value">{stats.moodDays}</div>
+                <div className="stat-label">기분</div>
               </div>
               <div className="stat-card">
                 <div className="stat-value">

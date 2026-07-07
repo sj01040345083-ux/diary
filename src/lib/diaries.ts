@@ -7,7 +7,6 @@ export type Diary = {
   entry_date: string // "2026-07-05" 형식
   content: string
   mood: string | null // 그날의 기분 이모지 (없으면 null)
-  gratitude: string | null // 그날 감사한 일 (없으면 null)
   created_at: string
   updated_at: string
 }
@@ -47,14 +46,13 @@ export async function deleteDiary(id: string): Promise<void> {
   if (error) throw error
 }
 
-// 특정 날짜의 일기를 저장합니다. (기분·감사도 함께)
+// 특정 날짜의 일기를 저장합니다. (기분도 함께)
 // 같은 날짜 일기가 이미 있으면 새로 쌓지 않고 기존 것을 수정합니다. (upsert)
 export async function saveDiary(
   userId: string,
   entryDate: string,
   content: string,
   mood: string | null,
-  gratitude: string | null,
 ): Promise<void> {
   const { error } = await supabase.from('diaries').upsert(
     {
@@ -62,7 +60,6 @@ export async function saveDiary(
       entry_date: entryDate,
       content,
       mood,
-      gratitude,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id,entry_date' },

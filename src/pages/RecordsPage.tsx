@@ -34,12 +34,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
     const q = query.trim().toLowerCase()
     return diaries.filter((d) => {
       if (month !== 'all' && !d.entry_date.startsWith(month)) return false
-      if (
-        q &&
-        !d.content.toLowerCase().includes(q) &&
-        !(d.gratitude ?? '').toLowerCase().includes(q)
-      )
-        return false
+      if (q && !d.content.toLowerCase().includes(q)) return false
       return true
     })
   }, [diaries, query, month])
@@ -139,9 +134,6 @@ export default function RecordsPage({ onEditDiary }: Props) {
               {formatEntryDate(detail.entry_date)}
             </p>
             <p className="detail-content">{detail.content}</p>
-            {detail.gratitude && (
-              <p className="detail-gratitude">🙏 {detail.gratitude}</p>
-            )}
             <div className="modal-actions">
               <button
                 className="modal-btn-cancel"
