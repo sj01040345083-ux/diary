@@ -10,6 +10,12 @@ import {
   deleteTransaction,
 } from '../lib/transactions'
 import type { Transaction, TxType } from '../lib/transactions'
+import {
+  getMyCategories,
+  addCategory,
+  deleteCategory,
+} from '../lib/categories'
+import type { Category } from '../lib/categories'
 import './home.css'
 
 type Props = {
@@ -36,13 +42,26 @@ export default function TransactionsPage({ session, onBack }: Props) {
   const [confirmTarget, setConfirmTarget] = useState<Transaction | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  const categories = type === 'expense' ? expenseCategories : incomeCategories
+  // 내가 만든 카테고리
+  const [customCats, setCustomCats] = useState<Category[]>([])
+  const [addOpen, setAddOpen] = useState(false)
+  const [newCatName, setNewCatName] = useState('')
+  const [savingCat, setSavingCat] = useState(false)
+  const [catError, setCatError] = useState('')
+  const [catToDelete, setCatToDelete] = useState<Category | null>(null)
+  const [deletingCat, setDeletingCat] = useState(false)
+
+  const defaults = type === 'expense' ? expenseCategories : incomeCategories
+  const customForType = customCats.filter((c) => c.type === type)
 
   useEffect(() => {
     getMyTransactions()
       .then(setItems)
       .catch(() => setItems([]))
       .finally(() => setLoading(false))
+    getMyCategories()
+      .then(setCustomCats)
+      .catch(() => setCustomCats([]))
   }, [])
 
   // 소비/수입 종류를 바꾸면 카테고리 기본값도 맞춰줍니다.
@@ -78,6 +97,53 @@ export default function TransactionsPage({ session, onBack }: Props) {
     }
   }
 
+  // 새 카테고리 추가
+  async function handleAddCategory() {
+    const name = newCatName.trim()
+    setCatError('')
+    if (!name) {
+      setCatError('카테고리 이름을 입력해주세요.')
+      return
+    }
+    const exists = [...defaults, ...customForType.map((c) => c.name)].includes(
+      name,
+    )
+    if (exists) {
+      setCatError('이미 있는 카테고리예요.')
+      return
+    }
+    setSavingCat(true)
+    try {
+      await addCategory(session.user.id, type, name)
+      const fresh = await getMyCategories()
+      setCustomCats(fresh)
+      setCategory(name) // 방금 만든 것을 바로 선택
+      setNewCatName('')
+      setAddOpen(false)
+    } catch {
+      setCatError('추가에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setSavingCat(false)
+    }
+  }
+
+  // 카테고리 삭제
+  async function handleDeleteCategory() {
+    if (!catToDelete) return
+    setDeletingCat(true)
+    try {
+      await deleteCategory(catToDelete.id)
+      const fresh = await getMyCategories()
+      setCustomCats(fresh)
+      if (category === catToDelete.name) setCategory(defaults[0])
+      setCatToDelete(null)
+    } catch {
+      // 유지
+    } finally {
+      setDeletingCat(false)
+    }
+  }
+
   async function handleDelete() {
     if (!confirmTarget) return
     setDeleting(true)
@@ -92,7 +158,6 @@ export default function TransactionsPage({ session, onBack }: Props) {
     }
   }
 
-  // 합계 계산
   const incomeSum = items
     .filter((t) => t.type === 'income')
     .reduce((s, t) => s + Number(t.amount), 0)
@@ -153,15 +218,52 @@ export default function TransactionsPage({ session, onBack }: Props) {
           />
 
           <div className="tx-cat-row">
-            {categories.map((c) => (
+            {/* 기본 카테고리 */}
+            {defaults.map((c) => (
               <button
                 key={c}
+                type="button"
                 className={`tx-cat-btn ${category === c ? 'is-active' : ''}`}
                 onClick={() => setCategory(c)}
               >
                 {c}
               </button>
             ))}
+            {/* 내가 만든 카테고리 (× 삭제 가능) */}
+            {customForType.map((c) => (
+              <span
+                key={c.id}
+                className={`tx-cat-btn tx-cat-custom ${category === c.name ? 'is-active' : ''}`}
+              >
+                <button
+                  type="button"
+                  className="tx-cat-name"
+                  onClick={() => setCategory(c.name)}
+                >
+                  {c.name}
+                </button>
+                <button
+                  type="button"
+                  className="tx-cat-del"
+                  onClick={() => setCatToDelete(c)}
+                  aria-label={`${c.name} 카테고리 삭제`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            {/* 새 카테고리 추가 */}
+            <button
+              type="button"
+              className="tx-cat-add"
+              onClick={() => {
+                setNewCatName('')
+                setCatError('')
+                setAddOpen(true)
+              }}
+            >
+              + 추가
+            </button>
           </div>
 
           <input
@@ -228,6 +330,7 @@ export default function TransactionsPage({ session, onBack }: Props) {
         </section>
       </main>
 
+      {/* 기록 삭제 확인 */}
       {confirmTarget && (
         <div
           className="modal-overlay"
@@ -256,6 +359,86 @@ export default function TransactionsPage({ session, onBack }: Props) {
                 disabled={deleting}
               >
                 {deleting ? '삭제 중…' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 새 카테고리 추가 */}
+      {addOpen && (
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            if (!savingCat) setAddOpen(false)
+          }}
+        >
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">새 카테고리</h3>
+            <p className="modal-desc">
+              {type === 'expense' ? '지출' : '수입'} 카테고리 이름을 입력하세요.
+            </p>
+            <input
+              className="tx-input"
+              type="text"
+              placeholder="예: 커피, 반려동물, 저축"
+              value={newCatName}
+              maxLength={12}
+              autoFocus
+              onChange={(e) => setNewCatName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddCategory()
+              }}
+            />
+            {catError && <p className="modal-error">{catError}</p>}
+            <div className="modal-actions">
+              <button
+                className="modal-btn-cancel"
+                onClick={() => setAddOpen(false)}
+                disabled={savingCat}
+              >
+                취소
+              </button>
+              <button
+                className="modal-btn-edit"
+                onClick={handleAddCategory}
+                disabled={savingCat}
+              >
+                {savingCat ? '추가 중…' : '추가'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 카테고리 삭제 확인 */}
+      {catToDelete && (
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            if (!deletingCat) setCatToDelete(null)
+          }}
+        >
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">카테고리를 삭제할까요?</h3>
+            <p className="modal-desc">
+              이 카테고리만 사라져요. (기존 기록은 그대로 남아요)
+            </p>
+            <p className="modal-preview">“{catToDelete.name}”</p>
+            <div className="modal-actions">
+              <button
+                className="modal-btn-cancel"
+                onClick={() => setCatToDelete(null)}
+                disabled={deletingCat}
+              >
+                취소
+              </button>
+              <button
+                className="modal-btn-delete"
+                onClick={handleDeleteCategory}
+                disabled={deletingCat}
+              >
+                {deletingCat ? '삭제 중…' : '삭제'}
               </button>
             </div>
           </div>

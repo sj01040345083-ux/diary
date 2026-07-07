@@ -388,6 +388,54 @@
   font-weight: 800;
 }
 
+/* 내가 만든 카테고리 (이름 + × 삭제) */
+.tx-cat-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding-right: 0.5rem;
+}
+.tx-cat-name {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.tx-cat-del {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0 0.1rem;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.tx-cat-del:hover {
+  opacity: 1;
+}
+
+/* + 추가 버튼 (점선 테두리) */
+.tx-cat-add {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: none;
+  border: 1.5px dashed #b9d3ad;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.tx-cat-add:hover {
+  background: var(--accent-soft);
+}
+
 .tx-amount-in {
   font-weight: 700;
   color: #4f8a6b;
