@@ -377,9 +377,15 @@
 }
 
 .tx-cat-btn.is-active {
-  color: var(--accent-strong);
-  background: var(--accent-soft);
-  border-color: #cfe0c6;
+  color: #fff;
+  background: #6f9068;
+  border-color: #4f8a6b;
+  font-weight: 700;
+}
+/* 선택된 카테고리 앞에 ✓ 표시 */
+.tx-cat-btn.is-active::before {
+  content: '✓ ';
+  font-weight: 800;
 }
 
 .tx-amount-in {
@@ -756,6 +762,7 @@
 }
 
 .mood-btn {
+  position: relative;
   width: 3rem;
   height: 3rem;
   font-size: 1.4rem;
@@ -776,10 +783,28 @@
 }
 
 .mood-btn.is-selected {
-  border-color: #6f9068;
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 3px rgba(232, 242, 223, 0.7);
-  transform: scale(1.05);
+  border: 2.5px solid #4f8a6b;
+  background: #d3e8c8;
+  box-shadow: 0 0 0 4px rgba(111, 144, 104, 0.28);
+  transform: scale(1.1);
+}
+/* 선택된 이모지 오른쪽 위 ✓ 뱃지 */
+.mood-btn.is-selected::after {
+  content: '✓';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: #4f8a6b;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .diary-item-content {
