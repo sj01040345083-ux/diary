@@ -7,7 +7,7 @@ import HomePage from '../pages/HomePage'
 import WritePage from '../pages/WritePage'
 import TransactionsPage from '../pages/TransactionsPage'
 import FavoritesPage from '../pages/FavoritesPage'
-import ReportPage from '../pages/ReportPage'
+import StatsPage from '../pages/StatsPage'
 import SettingsPage from '../pages/SettingsPage'
 import RecordsPage from '../pages/RecordsPage'
 
@@ -86,10 +86,10 @@ export default function AppShell({ session }: Props) {
         />
       )}
       {tab === 'records' && <RecordsPage onEditDiary={openEdit} />}
-      {tab === 'report' && <ReportPage />}
+      {tab === 'stats' && <StatsPage />}
       {tab === 'settings' && <SettingsPage session={session} />}
 
-      <TabBar active={tab} onChange={setTab} onAdd={openWrite} />
+      <TabBar active={tab} onChange={setTab} />
     </div>
   )
 }

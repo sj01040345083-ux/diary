@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
-import { expenseCategories, incomeCategories } from '../config/categories'
-import { formatDateTime } from '../lib/today'
+import {
+  expenseCategories,
+  incomeCategories,
+  categoryIcon,
+} from '../config/categories'
+import { formatEntryDate } from '../lib/today'
 import { todayString } from '../lib/diaries'
 import {
   getMyTransactions,
@@ -33,6 +37,7 @@ export default function TransactionsPage({ session, onBack }: Props) {
   const [loading, setLoading] = useState(true)
 
   const [type, setType] = useState<TxType>('expense')
+  const [txDate, setTxDate] = useState(todayString()) // 기록 날짜 (달력 선택)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('식비')
   const [memo, setMemo] = useState('')
@@ -84,7 +89,7 @@ export default function TransactionsPage({ session, onBack }: Props) {
         amount: value,
         category,
         memo: memo.trim() || null,
-        tx_date: todayString(),
+        tx_date: txDate,
       })
       const fresh = await getMyTransactions()
       setItems(fresh)
@@ -208,6 +213,14 @@ export default function TransactionsPage({ session, onBack }: Props) {
             </button>
           </div>
 
+          <label className="tx-date-label">날짜</label>
+          <input
+            className="tx-input"
+            type="date"
+            value={txDate}
+            onChange={(e) => setTxDate(e.target.value)}
+          />
+
           <input
             className="tx-input"
             type="text"
@@ -280,7 +293,7 @@ export default function TransactionsPage({ session, onBack }: Props) {
             onClick={handleAdd}
             disabled={saving}
           >
-            {saving ? '저장 중…' : '기록 추가'}
+            {saving ? '저장 중…' : '기록 추가하기'}
           </button>
         </div>
 
@@ -302,7 +315,8 @@ export default function TransactionsPage({ session, onBack }: Props) {
                 <article key={t.id} className="diary-item">
                   <div className="diary-item-main">
                     <p className="diary-item-date">
-                      {t.category || '기타'} · {formatDateTime(t.created_at)}
+                      {categoryIcon(t.category || '기타')} {t.category || '기타'}{' '}
+                      · {formatEntryDate(t.tx_date)}
                     </p>
                     <p className="diary-item-content">
                       <span
