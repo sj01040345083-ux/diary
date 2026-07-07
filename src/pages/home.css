@@ -493,11 +493,16 @@
 }
 
 .report-section-title {
+  display: inline-block;
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   margin: 1.75rem 0 0.9rem;
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.24rem 0.85rem;
+  box-shadow: var(--shadow-soft);
 }
 
 .money-card {
@@ -716,12 +721,16 @@
 
 /* "내 일기" 라벨 — 작고 차분한 소제목 */
 .diary-heading {
+  display: inline-block;
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   margin: 0 0 1rem;
-  padding-left: 0.1rem;
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.24rem 0.85rem;
+  box-shadow: var(--shadow-soft);
 }
 
 .diary-empty {
@@ -729,8 +738,8 @@
   border-radius: 22px;
   padding: 2.75rem 1.5rem;
   text-align: center;
-  color: var(--ink-faint);
-  background: rgba(255, 254, 250, 0.45);
+  color: var(--ink-soft);
+  background: rgba(255, 254, 250, 0.88);
   line-height: 1.9;
 }
 
@@ -973,11 +982,14 @@
 }
 .stat-month-label {
   font-family: 'Gowun Batang', serif;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--ink);
-  min-width: 8rem;
   text-align: center;
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.35rem 1.1rem;
+  box-shadow: var(--shadow-soft);
 }
 
 /* ── 통계: 도넛 그래프 ── */
@@ -998,13 +1010,15 @@
 }
 .stat-donut-label {
   font-size: 0.8rem;
-  color: var(--ink-faint);
+  color: var(--ink-soft);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.95);
 }
 .stat-donut-total {
   font-family: 'Gowun Batang', serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--ink);
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.95);
 }
 
 /* ── 통계: 카테고리 목록 ── */
