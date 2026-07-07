@@ -1,10 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { authBackground } from '../config/backgrounds'
 import { formatEntryDate } from '../lib/today'
 import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
 import './home.css'
+
+// 일기 글에 넣는 꾸미기 이모티콘 (기분 지정과는 별개)
+const stickerEmojis = [
+  '🌳',
+  '🌸',
+  '💚',
+  '☔',
+  '☁️',
+  ...emotions.map((e) => e.emoji),
+]
 
 type Props = {
   session: Session
@@ -29,6 +39,11 @@ export default function WritePage({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // 선택한 기분의 이름 (없으면 undefined)
+  const selectedEmotion = emotions.find((e) => e.emoji === mood)
+
   useEffect(() => {
     // 해당 날짜 일기가 이미 있으면 불러와 채워둡니다 (수정)
     getDiaryByDate(workDate)
@@ -42,6 +57,25 @@ export default function WritePage({
       .catch(() => {})
       .finally(() => setLoadingInitial(false))
   }, [workDate])
+
+  // 커서 위치에 이모티콘을 끼워 넣습니다.
+  function insertEmoji(emoji: string) {
+    const el = textareaRef.current
+    if (!el) {
+      setContent((c) => c + emoji)
+      return
+    }
+    const start = el.selectionStart ?? content.length
+    const end = el.selectionEnd ?? content.length
+    const next = content.slice(0, start) + emoji + content.slice(end)
+    setContent(next)
+    // 방금 넣은 이모티콘 뒤로 커서를 옮깁니다.
+    requestAnimationFrame(() => {
+      el.focus()
+      const pos = start + emoji.length
+      el.setSelectionRange(pos, pos)
+    })
+  }
 
   async function handleSave() {
     setError('')
@@ -84,9 +118,9 @@ export default function WritePage({
           </div>
         ) : (
           <>
-            {/* 기분 (선택) */}
+            {/* 오늘의 기분 (그 날의 감정 지정) */}
             <p className="mood-label">오늘의 기분 (선택)</p>
-            <div className="mood-row">
+            <div className={`mood-row ${mood ? 'has-selection' : ''}`}>
               {emotions.map((e) => (
                 <button
                   key={e.key}
@@ -100,14 +134,36 @@ export default function WritePage({
                 </button>
               ))}
             </div>
+            {/* 선택한 감정 이름 */}
+            <p className="mood-name">
+              {selectedEmotion ? selectedEmotion.label : ' '}
+            </p>
 
             <textarea
+              ref={textareaRef}
               className="write-textarea"
               placeholder="오늘 하루, 마음에 남은 한 줄을 적어보세요."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               autoFocus
             />
+
+            {/* 일기 글에 넣는 이모티콘 (글 꾸미기용, 기분 지정과 별개) */}
+            <p className="sticker-label">이모티콘 넣기 (글 중간에)</p>
+            <div className="sticker-row">
+              {stickerEmojis.map((em, i) => (
+                <button
+                  key={`${em}-${i}`}
+                  type="button"
+                  className="sticker-btn"
+                  onClick={() => insertEmoji(em)}
+                  aria-label={`${em} 넣기`}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+
             {error && <p className="write-error">{error}</p>}
             <button
               className="home-cta write-save"
