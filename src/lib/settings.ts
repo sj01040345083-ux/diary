@@ -4,7 +4,7 @@ import { backgroundUrl, defaultBackground } from '../config/backgrounds'
 
 export type Settings = {
   nickname: string // 불러줄 이름 (비어 있으면 이메일 앞부분 사용)
-  bg: string // 배경 사진 (forest1~forest5)
+  bg: string // 배경 사진 값 (bg1~bg6)
   font: string
   font_size: string
 }
