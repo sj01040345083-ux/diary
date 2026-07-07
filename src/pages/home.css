@@ -930,8 +930,10 @@
   line-height: 1.7;
   color: var(--ink);
   margin: 0;
-  white-space: pre-wrap; /* 줄바꿈 유지 */
-  word-break: break-word;
+  /* 목록에서는 한 줄만 미리보기 (넘치면 …) — 전체 내용은 상세 보기에서 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── 일기 작성 화면 ── */
