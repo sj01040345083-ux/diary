@@ -79,11 +79,15 @@
 
 /* 날짜 — 작고 차분하게 (숲 위에서도 잘 보이도록 옅은 흰 그림자) */
 .home-date {
+  display: inline-block;
   font-size: 0.82rem;
   letter-spacing: 0.04em;
   color: var(--ink-soft);
-  margin: 0 0 0.65rem;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.75);
+  margin: 0 0 0.7rem;
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 10px;
+  padding: 0.28rem 0.75rem;
+  box-shadow: var(--shadow-soft);
 }
 
 /* 인사말 — 크고 우아한 제목 (숲 위에서도 또렷하게) */
