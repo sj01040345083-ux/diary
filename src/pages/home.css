@@ -797,16 +797,28 @@
 
 /* ── 오늘의 기분 선택 ── */
 .mood-label {
+  display: inline-block;
   font-size: 0.82rem;
-  color: var(--ink-soft);
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.24rem 0.8rem;
   margin: 0 0 0.6rem;
+  box-shadow: var(--shadow-soft);
 }
 
 /* ── 일기 글 꾸미기 이모티콘 팔레트 ── */
 .sticker-label {
+  display: inline-block;
   font-size: 0.82rem;
-  color: var(--ink-soft);
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.24rem 0.8rem;
   margin: 1.1rem 0 0.5rem;
+  box-shadow: var(--shadow-soft);
 }
 .sticker-row {
   display: flex;
@@ -877,14 +889,22 @@
   transform: scale(0.82);
 }
 
-/* 선택한 감정 이름 */
+/* 선택한 감정 이름 (배경 칩으로 잘 보이게) */
 .mood-name {
   text-align: center;
+  margin: 0.2rem 0 1.25rem;
+  min-height: 1.7rem;
+}
+.mood-name-chip {
+  display: inline-block;
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--accent-strong);
-  margin: 0.2rem 0 1.25rem;
-  min-height: 1.2rem;
+  background: rgba(255, 254, 250, 0.96);
+  border: 1px solid #cfe0c6;
+  border-radius: 999px;
+  padding: 0.28rem 0.95rem;
+  box-shadow: var(--shadow-soft);
 }
 /* 선택된 이모지 오른쪽 위 ✓ 뱃지 */
 .mood-btn.is-selected::after {
@@ -954,6 +974,7 @@
   font-weight: 700;
   color: var(--ink);
   margin: 0 0 1.25rem;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.85);
 }
 
 .write-textarea {

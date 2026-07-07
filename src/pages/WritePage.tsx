@@ -10,9 +10,18 @@ import './home.css'
 const stickerEmojis = [
   '🌳',
   '🌸',
+  '🌵',
   '💚',
   '☔',
   '☁️',
+  '⛄',
+  '☕',
+  '🍺',
+  '🍦',
+  '🍰',
+  '🏊',
+  '🛁',
+  '♨️',
   ...emotions.map((e) => e.emoji),
 ]
 
@@ -136,7 +145,7 @@ export default function WritePage({
             </div>
             {/* 선택한 감정 이름 */}
             <p className="mood-name">
-              {selectedEmotion ? selectedEmotion.label : ' '}
+              {selectedEmotion && <span className="mood-name-chip">{selectedEmotion.label}</span>}
             </p>
 
             <textarea
