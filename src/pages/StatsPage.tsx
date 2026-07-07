@@ -139,6 +139,13 @@ export default function StatsPage() {
                     )
                   })}
                 </g>
+                {/* 가운데 크림색 원 (숫자가 잘 보이도록) */}
+                <circle
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={r - stroke / 2}
+                  fill="#fffdf8"
+                />
               </svg>
               <div className="stat-donut-center">
                 <span className="stat-donut-label">총 지출</span>
