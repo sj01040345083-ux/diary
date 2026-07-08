@@ -122,20 +122,22 @@ export default function HomePage({
 
         {/* 오늘의 명언 */}
         <section className="quote-card">
-          <button
-            className={`quote-fav ${isFav ? 'is-fav' : ''}`}
-            onClick={toggleFav}
-            disabled={favBusy}
-            aria-label="오늘의 명언 즐겨찾기"
-          >
-            {isFav ? '♥' : '♡'}
-          </button>
           <p className="quote-label">오늘의 명언</p>
           <blockquote className="quote-text">“{quote.text}”</blockquote>
           <p className="quote-author">— {quote.author}</p>
-          <button className="quote-fav-link" onClick={onFavorites}>
-            ⭐ 즐겨찾은 명언 보기
-          </button>
+
+          <div className="quote-actions">
+            <button
+              className={`quote-fav-btn ${isFav ? 'is-fav' : ''}`}
+              onClick={toggleFav}
+              disabled={favBusy}
+            >
+              {isFav ? '♥ 즐겨찾기 완료' : '♡ 즐겨찾기'}
+            </button>
+            <button className="quote-fav-link" onClick={onFavorites}>
+              ⭐ 즐겨찾은 명언 보기
+            </button>
+          </div>
         </section>
 
         {/* 일기 쓰기 버튼 → 작성 화면으로 이동 */}

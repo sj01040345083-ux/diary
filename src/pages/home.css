@@ -161,10 +161,50 @@
   cursor: default;
 }
 
-.quote-fav-link {
-  margin-top: 0.7rem;
+/* 명언 카드 아래 버튼 묶음 */
+.quote-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* 즐겨찾기 저장 버튼 (뚜렷하게) */
+.quote-fav-btn {
   font-family: inherit;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #d9594c;
+  background: #fdece9;
+  border: 1.5px solid #f2c4bd;
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.quote-fav-btn:not(.is-fav):hover:not(:disabled) {
+  background: #fbddd8;
+}
+.quote-fav-btn.is-fav:hover:not(:disabled) {
+  background: #d1544a;
+}
+.quote-fav-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.quote-fav-btn.is-fav {
+  color: #fff;
+  background: #e0685a;
+  border-color: #e0685a;
+}
+.quote-fav-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.quote-fav-link {
+  font-family: inherit;
+  font-size: 0.82rem;
   color: var(--accent-strong);
   background: none;
   border: none;
