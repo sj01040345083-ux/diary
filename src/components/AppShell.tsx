@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import TabBar from './TabBar'
 import type { Tab } from './TabBar'
-import { getSettings, applySettings } from '../lib/settings'
+import { getSettings, applySettings, getCachedSettings } from '../lib/settings'
 import HomePage from '../pages/HomePage'
 import WritePage from '../pages/WritePage'
 import TransactionsPage from '../pages/TransactionsPage'
@@ -27,7 +27,10 @@ export default function AppShell({ session }: Props) {
   const [editDate, setEditDate] = useState<string | null>(null)
 
   useEffect(() => {
-    // 앱을 열 때 저장된 화면 설정(배경색·글씨체·크기)을 불러와 적용합니다.
+    // 1) 로컬 캐시가 있으면 먼저 즉시 적용 (서버 응답을 기다리지 않고 배경 유지)
+    const cached = getCachedSettings()
+    if (cached) applySettings(cached)
+    // 2) 서버에서 최신 설정을 받아 다시 적용
     getSettings()
       .then(applySettings)
       .catch(() => {})
@@ -81,6 +84,7 @@ export default function AppShell({ session }: Props) {
         <HomePage
           session={session}
           onWrite={openWrite}
+          onEditDiary={openEdit}
           onTransactions={() => setOverlay('transactions')}
           onFavorites={() => setOverlay('favorites')}
         />

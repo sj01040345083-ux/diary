@@ -16,6 +16,30 @@ export const defaultSettings: Settings = {
   font_size: 'normal',
 }
 
+// ── 로컬 캐시 ──────────────────────────────────
+// 서버(Supabase) 응답을 기다리지 않고, 앱을 열자마자 지난번 배경·글씨체를
+// 즉시 적용하기 위한 보조 저장소입니다. (최종 저장은 여전히 서버)
+const LOCAL_KEY = 'soso.settings'
+
+export function cacheSettingsLocal(s: Settings): void {
+  try {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(s))
+  } catch {
+    // 저장 실패는 조용히 무시 (시크릿 모드 등)
+  }
+}
+
+export function getCachedSettings(): Settings | null {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<Settings>
+    return { ...defaultSettings, ...parsed }
+  } catch {
+    return null
+  }
+}
+
 // 내 설정 불러오기 (없으면 기본값)
 export async function getSettings(): Promise<Settings> {
   const { data, error } = await supabase
@@ -23,7 +47,7 @@ export async function getSettings(): Promise<Settings> {
     .select('nickname, bg, font, font_size')
     .maybeSingle()
   if (error) throw error
-  return data
+  const result: Settings = data
     ? {
         nickname: data.nickname ?? '',
         bg: data.bg,
@@ -31,6 +55,8 @@ export async function getSettings(): Promise<Settings> {
         font_size: data.font_size,
       }
     : { ...defaultSettings }
+  cacheSettingsLocal(result) // 다음 접속 때 바로 적용되도록 캐시
+  return result
 }
 
 // 설정 저장 (한 사용자당 한 줄, 있으면 수정)
@@ -50,6 +76,7 @@ export async function saveSettings(
     { onConflict: 'user_id' },
   )
   if (error) throw error
+  cacheSettingsLocal(s) // 로컬 캐시도 최신으로
 }
 
 // 닉네임만 저장합니다. (가입 시 이름을 설정에 저장하는 용도)

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
+import { getAutoLogin, isSessionActive, markSessionActive } from './lib/autoLogin'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
@@ -16,9 +17,18 @@ export default function App() {
   const [recovering, setRecovering] = useState(false) // 비밀번호 재설정 중
 
   useEffect(() => {
-    // 1) 앱을 열 때 이미 로그인돼 있는지 확인 (새로고침해도 로그인 유지)
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+    // 1) 앱을 열 때 이미 로그인돼 있는지 확인
+    supabase.auth.getSession().then(async ({ data }) => {
+      const existing = data.session
+      // "자동 로그인"이 꺼져 있고, 이번이 '새로 연 브라우저 세션'이면 로그아웃합니다.
+      // (같은 세션 내 새로고침은 isSessionActive 로 구분되어 로그인 유지)
+      if (existing && !getAutoLogin() && !isSessionActive()) {
+        await supabase.auth.signOut()
+        setSession(null)
+      } else {
+        setSession(existing)
+      }
+      markSessionActive()
       setChecking(false)
     })
 

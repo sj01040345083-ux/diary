@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import AuthLayout from '../components/AuthLayout'
 import { supabase } from '../lib/supabase'
 import { translateAuthError } from '../lib/authErrors'
+import { setAutoLogin, getAutoLogin, markSessionActive } from '../lib/autoLogin'
 
 // 이메일 형식이 맞는지 간단히 확인하는 규칙
 const EMAIL_RULE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -14,6 +15,8 @@ type Props = {
 export default function LoginPage({ onGoSignup }: Props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPw, setShowPw] = useState(false) // 비밀번호 보기/숨기기
+  const [remember, setRemember] = useState(getAutoLogin()) // 자동 로그인
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState('')
@@ -33,6 +36,8 @@ export default function LoginPage({ onGoSignup }: Props) {
     setNotice('')
     if (!validate()) return
     setLoading(true)
+    // 자동 로그인 여부를 먼저 저장 (비밀번호는 저장하지 않습니다)
+    setAutoLogin(remember)
     // 실제 로그인 시도 (Supabase)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
@@ -40,6 +45,8 @@ export default function LoginPage({ onGoSignup }: Props) {
       setNotice(translateAuthError(error.message))
       return
     }
+    // 이번 브라우저 세션을 활성으로 표시 (자동 로그인 OFF 시 새 창에서만 재로그인)
+    markSessionActive()
     // 로그인 성공 시: App 이 로그인 상태를 감지해 홈 화면으로 자동 이동합니다.
   }
 
@@ -60,8 +67,15 @@ export default function LoginPage({ onGoSignup }: Props) {
     setNotice('비밀번호 재설정 메일을 보냈어요 🌿 메일의 링크를 눌러주세요.')
   }
 
+  // 카카오 로그인 — 실제 연동은 앱 등록/도메인 설정이 필요해 지금은 안내만 합니다.
+  function handleKakao() {
+    setNotice('카카오 로그인은 준비 중이에요. 지금은 이메일로 로그인해주세요 🌿')
+  }
+
   return (
     <AuthLayout>
+      <p className="auth-welcome">소소한 하루를 기록해보세요 🌿</p>
+
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <div className="field">
           <label htmlFor="login-email">이메일</label>
@@ -79,19 +93,37 @@ export default function LoginPage({ onGoSignup }: Props) {
 
         <div className="field">
           <label htmlFor="login-password">비밀번호</label>
-          <input
-            id="login-password"
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={errors.password ? 'has-error' : ''}
-            autoComplete="current-password"
-          />
+          <div className={`field-password ${errors.password ? 'has-error' : ''}`}>
+            <input
+              id="login-password"
+              type={showPw ? 'text' : 'password'}
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 보기'}
+            >
+              {showPw ? '🙈' : '👁️'}
+            </button>
+          </div>
           <span className="field-error">{errors.password ?? ''}</span>
         </div>
 
-        <div className="auth-forgot">
+        {/* 자동 로그인 + 비밀번호 찾기 */}
+        <div className="auth-options">
+          <label className="auth-remember">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            자동 로그인
+          </label>
           <button type="button" className="link-btn" onClick={handleForgot}>
             비밀번호를 잊으셨나요?
           </button>
@@ -104,13 +136,17 @@ export default function LoginPage({ onGoSignup }: Props) {
         {notice && <p className="auth-notice">{notice}</p>}
       </form>
 
-      <div className="auth-divider" />
-      <p className="auth-foot">
-        아직 계정이 없으신가요?{' '}
-        <button type="button" className="link-btn" onClick={onGoSignup}>
-          회원가입
-        </button>
-      </p>
+      {/* 소셜 로그인 (카카오 — UI) */}
+      <div className="auth-or"><span>또는</span></div>
+      <button type="button" className="btn-kakao" onClick={handleKakao}>
+        <span className="btn-kakao-icon" aria-hidden>💬</span>
+        카카오로 시작하기
+      </button>
+
+      {/* 회원가입 (크림 테두리 버튼) */}
+      <button type="button" className="btn-outline" onClick={onGoSignup}>
+        이메일로 회원가입
+      </button>
     </AuthLayout>
   )
 }

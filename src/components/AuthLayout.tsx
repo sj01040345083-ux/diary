@@ -12,7 +12,15 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     >
       <div className="auth-card">
         <div className="auth-brand">
-          <div className="auth-logo" aria-hidden>🌿</div>
+          <div className="auth-logo" aria-hidden>
+            <img
+              className="auth-logo-img"
+              src="/clover-icon.svg"
+              alt=""
+              width={38}
+              height={38}
+            />
+          </div>
           <h1 className="auth-title">{APP_NAME}</h1>
           <p className="auth-subtitle">{APP_SUBTITLE}</p>
         </div>
