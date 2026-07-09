@@ -72,6 +72,13 @@
   box-shadow: var(--shadow-soft);
 }
 
+.auth-logo-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  display: block;
+}
+
 .auth-title {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
   font-weight: 700;
