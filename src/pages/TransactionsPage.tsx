@@ -10,6 +10,7 @@ import { todayString } from '../lib/diaries'
 import {
   getMyTransactions,
   addTransaction,
+  updateTransaction,
   deleteTransaction,
 } from '../lib/transactions'
 import type { Transaction, TxType } from '../lib/transactions'
@@ -42,6 +43,8 @@ export default function TransactionsPage({ session, onBack }: Props) {
   const [memo, setMemo] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  // 수정 중인 기록 id (null 이면 '새 기록 추가' 모드)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const [confirmTarget, setConfirmTarget] = useState<Transaction | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -74,7 +77,30 @@ export default function TransactionsPage({ session, onBack }: Props) {
     setCategory(next === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
-  async function handleAdd() {
+  // 입력 폼을 비웁니다. (추가 모드로 되돌리기)
+  function resetForm() {
+    setEditingId(null)
+    setAmount('')
+    setMemo('')
+    setError('')
+    setTxDate(todayString())
+  }
+
+  // 목록의 '수정' 버튼 → 그 기록을 폼에 채우고 수정 모드로 전환
+  function startEdit(t: Transaction) {
+    setEditingId(t.id)
+    setType(t.type)
+    setTxDate(t.tx_date)
+    setAmount(String(t.amount))
+    setCategory(t.category || (t.type === 'expense' ? expenseCategories[0] : incomeCategories[0]))
+    setMemo(t.memo ?? '')
+    setError('')
+    // 입력 폼이 화면 위쪽에 있으므로 위로 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // 새 기록 추가 또는 기존 기록 수정 (editingId 여부로 구분)
+  async function handleSubmit() {
     setError('')
     const value = Number(amount.replace(/[^0-9]/g, ''))
     if (!value || value <= 0) {
@@ -82,18 +108,22 @@ export default function TransactionsPage({ session, onBack }: Props) {
       return
     }
     setSaving(true)
+    const payload = {
+      type,
+      amount: value,
+      category,
+      memo: memo.trim() || null,
+      tx_date: txDate,
+    }
     try {
-      await addTransaction(session.user.id, {
-        type,
-        amount: value,
-        category,
-        memo: memo.trim() || null,
-        tx_date: txDate,
-      })
+      if (editingId) {
+        await updateTransaction(editingId, payload)
+      } else {
+        await addTransaction(session.user.id, payload)
+      }
       const fresh = await getMyTransactions()
       setItems(fresh)
-      setAmount('')
-      setMemo('')
+      resetForm()
     } catch {
       setError('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
     } finally {
@@ -154,6 +184,8 @@ export default function TransactionsPage({ session, onBack }: Props) {
     try {
       await deleteTransaction(confirmTarget.id)
       setItems((prev) => prev.filter((t) => t.id !== confirmTarget.id))
+      // 수정 중이던 기록을 삭제하면 폼도 초기화
+      if (editingId === confirmTarget.id) resetForm()
       setConfirmTarget(null)
     } catch {
       // 유지
@@ -288,11 +320,24 @@ export default function TransactionsPage({ session, onBack }: Props) {
           {error && <p className="write-error">{error}</p>}
           <button
             className="home-cta write-save"
-            onClick={handleAdd}
+            onClick={handleSubmit}
             disabled={saving}
           >
-            {saving ? '저장 중…' : '기록 추가하기'}
+            {saving
+              ? '저장 중…'
+              : editingId
+                ? '수정 저장하기'
+                : '기록 추가하기'}
           </button>
+          {editingId && (
+            <button
+              className="tx-edit-cancel"
+              onClick={resetForm}
+              disabled={saving}
+            >
+              수정 취소
+            </button>
+          )}
         </div>
 
         {/* 목록 */}
@@ -310,7 +355,10 @@ export default function TransactionsPage({ session, onBack }: Props) {
           ) : (
             <div className="diary-list">
               {items.map((t) => (
-                <article key={t.id} className="diary-item">
+                <article
+                  key={t.id}
+                  className={`diary-item ${editingId === t.id ? 'is-editing' : ''}`}
+                >
                   <div className="diary-item-main">
                     <p className="diary-item-date">
                       {categoryIcon(t.category || '기타')} {t.category || '기타'}{' '}
@@ -328,13 +376,22 @@ export default function TransactionsPage({ session, onBack }: Props) {
                       {t.memo ? ` · ${t.memo}` : ''}
                     </p>
                   </div>
-                  <button
-                    className="diary-delete-btn"
-                    onClick={() => setConfirmTarget(t)}
-                    aria-label="기록 삭제"
-                  >
-                    삭제
-                  </button>
+                  <div className="diary-item-actions">
+                    <button
+                      className="diary-edit-btn"
+                      onClick={() => startEdit(t)}
+                      aria-label="기록 수정"
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="diary-delete-btn"
+                      onClick={() => setConfirmTarget(t)}
+                      aria-label="기록 삭제"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </article>
               ))}
             </div>

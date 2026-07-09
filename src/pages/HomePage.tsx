@@ -16,6 +16,7 @@ import './home.css'
 type Props = {
   session: Session
   onWrite: () => void // "오늘 일기 쓰기" 버튼 → 작성 화면으로
+  onEditDiary: (date: string) => void // 일기 카드 "수정" → 작성(수정) 화면으로
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
 }
@@ -23,6 +24,7 @@ type Props = {
 export default function HomePage({
   session,
   onWrite,
+  onEditDiary,
   onTransactions,
   onFavorites,
 }: Props) {
@@ -176,16 +178,25 @@ export default function HomePage({
                     </p>
                     <p className="diary-item-content">{d.content}</p>
                   </div>
-                  <button
-                    className="diary-delete-btn"
-                    onClick={() => {
-                      setDeleteError('')
-                      setConfirmTarget(d)
-                    }}
-                    aria-label="일기 삭제"
-                  >
-                    삭제
-                  </button>
+                  <div className="diary-item-actions">
+                    <button
+                      className="diary-edit-btn"
+                      onClick={() => onEditDiary(d.entry_date)}
+                      aria-label="일기 수정"
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="diary-delete-btn"
+                      onClick={() => {
+                        setDeleteError('')
+                        setConfirmTarget(d)
+                      }}
+                      aria-label="일기 삭제"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </article>
               ))}
             </div>

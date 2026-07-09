@@ -46,6 +46,24 @@ export async function addTransaction(
   if (error) throw error
 }
 
+// 기존 기록을 수정합니다. (id 로 찾아 내용을 통째로 업데이트)
+export async function updateTransaction(
+  id: string,
+  t: NewTransaction,
+): Promise<void> {
+  const { error } = await supabase
+    .from('transactions')
+    .update({
+      type: t.type,
+      amount: t.amount,
+      category: t.category,
+      memo: t.memo,
+      tx_date: t.tx_date,
+    })
+    .eq('id', id)
+  if (error) throw error
+}
+
 export async function deleteTransaction(id: string): Promise<void> {
   const { error } = await supabase.from('transactions').delete().eq('id', id)
   if (error) throw error

@@ -1,36 +1,52 @@
-// 이 파일을 수정하면 앱에서 고를 수 있는 배경 사진 목록이 바뀝니다.
-// 새 사진을 넣으려면 src/assets/backgrounds/ 에 파일을 넣고 아래처럼 추가하세요.
+// 배경 사진 목록을 폴더에서 '자동으로' 불러옵니다.
+// src/assets/backgrounds/ 에 jpg·jpeg·png·webp 파일을 넣기만 하면
+// 코드를 고치지 않아도 설정 화면 목록에 자동으로 나타납니다.
 
-import bg1 from '../assets/backgrounds/1.jpg'
-import bg2 from '../assets/backgrounds/2.jpg'
-import bg3 from '../assets/backgrounds/3.jpg'
-import bg4 from '../assets/backgrounds/4.png'
-import bg5 from '../assets/backgrounds/5.jpg'
-import bg6 from '../assets/backgrounds/6.jpg'
+// Vite의 import.meta.glob 으로 폴더 안 이미지를 한 번에 가져옵니다.
+const modules = import.meta.glob(
+  '../assets/backgrounds/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
+  { eager: true, query: '?url', import: 'default' },
+) as Record<string, string>
 
-// 설정 화면 '배경 사진 선택'에 보여줄 목록 (value = 저장되는 값, label = 이름)
-export const backgroundOptions = [
-  { value: 'bg1', label: '숲', url: bg1 },
-  { value: 'bg2', label: '하트나무', url: bg2 },
-  { value: 'bg3', label: '겨울', url: bg3 },
-  { value: 'bg4', label: '딸기', url: bg4 },
-  { value: 'bg5', label: '별빛', url: bg5 },
-  { value: 'bg6', label: '봄들판', url: bg6 },
-]
-
-// value → 이미지 주소
-export const backgroundMap: Record<string, string> = {
-  bg1,
-  bg2,
-  bg3,
-  bg4,
-  bg5,
-  bg6,
+// 파일 이름(확장자 제외)에 붙일 예쁜 라벨. 없으면 파일명을 그대로 씁니다.
+const LABELS: Record<string, string> = {
+  '1': '숲',
+  '2': '하트나무',
+  '3': '겨울',
+  '4': '딸기',
+  '5': '별빛',
+  '6': '봄들판',
 }
 
-// 기본 배경
-export const defaultBackground = 'bg1'
+export type BgOption = { value: string; label: string; url: string }
+
+// 경로에서 파일 이름(확장자 제외)만 뽑아냅니다.
+function baseName(path: string): string {
+  const file = path.split('/').pop() ?? path
+  return file.replace(/\.[^.]+$/, '')
+}
+
+// 목록 만들기 — value 는 'bg' + 파일이름.
+// (기존 사용자 설정이 'bg1'~'bg6' 이므로, 숫자 파일명은 그대로 호환됩니다.)
+export const backgroundOptions: BgOption[] = Object.entries(modules)
+  .map(([path, url]) => {
+    const base = baseName(path)
+    return { value: `bg${base}`, label: LABELS[base] ?? base, url }
+  })
+  .sort((a, b) =>
+    a.value.localeCompare(b.value, undefined, { numeric: true }),
+  )
+
+// value → 이미지 주소
+export const backgroundMap: Record<string, string> = Object.fromEntries(
+  backgroundOptions.map((o) => [o.value, o.url]),
+)
+
+// 기본 배경 (첫 번째 이미지, 보통 'bg1')
+export const defaultBackground = backgroundOptions[0]?.value ?? 'bg1'
 
 export function backgroundUrl(value: string): string {
-  return backgroundMap[value] ?? backgroundMap[defaultBackground]
+  return (
+    backgroundMap[value] ?? backgroundMap[defaultBackground] ?? ''
+  )
 }

@@ -10,7 +10,15 @@ import {
 } from '../lib/settings'
 import type { Settings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
+import { getMyDiaries } from '../lib/diaries'
+import { getMyTransactions } from '../lib/transactions'
 import './home.css'
+
+// 이번 달 "YYYY-MM"
+function thisMonth(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
 
 type Props = {
   session: Session
@@ -21,6 +29,7 @@ export default function SettingsPage({ session }: Props) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
+  const [exporting, setExporting] = useState<'' | 'xlsx' | 'docx'>('')
 
   useEffect(() => {
     getSettings()
@@ -55,6 +64,26 @@ export default function SettingsPage({ session }: Props) {
 
   async function handleLogout() {
     await supabase.auth.signOut()
+  }
+
+  // 이번 달 기록을 엑셀/워드로 내보내기 (필요할 때 데이터를 불러옵니다)
+  async function handleExport(kind: 'xlsx' | 'docx') {
+    setExporting(kind)
+    setNotice('')
+    try {
+      const [diaries, transactions] = await Promise.all([
+        getMyDiaries(),
+        getMyTransactions(),
+      ])
+      const data = { month: thisMonth(), diaries, transactions }
+      const exporters = await import('../lib/exporters')
+      if (kind === 'xlsx') exporters.exportRecordsXlsx(data)
+      else await exporters.exportReportDocx(data)
+    } catch {
+      setNotice('내보내기에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setExporting('')
+    }
   }
 
   return (
@@ -134,6 +163,27 @@ export default function SettingsPage({ session }: Props) {
               {saving ? '저장 중…' : '설정 저장'}
             </button>
             {notice && <p className="home-notice">{notice}</p>}
+
+            <p className="report-section-title">데이터 내보내기</p>
+            <p className="settings-hint">
+              이번 달 일기·소비·수입 기록을 파일로 저장해요.
+            </p>
+            <div className="export-row">
+              <button
+                className="export-btn"
+                onClick={() => handleExport('xlsx')}
+                disabled={exporting !== ''}
+              >
+                {exporting === 'xlsx' ? '만드는 중…' : '📊 엑셀로 내보내기'}
+              </button>
+              <button
+                className="export-btn"
+                onClick={() => handleExport('docx')}
+                disabled={exporting !== ''}
+              >
+                {exporting === 'docx' ? '만드는 중…' : '📄 워드로 내보내기'}
+              </button>
+            </div>
 
             <button className="settings-logout" onClick={handleLogout}>
               로그아웃
