@@ -8,7 +8,7 @@
   background-image: var(--app-bg);
   background-size: cover;
   background-position: center;
-  padding-bottom: 6rem; /* 하단 탭바에 내용이 가리지 않도록 */
+  padding-bottom: 7.5rem; /* 떠 있는 하단 탭바에 내용이 가리지 않도록 */
 }
 
 /* 배경 위 크림색 덮개 (글자가 잘 보이게, 살짝 더 밝고 은은하게) */
@@ -1191,6 +1191,138 @@
 
 .stat-block {
   margin-bottom: 0.5rem;
+}
+
+/* ── 통계: 수입·지출 비교 (가로 비율 바) ── */
+.compare-card {
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 1rem 1.1rem 1.15rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 8px 22px rgba(49, 68, 55, 0.08);
+}
+.compare-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.compare-tag.income {
+  color: #4f8a6b;
+}
+.compare-tag.expense {
+  color: #c0674f;
+}
+.compare-bar {
+  display: flex;
+  height: 0.85rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--line-soft);
+}
+.compare-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.compare-seg.income {
+  background: #7cc196;
+}
+.compare-seg.expense {
+  background: #e0917f;
+}
+
+/* ── 통계: 고정 수입·지출 (작고 깔끔한 카드) ── */
+.fixed-card {
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 8px 22px rgba(49, 68, 55, 0.08);
+}
+.fixed-group-label {
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin: 0 0 0.55rem;
+}
+.fixed-group-label.income {
+  color: #4f8a6b;
+}
+.fixed-group-label.expense {
+  color: #c0674f;
+}
+.fixed-divider {
+  height: 1px;
+  background: var(--line-soft);
+  margin: 0.85rem 0;
+}
+.fixed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.fixed-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.fixed-name {
+  flex-shrink: 0;
+  width: 5.5rem;
+  font-size: 0.88rem;
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fixed-bar-track {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--line-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fixed-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.fixed-bar-fill.income {
+  background: #7cc196;
+}
+.fixed-bar-fill.expense {
+  background: #e0917f;
+}
+.fixed-amt {
+  flex-shrink: 0;
+  width: 5.5rem;
+  text-align: right;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.fixed-amt.income {
+  color: #4f8a6b;
+}
+.fixed-amt.expense {
+  color: #c0674f;
+}
+.fixed-empty {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin: 0;
+}
+.fixed-hint {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: 0.85rem 0 0.5rem;
 }
 
 /* ── 통계: 내보내기 버튼 ── */

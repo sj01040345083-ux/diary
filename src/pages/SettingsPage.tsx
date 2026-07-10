@@ -77,8 +77,8 @@ export default function SettingsPage({ session }: Props) {
       ])
       const data = { month: thisMonth(), diaries, transactions }
       const exporters = await import('../lib/exporters')
-      if (kind === 'xlsx') exporters.exportRecordsXlsx(data)
-      else await exporters.exportReportDocx(data)
+      if (kind === 'xlsx') exporters.exportStatsXlsx(data)
+      else await exporters.exportDiaryDocx(data)
     } catch {
       setNotice('내보내기에 실패했어요. 잠시 후 다시 시도해주세요.')
     } finally {
