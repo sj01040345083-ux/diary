@@ -3,7 +3,7 @@ import { getMyTransactions } from '../lib/transactions'
 import type { Transaction } from '../lib/transactions'
 import { getMyDiaries } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
-import { categoryIcon, pastelColor } from '../config/categories'
+import { categoryIcon } from '../config/categories'
 import './home.css'
 
 function won(n: number): string {
@@ -27,14 +27,14 @@ function thisMonth(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
-type Segment = { name: string; amount: number; color: string; percent: number }
+type Item = { name: string; amount: number }
 
-// 선택한 달, 특정 종류(수입/지출)를 카테고리별로 합산
-function buildSegments(
+// 선택한 달·종류(수입/지출)를 카테고리별로 합산 → 큰 금액순 목록 + 합계
+function summarize(
   txs: Transaction[],
   month: string,
   type: 'income' | 'expense',
-): { segments: Segment[]; total: number } {
+): { items: Item[]; total: number } {
   const monthly = txs.filter(
     (t) => t.type === type && t.tx_date.startsWith(month),
   )
@@ -44,86 +44,40 @@ function buildSegments(
     sums[key] = (sums[key] || 0) + Number(t.amount)
   })
   const total = Object.values(sums).reduce((s, v) => s + v, 0)
-  const segments = Object.entries(sums)
+  const items = Object.entries(sums)
     .map(([name, amount]) => ({ name, amount }))
     .sort((a, b) => b.amount - a.amount)
-    .map((seg, i) => ({
-      ...seg,
-      color: pastelColor(i),
-      percent: total ? (seg.amount / total) * 100 : 0,
-    }))
-  return { segments, total }
+  return { items, total }
 }
 
-// 도넛 그래프 (재사용)
-function Donut({
-  segments,
+// 고정 수입·지출: 최대 3개까지만, 각 항목은 텍스트 + 작은 비율 막대
+function FixedList({
+  items,
   total,
-  label,
+  tone,
 }: {
-  segments: Segment[]
+  items: Item[]
   total: number
-  label: string
+  tone: 'income' | 'expense'
 }) {
-  const size = 190
-  const stroke = 30
-  const r = (size - stroke) / 2
-  const C = 2 * Math.PI * r
-  let cumulative = 0
+  const top = items.slice(0, 3)
+  if (top.length === 0) {
+    return <p className="fixed-empty">기록이 없어요.</p>
+  }
   return (
-    <div className="stat-donut-wrap">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={r}
-            fill="none"
-            stroke="rgba(0,0,0,0.05)"
-            strokeWidth={stroke}
-          />
-          {segments.map((seg) => {
-            const len = (seg.percent / 100) * C
-            const offset = -(cumulative / 100) * C
-            cumulative += seg.percent
-            return (
-              <circle
-                key={seg.name}
-                cx={size / 2}
-                cy={size / 2}
-                r={r}
-                fill="none"
-                stroke={seg.color}
-                strokeWidth={stroke}
-                strokeDasharray={`${len} ${C - len}`}
-                strokeDashoffset={offset}
-                strokeLinecap="butt"
-              />
-            )
-          })}
-        </g>
-        <circle cx={size / 2} cy={size / 2} r={r - stroke / 2} fill="#fffdf8" />
-      </svg>
-      <div className="stat-donut-center">
-        <span className="stat-donut-label">{label}</span>
-        <span className="stat-donut-total">{won(total)}원</span>
-      </div>
-    </div>
-  )
-}
-
-// 카테고리별 목록 (재사용)
-function CategoryList({ segments }: { segments: Segment[] }) {
-  return (
-    <div className="stat-cat-list">
-      {segments.map((seg) => (
-        <div className="stat-cat-row" key={seg.name}>
-          <span className="stat-cat-dot" style={{ background: seg.color }} />
-          <span className="stat-cat-name">
-            {categoryIcon(seg.name)} {seg.name}
+    <div className="fixed-list">
+      {top.map((it) => (
+        <div className="fixed-row" key={it.name}>
+          <span className="fixed-name">
+            {categoryIcon(it.name)} {it.name}
           </span>
-          <span className="stat-cat-pct">{Math.round(seg.percent)}%</span>
-          <span className="stat-cat-amt">{won(seg.amount)}원</span>
+          <span className="fixed-bar-track">
+            <span
+              className={`fixed-bar-fill ${tone}`}
+              style={{ width: `${total ? (it.amount / total) * 100 : 0}%` }}
+            />
+          </span>
+          <span className={`fixed-amt ${tone}`}>{won(it.amount)}원</span>
         </div>
       ))}
     </div>
@@ -150,33 +104,21 @@ export default function StatsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const expense = useMemo(
-    () => buildSegments(txs, month, 'expense'),
-    [txs, month],
-  )
-  const income = useMemo(
-    () => buildSegments(txs, month, 'income'),
-    [txs, month],
-  )
+  const expense = useMemo(() => summarize(txs, month, 'expense'), [txs, month])
+  const income = useMemo(() => summarize(txs, month, 'income'), [txs, month])
   const balance = income.total - expense.total
-  const hasData = income.total > 0 || expense.total > 0
+  const sum = income.total + expense.total
+  const hasData = sum > 0
+  // 수입·지출 비교 비율 (합계 대비)
+  const incomePct = sum ? Math.round((income.total / sum) * 100) : 0
+  const expensePct = sum ? 100 - incomePct : 0
 
-  // 내보내기 라이브러리는 버튼을 누를 때만 불러옵니다 (초기 로딩 가볍게)
+  // 엑셀 라이브러리는 버튼을 누를 때만 불러옵니다 (초기 로딩 가볍게)
   async function handleExcel() {
     setExporting(true)
     try {
-      const { exportRecordsXlsx } = await import('../lib/exporters')
-      exportRecordsXlsx({ month, diaries, transactions: txs })
-    } finally {
-      setExporting(false)
-    }
-  }
-
-  async function handleWord() {
-    setExporting(true)
-    try {
-      const { exportReportDocx } = await import('../lib/exporters')
-      await exportReportDocx({ month, diaries, transactions: txs })
+      const { exportStatsXlsx } = await import('../lib/exporters')
+      exportStatsXlsx({ month, diaries, transactions: txs })
     } finally {
       setExporting(false)
     }
@@ -212,29 +154,25 @@ export default function StatsPage() {
           <div className="diary-empty">
             <p>불러오는 중…</p>
           </div>
-        ) : !hasData ? (
-          <div className="diary-empty">
-            <p>이번 달 기록이 아직 없어요.</p>
-            <p>소비·수입에서 기록을 남겨보세요 🌿</p>
-          </div>
         ) : (
           <>
-            {/* 월간 요약 */}
+            {/* 이번 달 요약 */}
+            <p className="report-section-title">이번 달 요약</p>
             <div className="summary-card">
               <div className="summary-item">
                 <span className="summary-label">총 수입</span>
                 <span className="summary-value income">
-                  +{won(income.total)}원
+                  {won(income.total)}원
                 </span>
               </div>
               <div className="summary-item">
                 <span className="summary-label">총 지출</span>
                 <span className="summary-value expense">
-                  -{won(expense.total)}원
+                  {won(expense.total)}원
                 </span>
               </div>
               <div className="summary-item summary-balance">
-                <span className="summary-label">잔액</span>
+                <span className="summary-label">남은 금액</span>
                 <span
                   className={`summary-value ${balance < 0 ? 'expense' : 'income'}`}
                 >
@@ -244,38 +182,60 @@ export default function StatsPage() {
               </div>
             </div>
 
-            {/* 지출 통계 */}
-            {expense.total > 0 && (
-              <section className="stat-block">
-                <p className="report-section-title">지출 통계</p>
-                <Donut
-                  segments={expense.segments}
-                  total={expense.total}
-                  label="총 지출"
-                />
-                <CategoryList segments={expense.segments} />
-              </section>
+            {!hasData ? (
+              <div className="diary-empty">
+                <p>이번 달 기록이 아직 없어요.</p>
+                <p>소비·수입에서 기록을 남겨보세요 🌿</p>
+              </div>
+            ) : (
+              <>
+                {/* 수입·지출 비교 (가로 비율 바) */}
+                <p className="report-section-title">수입·지출 비교</p>
+                <div className="compare-card">
+                  <div className="compare-legend">
+                    <span className="compare-tag income">
+                      수입 {incomePct}%
+                    </span>
+                    <span className="compare-tag expense">
+                      지출 {expensePct}%
+                    </span>
+                  </div>
+                  <div className="compare-bar">
+                    <span
+                      className="compare-seg income"
+                      style={{ width: `${incomePct}%` }}
+                    />
+                    <span
+                      className="compare-seg expense"
+                      style={{ width: `${expensePct}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* 고정 수입·지출 (큰 금액순 최대 3개) */}
+                <p className="report-section-title">고정 수입·지출</p>
+                <div className="fixed-card">
+                  <p className="fixed-group-label income">수입</p>
+                  <FixedList
+                    items={income.items}
+                    total={income.total}
+                    tone="income"
+                  />
+                  <div className="fixed-divider" />
+                  <p className="fixed-group-label expense">지출</p>
+                  <FixedList
+                    items={expense.items}
+                    total={expense.total}
+                    tone="expense"
+                  />
+                </div>
+                <p className="fixed-hint">
+                  더 자세한 내용은 엑셀 파일에서 확인할 수 있어요.
+                </p>
+              </>
             )}
 
-            {/* 수입 통계 */}
-            {income.total > 0 && (
-              <section className="stat-block">
-                <p className="report-section-title">수입 통계</p>
-                <Donut
-                  segments={income.segments}
-                  total={income.total}
-                  label="총 수입"
-                />
-                <CategoryList segments={income.segments} />
-              </section>
-            )}
-          </>
-        )}
-
-        {/* 내보내기 */}
-        {!loading && (
-          <>
-            <p className="report-section-title">내보내기</p>
+            {/* 엑셀 내보내기 (하나만) */}
             <div className="export-row">
               <button
                 className="export-btn"
@@ -283,13 +243,6 @@ export default function StatsPage() {
                 disabled={exporting}
               >
                 {exporting ? '만드는 중…' : '📊 엑셀로 내보내기'}
-              </button>
-              <button
-                className="export-btn"
-                onClick={handleWord}
-                disabled={exporting}
-              >
-                {exporting ? '만드는 중…' : '📄 워드로 내보내기'}
               </button>
             </div>
           </>

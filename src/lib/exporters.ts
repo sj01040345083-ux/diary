@@ -1,5 +1,7 @@
-// 기록과 월간 통계를 엑셀(.xlsx) / 워드(.docx) 파일로 내려받는 도구입니다.
+// 기록을 엑셀(.xlsx) / 워드(.docx) 파일로 내려받는 도구입니다.
 // 무료 오픈소스 라이브러리(xlsx, docx)만 사용합니다.
+// - 엑셀: 통계 화면 전용 (월간요약 + 수입/지출/일기 기록, 모든 기록에 날짜 포함)
+// - 워드: 기록 화면 전용 (일기 기록만)
 import * as XLSX from 'xlsx'
 import {
   Document,
@@ -7,10 +9,6 @@ import {
   Paragraph,
   HeadingLevel,
   TextRun,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
   AlignmentType,
 } from 'docx'
 import type { Diary } from './diaries'
@@ -23,8 +21,11 @@ function monthTitle(month: string): string {
   return `${y}년 ${Number(m)}월`
 }
 
-function won(n: number): string {
-  return n.toLocaleString('ko-KR')
+// 본문에서 이모지 문자만 뽑아 중복 없이 모읍니다. ("선택한 이모티콘" 칸용)
+function extractEmojis(text: string): string {
+  const matches = text.match(/\p{Extended_Pictographic}/gu)
+  if (!matches) return ''
+  return Array.from(new Set(matches)).join(' ')
 }
 
 export type ExportData = {
@@ -33,7 +34,7 @@ export type ExportData = {
   transactions: Transaction[]
 }
 
-// 그 달 데이터만 골라내고 합계를 계산합니다.
+// 그 달 데이터만 골라내고 합계를 계산합니다. (날짜 오름차순 정렬)
 function prepare({ month, diaries, transactions }: ExportData) {
   const monthDiaries = diaries
     .filter((d) => d.entry_date.startsWith(month))
@@ -41,13 +42,18 @@ function prepare({ month, diaries, transactions }: ExportData) {
   const monthTx = transactions
     .filter((t) => t.tx_date.startsWith(month))
     .sort((a, b) => a.tx_date.localeCompare(b.tx_date))
-  const income = monthTx
-    .filter((t) => t.type === 'income')
-    .reduce((s, t) => s + Number(t.amount), 0)
-  const expense = monthTx
-    .filter((t) => t.type === 'expense')
-    .reduce((s, t) => s + Number(t.amount), 0)
-  return { monthDiaries, monthTx, income, expense, balance: income - expense }
+  const incomeTx = monthTx.filter((t) => t.type === 'income')
+  const expenseTx = monthTx.filter((t) => t.type === 'expense')
+  const income = incomeTx.reduce((s, t) => s + Number(t.amount), 0)
+  const expense = expenseTx.reduce((s, t) => s + Number(t.amount), 0)
+  return {
+    monthDiaries,
+    incomeTx,
+    expenseTx,
+    income,
+    expense,
+    balance: income - expense,
+  }
 }
 
 // 브라우저에서 파일 다운로드를 시작합니다.
@@ -59,45 +65,33 @@ function download(blob: Blob, filename: string) {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  // 잠시 후 메모리 정리
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-// ── 엑셀(.xlsx) 내보내기 ─────────────────────────
-export function exportRecordsXlsx(data: ExportData): void {
-  const { monthDiaries, monthTx, income, expense, balance } = prepare(data)
+// ── 엑셀(.xlsx) 내보내기 (통계 화면 전용) ─────────
+export function exportStatsXlsx(data: ExportData): void {
+  const { monthDiaries, incomeTx, expenseTx, income, expense, balance } =
+    prepare(data)
   const wb = XLSX.utils.book_new()
 
-  // 1) 월간 요약 시트
+  // 1) 월간 요약
   const summary = [
-    ['항목', '금액(원)'],
+    ['기준 월', data.month],
     ['총 수입', income],
     ['총 지출', expense],
-    ['잔액', balance],
+    ['남은 금액', balance],
   ]
   XLSX.utils.book_append_sheet(
     wb,
     XLSX.utils.aoa_to_sheet(summary),
-    '월간요약',
+    '월간 요약',
   )
 
-  // 2) 일기 시트
-  const diaryRows = [
-    ['날짜', '기분', '내용'],
-    ...monthDiaries.map((d) => [d.entry_date, d.mood ?? '', d.content]),
-  ]
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet(diaryRows),
-    '일기',
-  )
-
-  // 3) 소비·수입 시트
-  const txRows = [
-    ['날짜', '구분', '카테고리', '금액(원)', '메모'],
-    ...monthTx.map((t) => [
-      t.tx_date,
-      t.type === 'income' ? '수입' : '지출',
+  // 2) 수입 기록 (날짜 · 카테고리 · 금액 · 메모)
+  const incomeRows = [
+    ['날짜', '카테고리', '금액', '메모'],
+    ...incomeTx.map((t) => [
+      t.tx_date, // YYYY-MM-DD
       t.category ?? '',
       Number(t.amount),
       t.memo ?? '',
@@ -105,8 +99,40 @@ export function exportRecordsXlsx(data: ExportData): void {
   ]
   XLSX.utils.book_append_sheet(
     wb,
-    XLSX.utils.aoa_to_sheet(txRows),
-    '소비수입',
+    XLSX.utils.aoa_to_sheet(incomeRows),
+    '수입 기록',
+  )
+
+  // 3) 지출 기록 (날짜 · 카테고리 · 금액 · 메모)
+  const expenseRows = [
+    ['날짜', '카테고리', '금액', '메모'],
+    ...expenseTx.map((t) => [
+      t.tx_date,
+      t.category ?? '',
+      Number(t.amount),
+      t.memo ?? '',
+    ]),
+  ]
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.aoa_to_sheet(expenseRows),
+    '지출 기록',
+  )
+
+  // 4) 일기 기록 (날짜 · 기분 · 내용 · 선택한 이모티콘)
+  const diaryRows = [
+    ['날짜', '기분', '내용', '선택한 이모티콘'],
+    ...monthDiaries.map((d) => [
+      d.entry_date,
+      d.mood ?? '',
+      d.content,
+      extractEmojis(d.content),
+    ]),
+  ]
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.aoa_to_sheet(diaryRows),
+    '일기 기록',
   )
 
   const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' })
@@ -114,53 +140,19 @@ export function exportRecordsXlsx(data: ExportData): void {
     new Blob([out], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     }),
-    `soso-diary-records-${data.month}.xlsx`,
+    `soso-diary-통계-${data.month}.xlsx`,
   )
 }
 
-// ── 워드(.docx) 내보내기 ─────────────────────────
-function cell(text: string, bold = false, align: 'left' | 'right' = 'left') {
-  return new TableCell({
-    width: { size: 33, type: WidthType.PERCENTAGE },
-    children: [
-      new Paragraph({
-        alignment:
-          align === 'right' ? AlignmentType.RIGHT : AlignmentType.LEFT,
-        children: [new TextRun({ text, bold })],
-      }),
-    ],
-  })
-}
+// ── 워드(.docx) 내보내기 (기록 화면 전용, 일기만) ──
+export async function exportDiaryDocx(data: ExportData): Promise<void> {
+  const { monthDiaries } = prepare(data)
 
-export async function exportReportDocx(data: ExportData): Promise<void> {
-  const { monthDiaries, monthTx, income, expense, balance } = prepare(data)
-
-  const summaryTable = new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
-    rows: [
-      new TableRow({
-        children: [cell('항목', true), cell('금액(원)', true, 'right')],
-      }),
-      new TableRow({
-        children: [cell('총 수입'), cell(`${won(income)}원`, false, 'right')],
-      }),
-      new TableRow({
-        children: [cell('총 지출'), cell(`${won(expense)}원`, false, 'right')],
-      }),
-      new TableRow({
-        children: [
-          cell('잔액', true),
-          cell(`${won(balance)}원`, true, 'right'),
-        ],
-      }),
-    ],
-  })
-
-  const children: (Paragraph | Table)[] = [
+  const children: Paragraph[] = [
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [
-        new TextRun({ text: 'Soso Diary', bold: true, size: 40 }),
+        new TextRun({ text: 'Soso Diary 일기 기록', bold: true, size: 36 }),
       ],
     }),
     new Paragraph({
@@ -168,18 +160,11 @@ export async function exportReportDocx(data: ExportData): Promise<void> {
       spacing: { after: 300 },
       children: [
         new TextRun({
-          text: `${monthTitle(data.month)} 기록 리포트`,
-          size: 26,
+          text: `기준 월: ${monthTitle(data.month)}`,
+          size: 24,
           color: '3FA535',
         }),
       ],
-    }),
-    new Paragraph({ text: '월간 요약', heading: HeadingLevel.HEADING_2 }),
-    summaryTable,
-    new Paragraph({
-      text: '일기',
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 400 },
     }),
   ]
 
@@ -189,7 +174,8 @@ export async function exportReportDocx(data: ExportData): Promise<void> {
     for (const d of monthDiaries) {
       children.push(
         new Paragraph({
-          spacing: { before: 160 },
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 220, after: 40 },
           children: [
             new TextRun({
               text: `${d.mood ? d.mood + ' ' : ''}${formatEntryDate(d.entry_date)}`,
@@ -202,32 +188,7 @@ export async function exportReportDocx(data: ExportData): Promise<void> {
     }
   }
 
-  children.push(
-    new Paragraph({
-      text: '소비 · 수입',
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 400 },
-    }),
-  )
-  if (monthTx.length === 0) {
-    children.push(new Paragraph({ text: '이 달의 소비·수입 기록이 없어요.' }))
-  } else {
-    for (const t of monthTx) {
-      const sign = t.type === 'income' ? '+' : '-'
-      children.push(
-        new Paragraph({
-          spacing: { before: 80 },
-          children: [
-            new TextRun({
-              text: `${t.tx_date}  ·  ${t.category ?? '기타'}  ·  ${sign}${won(Number(t.amount))}원${t.memo ? '  ·  ' + t.memo : ''}`,
-            }),
-          ],
-        }),
-      )
-    }
-  }
-
   const doc = new Document({ sections: [{ children }] })
   const blob = await Packer.toBlob(doc)
-  download(blob, `soso-diary-report-${data.month}.docx`)
+  download(blob, `soso-diary-일기-${data.month}.docx`)
 }
