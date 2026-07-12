@@ -1020,6 +1020,154 @@
   transform: scale(0.92);
 }
 
+/* ── 사진 첨부 ── */
+.photo-label {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.24rem 0.8rem;
+  margin: 1.1rem 0 0.5rem;
+  box-shadow: var(--shadow-soft);
+}
+.photo-card {
+  background: var(--glass-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: 0 8px 22px rgba(49, 68, 55, 0.08);
+}
+.photo-hint {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0.35rem 0;
+  text-align: center;
+}
+.photo-busy {
+  font-size: 0.85rem;
+  color: var(--accent-strong);
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+.photo-error {
+  font-size: 0.85rem;
+  color: var(--danger);
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+.photo-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.85rem;
+}
+.photo-pick-btn {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #4f6b4a;
+  background: var(--paper);
+  border: 1.5px solid #cfe0c6;
+  border-radius: 14px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.photo-pick-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+.photo-pick-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.photo-clear-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+}
+.photo-clear-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* ── 일기 사진 콜라주 (장수별 배치) ── */
+.collage {
+  display: grid;
+  gap: 4px;
+  margin-top: 0.7rem;
+  border-radius: 14px;
+  overflow: hidden;
+  height: 180px;
+}
+.collage.collage-edit {
+  height: 220px;
+  margin-top: 0;
+}
+.collage-cell {
+  position: relative;
+  overflow: hidden;
+}
+.collage-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.collage-1 {
+  grid-template-columns: 1fr;
+}
+.collage-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.collage-3 {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.collage-3 > .collage-cell:first-child {
+  grid-row: 1 / span 2;
+}
+.collage-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.collage-5,
+.collage-6 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+}
+/* 미리보기 사진 × 삭제 버튼 */
+.photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: rgba(30, 40, 30, 0.6);
+  color: #fff;
+  border: none;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-remove:hover {
+  background: rgba(30, 40, 30, 0.85);
+}
+
 .mood-row {
   display: flex;
   flex-wrap: wrap;

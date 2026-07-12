@@ -10,6 +10,7 @@ import {
 } from '../lib/favorites'
 import { getSettings, resolveDisplayName } from '../lib/settings'
 import Header from '../components/Header'
+import DiaryPhotos from '../components/DiaryPhotos'
 import './home.css'
 
 // 로그인한 사용자가 보는 진짜 Soso Diary 홈 화면입니다.
@@ -177,6 +178,7 @@ export default function HomePage({
                       {formatEntryDate(d.entry_date)}
                     </p>
                     <p className="diary-item-content">{d.content}</p>
+                    <DiaryPhotos date={d.entry_date} />
                   </div>
                   <div className="diary-item-actions">
                     <button
