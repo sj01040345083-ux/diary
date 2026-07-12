@@ -127,7 +127,7 @@ export default function StatsPage() {
   return (
     <div className="home-screen">
       <header className="tab-header">
-        <div className="write-title">통계</div>
+        <div className="write-title">가계부 통계</div>
       </header>
 
       <main className="home-container">
@@ -212,8 +212,8 @@ export default function StatsPage() {
                   </div>
                 </div>
 
-                {/* 고정 수입·지출 (큰 금액순 최대 3개) */}
-                <p className="report-section-title">고정 수입·지출</p>
+                {/* 수입·지출 내역 (큰 금액순 최대 3개) */}
+                <p className="report-section-title">수입·지출 내역</p>
                 <div className="fixed-card">
                   <p className="fixed-group-label income">수입</p>
                   <FixedList

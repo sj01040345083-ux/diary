@@ -88,7 +88,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
   return (
     <div className="home-screen">
       <header className="tab-header">
-        <div className="write-title">기록</div>
+        <div className="write-title">일기 기록</div>
       </header>
 
       <main className="home-container">

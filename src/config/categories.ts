@@ -10,7 +10,8 @@ export const expenseCategories = [
   '기타',
 ]
 
-export const incomeCategories = ['월급', '용돈', '부수입', '기타']
+// 수입 카테고리 (요청에 따라 '기타' 제외 — 이미 저장된 '기타' 수입 기록은 그대로 표시됩니다)
+export const incomeCategories = ['월급', '용돈', '부수입']
 
 // 카테고리별 아이콘 (없는 카테고리는 기본 아이콘)
 export const categoryIcons: Record<string, string> = {

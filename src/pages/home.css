@@ -29,8 +29,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.4rem;
-  background: rgba(255, 253, 248, 0.72);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 253, 248, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(220, 228, 214, 0.6);
 }
 
@@ -99,7 +100,7 @@
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 0 0 2rem;
-  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
+  text-shadow: var(--text-halo);
 }
 
 /* ── 오늘의 명언 카드 (가운데 정렬 + 부드러운 그림자) ── */
@@ -533,12 +534,13 @@
   align-items: center;
   justify-content: center;
   padding: 1rem 1.4rem;
-  background: rgba(255, 253, 248, 0.72);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 253, 248, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(220, 228, 214, 0.6);
 }
 .tab-header .write-title {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
 }
 
 /* ── 리포트 ── */
@@ -1438,19 +1440,28 @@
 /* ── 일기 작성 화면 ── */
 .icon-btn {
   font-family: inherit;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(220, 228, 214, 0.9);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--glass-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
-  padding: 0.42rem 0.95rem;
+  padding: 0.5rem 1.05rem;
+  min-height: 2.4rem;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 3px 10px rgba(49, 68, 55, 0.16);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.12s ease;
 }
 
 .icon-btn:hover:not(:disabled) {
   background: #eef3e8;
-  color: #5e7d58;
+  color: var(--accent-strong);
+}
+
+.icon-btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .icon-btn:disabled {
@@ -1475,7 +1486,7 @@
   font-weight: 700;
   color: var(--ink);
   margin: 0 0 1.25rem;
-  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.85);
+  text-shadow: var(--text-halo);
 }
 
 .write-textarea {
@@ -1704,9 +1715,10 @@
 }
 
 .tabbar-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 /* 가운데 ➕ 추가 버튼 */
