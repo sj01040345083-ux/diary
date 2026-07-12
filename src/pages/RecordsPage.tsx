@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import { formatEntryDate } from '../lib/today'
+import DiaryPhotos from '../components/DiaryPhotos'
 import './home.css'
 
 type Props = {
@@ -146,6 +147,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
                     {formatEntryDate(d.entry_date)}
                   </p>
                   <p className="diary-item-content">{d.content}</p>
+                  <DiaryPhotos date={d.entry_date} />
                 </div>
                 <div className="diary-item-actions">
                   <button
