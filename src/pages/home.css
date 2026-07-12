@@ -28,7 +28,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.4rem;
+  /* 좌우 여백을 넓혀, 넓은 화면에서도 헤더 내용(뒤로 버튼·제목)이
+     본문(앱 콘텐츠 폭)과 같은 위치에 오도록 가운데 정렬합니다. */
+  padding: 1rem max(1.4rem, calc((100% - var(--app-max)) / 2));
   background: rgba(255, 253, 248, 0.86);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -408,6 +410,13 @@
   box-shadow: 0 0 0 4px rgba(232, 242, 223, 0.6);
 }
 
+/* 입력창 안내 글씨(placeholder)가 너무 흐리지 않게 살짝 진하게 */
+.tx-input::placeholder,
+.search-input::placeholder,
+.write-textarea::placeholder {
+  color: #7b8a77;
+}
+
 .tx-cat-row {
   display: flex;
   flex-wrap: wrap;
@@ -533,7 +542,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 1.4rem;
+  padding: 1rem max(1.4rem, calc((100% - var(--app-max)) / 2));
   background: rgba(255, 253, 248, 0.86);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
