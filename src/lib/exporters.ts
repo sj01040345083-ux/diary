@@ -21,13 +21,6 @@ function monthTitle(month: string): string {
   return `${y}년 ${Number(m)}월`
 }
 
-// 본문에서 이모지 문자만 뽑아 중복 없이 모읍니다. ("선택한 이모티콘" 칸용)
-function extractEmojis(text: string): string {
-  const matches = text.match(/\p{Extended_Pictographic}/gu)
-  if (!matches) return ''
-  return Array.from(new Set(matches)).join(' ')
-}
-
 export type ExportData = {
   month: string // "YYYY-MM"
   diaries: Diary[]
@@ -69,25 +62,12 @@ function download(blob: Blob, filename: string) {
 }
 
 // ── 엑셀(.xlsx) 내보내기 (통계 화면 전용) ─────────
+// 시트 순서: 수입 기록 → 지출 기록 → 월간 요약 (일기 기록은 넣지 않음)
 export function exportStatsXlsx(data: ExportData): void {
-  const { monthDiaries, incomeTx, expenseTx, income, expense, balance } =
-    prepare(data)
+  const { incomeTx, expenseTx, income, expense, balance } = prepare(data)
   const wb = XLSX.utils.book_new()
 
-  // 1) 월간 요약
-  const summary = [
-    ['기준 월', data.month],
-    ['총 수입', income],
-    ['총 지출', expense],
-    ['남은 금액', balance],
-  ]
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet(summary),
-    '월간 요약',
-  )
-
-  // 2) 수입 기록 (날짜 · 카테고리 · 금액 · 메모)
+  // 1) 수입 기록 (날짜 · 카테고리 · 금액 · 메모)
   const incomeRows = [
     ['날짜', '카테고리', '금액', '메모'],
     ...incomeTx.map((t) => [
@@ -103,7 +83,7 @@ export function exportStatsXlsx(data: ExportData): void {
     '수입 기록',
   )
 
-  // 3) 지출 기록 (날짜 · 카테고리 · 금액 · 메모)
+  // 2) 지출 기록 (날짜 · 카테고리 · 금액 · 메모)
   const expenseRows = [
     ['날짜', '카테고리', '금액', '메모'],
     ...expenseTx.map((t) => [
@@ -119,20 +99,17 @@ export function exportStatsXlsx(data: ExportData): void {
     '지출 기록',
   )
 
-  // 4) 일기 기록 (날짜 · 기분 · 내용 · 선택한 이모티콘)
-  const diaryRows = [
-    ['날짜', '기분', '내용', '선택한 이모티콘'],
-    ...monthDiaries.map((d) => [
-      d.entry_date,
-      d.mood ?? '',
-      d.content,
-      extractEmojis(d.content),
-    ]),
+  // 3) 월간 요약
+  const summary = [
+    ['기준 월', data.month],
+    ['총 수입', income],
+    ['총 지출', expense],
+    ['남은 금액', balance],
   ]
   XLSX.utils.book_append_sheet(
     wb,
-    XLSX.utils.aoa_to_sheet(diaryRows),
-    '일기 기록',
+    XLSX.utils.aoa_to_sheet(summary),
+    '월간 요약',
   )
 
   const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' })
