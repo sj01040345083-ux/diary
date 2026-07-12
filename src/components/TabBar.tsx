@@ -39,13 +39,13 @@ export default function TabBar({ active, onChange }: Props) {
       />
       <TabButton
         icon="📖"
-        label="기록"
+        label="일기 기록"
         active={active === 'records'}
         onClick={() => onChange('records')}
       />
       <TabButton
         icon="📊"
-        label="통계"
+        label="가계부 통계"
         active={active === 'stats'}
         onClick={() => onChange('stats')}
       />
