@@ -143,13 +143,11 @@ export default function HomePage({
           </div>
         </section>
 
-        {/* 일기 쓰기 버튼 → 작성 화면으로 이동 */}
-        <button className="home-cta" onClick={onWrite}>
-          ✏️ 오늘 일기 쓰기
-        </button>
-
-        {/* 바로가기 */}
-        <div className="home-shortcut-row">
+        {/* 주요 버튼 — 한 줄에 반반 */}
+        <div className="home-actions">
+          <button className="home-cta" onClick={onWrite}>
+            ✏️ 오늘 일기 쓰기
+          </button>
           <button className="home-shortcut" onClick={onTransactions}>
             💰 소비·수입 기록
           </button>
