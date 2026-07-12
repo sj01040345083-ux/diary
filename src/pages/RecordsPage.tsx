@@ -3,6 +3,7 @@ import { getMyDiaries, deleteDiary } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import { formatEntryDate } from '../lib/today'
 import DiaryPhotos from '../components/DiaryPhotos'
+import DiaryCalendar from '../components/DiaryCalendar'
 import './home.css'
 
 type Props = {
@@ -19,7 +20,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
-  const [month, setMonth] = useState('all') // 'all' 또는 'YYYY-MM'
+  const [selectedDate, setSelectedDate] = useState<string | null>(null) // 달력에서 고른 날짜
   const [exporting, setExporting] = useState(false)
 
   // 삭제 확인
@@ -34,26 +35,17 @@ export default function RecordsPage({ onEditDiary }: Props) {
       .finally(() => setLoading(false))
   }, [])
 
-  // 일기가 있는 '달' 목록 (최신순)
-  const months = useMemo(() => {
-    const set = new Set(diaries.map((d) => d.entry_date.slice(0, 7)))
-    return Array.from(set).sort().reverse()
-  }, [diaries])
-
-  // 월 + 검색어로 걸러낸 목록
+  // 목록 거르기:
+  // - 검색어가 있으면: 전체에서 내용 검색 (달력 선택 무시)
+  // - 날짜를 골랐으면: 그 날짜만
+  // - 둘 다 없으면: 전체
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return diaries.filter((d) => {
-      if (month !== 'all' && !d.entry_date.startsWith(month)) return false
-      if (q && !d.content.toLowerCase().includes(q)) return false
-      return true
-    })
-  }, [diaries, query, month])
-
-  function monthLabel(m: string) {
-    const [y, mm] = m.split('-')
-    return `${y}.${mm}`
-  }
+    if (q) return diaries.filter((d) => d.content.toLowerCase().includes(q))
+    if (selectedDate)
+      return diaries.filter((d) => d.entry_date === selectedDate)
+    return diaries
+  }, [diaries, query, selectedDate])
 
   async function handleDelete() {
     if (!confirmTarget) return
@@ -70,11 +62,11 @@ export default function RecordsPage({ onEditDiary }: Props) {
     }
   }
 
-  // 일기 워드 내보내기 — 선택한 달(‘전체’면 이번 달) 기준
+  // 일기 워드 내보내기 — 고른 날짜의 달(없으면 이번 달) 기준
   async function handleWord() {
     setExporting(true)
     try {
-      const targetMonth = month === 'all' ? thisMonth() : month
+      const targetMonth = selectedDate ? selectedDate.slice(0, 7) : thisMonth()
       const { exportDiaryDocx } = await import('../lib/exporters')
       await exportDiaryDocx({
         month: targetMonth,
@@ -101,24 +93,27 @@ export default function RecordsPage({ onEditDiary }: Props) {
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        {/* 월별 필터 */}
-        {months.length > 0 && (
-          <div className="month-row">
+        {/* 달력 (검색 중이 아닐 때만) */}
+        {!loading && diaries.length > 0 && !query.trim() && (
+          <DiaryCalendar
+            diaries={diaries}
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+          />
+        )}
+
+        {/* 고른 날짜 안내 + 전체 보기 */}
+        {selectedDate && !query.trim() && (
+          <div className="cal-selected">
+            <span className="cal-selected-label">
+              📅 {formatEntryDate(selectedDate)}
+            </span>
             <button
-              className={`month-btn ${month === 'all' ? 'is-active' : ''}`}
-              onClick={() => setMonth('all')}
+              className="cal-clear-btn"
+              onClick={() => setSelectedDate(null)}
             >
-              전체
+              전체 보기
             </button>
-            {months.map((m) => (
-              <button
-                key={m}
-                className={`month-btn ${month === m ? 'is-active' : ''}`}
-                onClick={() => setMonth(m)}
-              >
-                {monthLabel(m)}
-              </button>
-            ))}
           </div>
         )}
 
@@ -128,7 +123,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
           </div>
         ) : filtered.length === 0 ? (
           <div className="diary-empty">
-            {query || month !== 'all' ? (
+            {query || selectedDate ? (
               <p>해당하는 일기가 없어요.</p>
             ) : (
               <>
