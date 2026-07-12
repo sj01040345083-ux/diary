@@ -707,6 +707,136 @@
   font-weight: 700;
 }
 
+/* ── 일기 기록 달력 ── */
+.cal-card {
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 0.9rem 0.9rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 22px rgba(49, 68, 55, 0.08);
+}
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.cal-arrow {
+  font-size: 0.9rem;
+  color: var(--accent-strong);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-arrow:hover {
+  background: var(--accent-soft);
+}
+.cal-title {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 6.5rem;
+  text-align: center;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.cal-weekrow {
+  margin-bottom: 3px;
+}
+.cal-wd {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+  padding: 0.2rem 0;
+}
+.cal-cell {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  background: none;
+  padding: 0;
+  color: var(--ink-soft);
+}
+.cal-empty {
+  border: none;
+}
+.cal-day {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+.cal-mark {
+  font-size: 0.85rem;
+  line-height: 1;
+  min-height: 0.85rem;
+}
+/* 일기가 있는 날 (누를 수 있음) */
+.cal-cell.has {
+  cursor: pointer;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+.cal-cell.has:hover {
+  border-color: #cfe0c6;
+}
+/* 지금 고른 날 */
+.cal-cell.sel {
+  border-color: #4f8a6b;
+  background: #d3e8c8;
+  box-shadow: 0 0 0 2px rgba(111, 144, 104, 0.25);
+}
+/* 고른 날짜 안내 줄 */
+.cal-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+.cal-selected-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: rgba(255, 254, 250, 0.92);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  box-shadow: var(--shadow-soft);
+}
+.cal-clear-btn {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  cursor: pointer;
+}
+.cal-clear-btn:hover {
+  background: #eef3e8;
+}
+
 /* 클릭 가능한 기록 아이템 */
 .diary-item-click {
   cursor: pointer;
