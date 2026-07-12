@@ -1128,7 +1128,7 @@
   background: rgba(255, 254, 250, 0.92);
   border-radius: 999px;
   padding: 0.24rem 0.8rem;
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.45rem;
   box-shadow: var(--shadow-soft);
 }
 
@@ -1320,18 +1320,21 @@
 
 .mood-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* 8개를 항상 한 줄에 */
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.3rem;
-  padding: 0.45rem 0.2rem;
+  gap: 0.3rem;
+  margin-bottom: 0.1rem;
+  padding: 0.35rem 0.25rem; /* 확대된 끝 이모지가 가장자리에 붙지 않게 */
 }
 
 .mood-btn {
   position: relative;
-  width: 3rem;
-  height: 3rem;
-  font-size: 1.4rem;
+  /* 한 줄에 8개가 들어가도록 유동 크기(좁은 화면에서 자동 축소) */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 2.7rem;
+  aspect-ratio: 1 / 1;
+  font-size: 1.15rem;
   line-height: 1;
   border-radius: 50%;
   border: 1.5px solid var(--line);
@@ -1351,21 +1354,21 @@
 .mood-btn.is-selected {
   border: 2.5px solid #4f8a6b;
   background: #d3e8c8;
-  box-shadow: 0 0 0 4px rgba(111, 144, 104, 0.28);
-  transform: scale(1.28);
+  box-shadow: 0 0 0 3px rgba(111, 144, 104, 0.28);
+  transform: scale(1.16);
   z-index: 1;
 }
 /* 하나를 고르면 나머지는 작고 흐리게 (선택한 게 확 도드라지게) */
 .mood-row.has-selection .mood-btn:not(.is-selected) {
-  opacity: 0.38;
-  transform: scale(0.82);
+  opacity: 0.4;
+  transform: scale(0.86);
 }
 
-/* 선택한 감정 이름 (배경 칩으로 잘 보이게) */
+/* 선택한 감정 이름 (배경 칩으로 잘 보이게) — 이모지 바로 아래에 붙게 */
 .mood-name {
   text-align: center;
-  margin: 0.2rem 0 0.85rem;
-  min-height: 1.7rem;
+  margin: 0 0 0.45rem;
+  min-height: 1.4rem;
 }
 .mood-name-chip {
   display: inline-block;
