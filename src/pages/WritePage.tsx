@@ -120,7 +120,7 @@ export default function WritePage({
       <main className="home-container">
         <p className="home-date">{formatEntryDate(workDate)}</p>
         <h1 className="write-heading">
-          {isToday ? '오늘, 마음에 남은 한 줄 🌱' : '이 날의 한 줄 🌱'}
+          {isToday ? '오늘, 마음에 남은 한 줄 🍀' : '이 날의 한 줄 🍀'}
         </h1>
 
         {loadingInitial ? (

@@ -119,7 +119,7 @@ export default function HomePage({
         <h1 className="home-greeting">
           {name}님,
           <br />
-          오늘의 한 줄을 남겨보세요 🌱
+          오늘의 한 줄을 남겨보세요 🍀
         </h1>
 
         {/* 오늘의 명언 */}

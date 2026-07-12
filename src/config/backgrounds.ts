@@ -31,7 +31,9 @@ function baseName(path: string): string {
 export const backgroundOptions: BgOption[] = Object.entries(modules)
   .map(([path, url]) => {
     const base = baseName(path)
-    return { value: `bg${base}`, label: LABELS[base] ?? base, url }
+    // 알려진 이름은 예쁜 라벨, 나머지는 파일명의 _/- 를 공백으로 바꿔 표시
+    const label = LABELS[base] ?? base.replace(/[_-]+/g, ' ')
+    return { value: `bg${base}`, label, url }
   })
   .sort((a, b) =>
     a.value.localeCompare(b.value, undefined, { numeric: true }),
