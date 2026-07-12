@@ -50,19 +50,75 @@ function summarize(
   return { items, total }
 }
 
-// 고정 수입·지출: 최대 3개까지만, 각 항목은 텍스트 + 작은 비율 막대
-function FixedList({
+// 수입/지출 비교 도넛 (SVG, 라이브러리 없이). 초록=수입, 붉은=지출.
+function CompareDonut({
+  incomePct,
+  expensePct,
+}: {
+  incomePct: number
+  expensePct: number
+}) {
+  const size = 150
+  const stroke = 26
+  const r = (size - stroke) / 2
+  const C = 2 * Math.PI * r
+  const incomeLen = (incomePct / 100) * C
+  const expenseLen = (expensePct / 100) * C
+  // 가운데 요약: 더 높은 쪽
+  const lead =
+    incomePct === expensePct
+      ? { text: '수입·지출\n비슷해요', pct: '' }
+      : incomePct > expensePct
+        ? { text: '수입 우세', pct: `${incomePct}%` }
+        : { text: '지출 우세', pct: `${expensePct}%` }
+  return (
+    <div className="donut-wrap">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+          {/* 수입(초록) */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke="#7cc196"
+            strokeWidth={stroke}
+            strokeDasharray={`${incomeLen} ${C - incomeLen}`}
+            strokeDashoffset={0}
+          />
+          {/* 지출(붉은) — 수입 다음에 이어서 */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke="#e0917f"
+            strokeWidth={stroke}
+            strokeDasharray={`${expenseLen} ${C - expenseLen}`}
+            strokeDashoffset={-incomeLen}
+          />
+        </g>
+        <circle cx={size / 2} cy={size / 2} r={r - stroke / 2} fill="#fffdf8" />
+      </svg>
+      <div className="donut-center">
+        <span className="donut-lead">{lead.text}</span>
+        {lead.pct && <span className="donut-lead-pct">{lead.pct}</span>}
+      </div>
+    </div>
+  )
+}
+
+// 지출 내역: 큰 금액순 최대 5개, 각 항목은 텍스트 + 작은 비율 막대
+function ExpenseList({
   items,
   total,
-  tone,
 }: {
   items: Item[]
   total: number
-  tone: 'income' | 'expense'
 }) {
-  const top = items.slice(0, 3)
+  const top = items.slice(0, 5)
   if (top.length === 0) {
-    return <p className="fixed-empty">기록이 없어요.</p>
+    return <p className="fixed-empty">이번 달 지출 기록이 아직 없어요.</p>
   }
   return (
     <div className="fixed-list">
@@ -73,11 +129,11 @@ function FixedList({
           </span>
           <span className="fixed-bar-track">
             <span
-              className={`fixed-bar-fill ${tone}`}
+              className="fixed-bar-fill expense"
               style={{ width: `${total ? (it.amount / total) * 100 : 0}%` }}
             />
           </span>
-          <span className={`fixed-amt ${tone}`}>{won(it.amount)}원</span>
+          <span className="fixed-amt expense">{won(it.amount)}원</span>
         </div>
       ))}
     </div>
@@ -160,19 +216,19 @@ export default function StatsPage() {
             <p className="report-section-title">이번 달 요약</p>
             <div className="summary-card">
               <div className="summary-item">
-                <span className="summary-label">총 수입</span>
+                <span className="summary-label">수입</span>
                 <span className="summary-value income">
                   {won(income.total)}원
                 </span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">총 지출</span>
+                <span className="summary-label">지출</span>
                 <span className="summary-value expense">
                   {won(expense.total)}원
                 </span>
               </div>
               <div className="summary-item summary-balance">
-                <span className="summary-label">남은 금액</span>
+                <span className="summary-label">잔액</span>
                 <span
                   className={`summary-value ${balance < 0 ? 'expense' : 'income'}`}
                 >
@@ -189,45 +245,41 @@ export default function StatsPage() {
               </div>
             ) : (
               <>
-                {/* 수입·지출 비교 (가로 비율 바) */}
+                {/* 수입·지출 비교 (도넛 그래프) */}
                 <p className="report-section-title">수입·지출 비교</p>
-                <div className="compare-card">
-                  <div className="compare-legend">
-                    <span className="compare-tag income">
-                      수입 {incomePct}%
-                    </span>
-                    <span className="compare-tag expense">
-                      지출 {expensePct}%
-                    </span>
-                  </div>
-                  <div className="compare-bar">
-                    <span
-                      className="compare-seg income"
-                      style={{ width: `${incomePct}%` }}
-                    />
-                    <span
-                      className="compare-seg expense"
-                      style={{ width: `${expensePct}%` }}
-                    />
+                <div className="compare-card compare-donut-card">
+                  <CompareDonut
+                    incomePct={incomePct}
+                    expensePct={expensePct}
+                  />
+                  <div className="donut-legend">
+                    <div className="donut-legend-row">
+                      <span className="donut-dot income" />
+                      <span className="donut-legend-name">수입</span>
+                      <span className="donut-legend-pct income">
+                        {incomePct}%
+                      </span>
+                      <span className="donut-legend-amt">
+                        {won(income.total)}원
+                      </span>
+                    </div>
+                    <div className="donut-legend-row">
+                      <span className="donut-dot expense" />
+                      <span className="donut-legend-name">지출</span>
+                      <span className="donut-legend-pct expense">
+                        {expensePct}%
+                      </span>
+                      <span className="donut-legend-amt">
+                        {won(expense.total)}원
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* 수입·지출 내역 (큰 금액순 최대 3개) */}
-                <p className="report-section-title">수입·지출 내역</p>
+                {/* 지출 내역 (지출만, 큰 금액순 최대 5개) */}
+                <p className="report-section-title">지출 내역</p>
                 <div className="fixed-card">
-                  <p className="fixed-group-label income">수입</p>
-                  <FixedList
-                    items={income.items}
-                    total={income.total}
-                    tone="income"
-                  />
-                  <div className="fixed-divider" />
-                  <p className="fixed-group-label expense">지출</p>
-                  <FixedList
-                    items={expense.items}
-                    total={expense.total}
-                    tone="expense"
-                  />
+                  <ExpenseList items={expense.items} total={expense.total} />
                 </div>
                 <p className="fixed-hint">
                   더 자세한 내용은 엑셀 파일에서 확인할 수 있어요.

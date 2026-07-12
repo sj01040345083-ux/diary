@@ -1246,6 +1246,86 @@
   background: #e0917f;
 }
 
+/* ── 통계: 수입·지출 비교 도넛 ── */
+.compare-donut-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.donut-wrap {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  text-align: center;
+}
+.donut-lead {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: pre-line;
+  line-height: 1.25;
+}
+.donut-lead-pct {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+.donut-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.donut-dot.income {
+  background: #7cc196;
+}
+.donut-dot.expense {
+  background: #e0917f;
+}
+.donut-legend-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+.donut-legend-pct {
+  font-weight: 800;
+}
+.donut-legend-pct.income {
+  color: #4f8a6b;
+}
+.donut-legend-pct.expense {
+  color: #c0674f;
+}
+.donut-legend-amt {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
 /* ── 통계: 고정 수입·지출 (작고 깔끔한 카드) ── */
 .fixed-card {
   background: var(--glass-strong);

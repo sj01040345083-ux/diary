@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { backgroundOptions } from '../config/backgrounds'
-import { fontOptions, sizeOptions } from '../config/theme'
+import { sizeOptions } from '../config/theme'
 import {
   getSettings,
   saveSettings,
@@ -95,19 +95,6 @@ export default function SettingsPage({ session }: Props) {
                   {settings.bg === o.value && (
                     <span className="bg-thumb-check">✓</span>
                   )}
-                </button>
-              ))}
-            </div>
-
-            <p className="report-section-title">글씨체</p>
-            <div className="opt-row">
-              {fontOptions.map((o) => (
-                <button
-                  key={o.value}
-                  className={`opt-btn ${settings.font === o.value ? 'is-active' : ''}`}
-                  onClick={() => pick('font', o.value)}
-                >
-                  {o.label}
                 </button>
               ))}
             </div>
