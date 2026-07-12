@@ -271,6 +271,22 @@ export default function WritePage({
               autoFocus
             />
 
+            {/* 일기 글에 넣는 이모티콘 (글 꾸미기용, 기분 지정과 별개) */}
+            <p className="sticker-label">이모티콘 넣기 (글 중간에)</p>
+            <div className="sticker-row">
+              {stickerEmojis.map((em, i) => (
+                <button
+                  key={`${em}-${i}`}
+                  type="button"
+                  className="sticker-btn"
+                  onClick={() => insertEmoji(em)}
+                  aria-label={`${em} 넣기`}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+
             {/* 사진 첨부 */}
             <p className="photo-label">사진 첨부</p>
             <div className="photo-card">
@@ -328,22 +344,6 @@ export default function WritePage({
                 hidden
                 onChange={(e) => handleFiles(e.target.files)}
               />
-            </div>
-
-            {/* 일기 글에 넣는 이모티콘 (글 꾸미기용, 기분 지정과 별개) */}
-            <p className="sticker-label">이모티콘 넣기 (글 중간에)</p>
-            <div className="sticker-row">
-              {stickerEmojis.map((em, i) => (
-                <button
-                  key={`${em}-${i}`}
-                  type="button"
-                  className="sticker-btn"
-                  onClick={() => insertEmoji(em)}
-                  aria-label={`${em} 넣기`}
-                >
-                  {em}
-                </button>
-              ))}
             </div>
 
             {error && <p className="write-error">{error}</p>}
