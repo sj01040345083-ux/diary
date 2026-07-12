@@ -19,7 +19,6 @@ function thisMonth(): string {
 export default function RecordsPage({ onEditDiary }: Props) {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loading, setLoading] = useState(true)
-  const [query, setQuery] = useState('')
   const [selectedDate, setSelectedDate] = useState<string | null>(null) // 달력에서 고른 날짜
   const [exporting, setExporting] = useState(false)
 
@@ -35,17 +34,12 @@ export default function RecordsPage({ onEditDiary }: Props) {
       .finally(() => setLoading(false))
   }, [])
 
-  // 목록 거르기:
-  // - 검색어가 있으면: 전체에서 내용 검색 (달력 선택 무시)
-  // - 날짜를 골랐으면: 그 날짜만
-  // - 둘 다 없으면: 전체
+  // 목록 거르기: 날짜를 골랐으면 그 날짜만, 아니면 전체
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (q) return diaries.filter((d) => d.content.toLowerCase().includes(q))
     if (selectedDate)
       return diaries.filter((d) => d.entry_date === selectedDate)
     return diaries
-  }, [diaries, query, selectedDate])
+  }, [diaries, selectedDate])
 
   async function handleDelete() {
     if (!confirmTarget) return
@@ -85,16 +79,8 @@ export default function RecordsPage({ onEditDiary }: Props) {
       </header>
 
       <main className="home-container">
-        <input
-          className="search-input"
-          type="text"
-          placeholder="🔍 일기 내용 검색"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-
-        {/* 달력 (검색 중이 아닐 때만) */}
-        {!loading && diaries.length > 0 && !query.trim() && (
+        {/* 달력 */}
+        {!loading && diaries.length > 0 && (
           <DiaryCalendar
             diaries={diaries}
             selectedDate={selectedDate}
@@ -103,7 +89,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
         )}
 
         {/* 고른 날짜 안내 + 전체 보기 */}
-        {selectedDate && !query.trim() && (
+        {selectedDate && (
           <div className="cal-selected">
             <span className="cal-selected-label">
               📅 {formatEntryDate(selectedDate)}
@@ -123,8 +109,8 @@ export default function RecordsPage({ onEditDiary }: Props) {
           </div>
         ) : filtered.length === 0 ? (
           <div className="diary-empty">
-            {query || selectedDate ? (
-              <p>해당하는 일기가 없어요.</p>
+            {selectedDate ? (
+              <p>이 날에는 일기가 없어요.</p>
             ) : (
               <>
                 <p>아직 기록이 없어요.</p>
