@@ -162,7 +162,6 @@ export default function StatsPage() {
 
   const expense = useMemo(() => summarize(txs, month, 'expense'), [txs, month])
   const income = useMemo(() => summarize(txs, month, 'income'), [txs, month])
-  const balance = income.total - expense.total
   const sum = income.total + expense.total
   const hasData = sum > 0
   // 수입·지출 비교 비율 (합계 대비)
@@ -225,15 +224,6 @@ export default function StatsPage() {
                 <span className="summary-label">지출</span>
                 <span className="summary-value expense">
                   {won(expense.total)}원
-                </span>
-              </div>
-              <div className="summary-item summary-balance">
-                <span className="summary-label">잔액</span>
-                <span
-                  className={`summary-value ${balance < 0 ? 'expense' : 'income'}`}
-                >
-                  {balance < 0 ? '-' : ''}
-                  {won(Math.abs(balance))}원
                 </span>
               </div>
             </div>
