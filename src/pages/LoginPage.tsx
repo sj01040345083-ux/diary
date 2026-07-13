@@ -67,9 +67,24 @@ export default function LoginPage({ onGoSignup }: Props) {
     setNotice('비밀번호 재설정 메일을 보냈어요 🌿 메일의 링크를 눌러주세요.')
   }
 
-  // 카카오 로그인 — 실제 연동은 앱 등록/도메인 설정이 필요해 지금은 안내만 합니다.
-  function handleKakao() {
-    setNotice('카카오 로그인은 준비 중이에요. 지금은 이메일로 로그인해주세요 🌿')
+  // 카카오 로그인 (Supabase OAuth)
+  // Supabase 대시보드에서 Kakao 제공자를 켜고 키를 넣어야 실제로 동작합니다.
+  // 설정 전이라면 오류가 나므로 친절한 안내로 처리합니다.
+  async function handleKakao() {
+    setNotice('')
+    // 자동 로그인은 기본 유지(비번 미저장). 이번 세션 활성 표시.
+    setAutoLogin(remember)
+    markSessionActive()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: { redirectTo: window.location.origin },
+    })
+    // 성공 시 카카오 로그인 페이지로 이동합니다. (아래는 실패 시)
+    if (error) {
+      setNotice(
+        '카카오 로그인이 아직 준비되지 않았어요. 이메일로 로그인하시거나 잠시 후 다시 시도해주세요 🌿',
+      )
+    }
   }
 
   return (
