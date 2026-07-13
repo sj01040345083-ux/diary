@@ -1550,8 +1550,9 @@
 /* ── 통계: 수입·지출 비교 도넛 ── */
 .compare-donut-card {
   display: flex;
+  flex-direction: column; /* 도넛 위, 범례 아래 (모바일에서 글씨 안 잘리게) */
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 .donut-wrap {
   position: relative;
@@ -1583,17 +1584,18 @@
   color: var(--ink);
 }
 .donut-legend {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
   min-width: 0;
 }
 .donut-legend-row {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 0.9rem;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  padding: 0 0.2rem;
 }
 .donut-dot {
   width: 0.75rem;
@@ -1610,6 +1612,7 @@
 .donut-legend-name {
   font-weight: 700;
   color: var(--ink);
+  white-space: nowrap;
 }
 .donut-legend-pct {
   font-weight: 800;
