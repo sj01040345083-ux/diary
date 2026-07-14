@@ -4,18 +4,18 @@ import { formatEntryDate } from '../lib/today'
 import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
 import { compressImage } from '../lib/imageCompress'
-import { addPhoto, getPhotosByDate, deletePhoto } from '../lib/photos'
+import { uploadPhoto, getPhotosByDate, deletePhoto } from '../lib/photos'
 import { collageClass } from '../components/PhotoCollage'
 import './home.css'
 
 const MAX_PHOTOS = 6
 
-// 작성 화면에서 다루는 사진 (새로 고른 것 + 기존에 저장된 것)
+// 작성 화면에서 다루는 사진 (새로 고른 것 + 서버에 이미 저장된 것)
 type EditPhoto = {
   key: string
-  url: string // 미리보기용 object URL
-  blob: Blob // 압축된 이미지
-  existingId?: string // IndexedDB에 이미 저장돼 있으면 그 ID
+  url: string // 미리보기용 URL (새 사진=object URL, 기존=서명 URL)
+  blob?: Blob // 새로 고른 사진의 압축 이미지 (기존 사진은 없음)
+  existingPath?: string // 서버(Storage)에 이미 저장돼 있으면 그 경로
 }
 
 // 일기 글에 넣는 꾸미기 이모티콘 (기분 지정과는 별개)
@@ -68,7 +68,7 @@ export default function WritePage({
   const [photos, setPhotos] = useState<EditPhoto[]>([])
   const [photoBusy, setPhotoBusy] = useState(false)
   const [photoError, setPhotoError] = useState('')
-  const removedIds = useRef<string[]>([]) // 저장 시 IndexedDB에서 지울 기존 사진 ID
+  const removedPaths = useRef<string[]>([]) // 저장 시 서버에서 지울 기존 사진 경로
   const pickedSigs = useRef<Set<string>>(new Set()) // 중복 선택 방지용 서명
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -92,24 +92,22 @@ export default function WritePage({
   }, [workDate])
 
   useEffect(() => {
-    // 이 날짜에 이미 저장된 사진을 불러와 미리보기로 채웁니다.
+    // 이 날짜에 이미 저장된 사진(서버)을 불러와 미리보기로 채웁니다.
     let alive = true
-    const created: string[] = []
     getPhotosByDate(workDate)
       .then((recs) => {
         if (!alive) return
         setPhotos(
-          recs.map((r) => {
-            const url = URL.createObjectURL(r.blob)
-            created.push(url)
-            return { key: r.id, url, blob: r.blob, existingId: r.id }
-          }),
+          recs.map((r) => ({
+            key: r.path,
+            url: r.url,
+            existingPath: r.path,
+          })),
         )
       })
       .catch(() => {})
     return () => {
       alive = false
-      created.forEach((u) => URL.revokeObjectURL(u))
     }
   }, [workDate])
 
@@ -158,8 +156,8 @@ export default function WritePage({
     setPhotos((prev) => {
       const target = prev.find((p) => p.key === key)
       if (target) {
-        URL.revokeObjectURL(target.url)
-        if (target.existingId) removedIds.current.push(target.existingId)
+        if (target.url.startsWith('blob:')) URL.revokeObjectURL(target.url)
+        if (target.existingPath) removedPaths.current.push(target.existingPath)
       }
       return prev.filter((p) => p.key !== key)
     })
@@ -167,8 +165,8 @@ export default function WritePage({
 
   function clearPhotos() {
     photos.forEach((p) => {
-      URL.revokeObjectURL(p.url)
-      if (p.existingId) removedIds.current.push(p.existingId)
+      if (p.url.startsWith('blob:')) URL.revokeObjectURL(p.url)
+      if (p.existingPath) removedPaths.current.push(p.existingPath)
     })
     setPhotos([])
   }
@@ -201,11 +199,13 @@ export default function WritePage({
     setSaving(true)
     try {
       await saveDiary(session.user.id, workDate, content.trim(), mood || null)
-      // 사진 반영: 삭제된 기존 사진 제거 + 새로 고른 사진 IndexedDB 저장
+      // 사진 반영: 삭제된 기존 사진 제거 + 새로 고른 사진 서버(Storage) 업로드
       try {
-        for (const id of removedIds.current) await deletePhoto(id)
+        for (const path of removedPaths.current) await deletePhoto(path)
         for (const p of photos) {
-          if (!p.existingId) await addPhoto(workDate, p.blob)
+          if (!p.existingPath && p.blob) {
+            await uploadPhoto(session.user.id, workDate, p.blob)
+          }
         }
       } catch {
         // 사진 저장 실패는 일기 저장을 막지 않습니다.
