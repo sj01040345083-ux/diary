@@ -1,74 +1,61 @@
-// 일기 사진을 브라우저의 IndexedDB에 저장합니다.
-// (용량이 큰 이미지를 Supabase/ localStorage 대신 IndexedDB에 Blob 으로 보관)
-// 사진은 일기 날짜(date, "YYYY-MM-DD")로 연결합니다 → Supabase 표 구조 변경 불필요.
+// 일기 사진을 Supabase Storage(서버)에 저장합니다.
+// → 폰·PC 어느 기기에서든 같은 사진을 볼 수 있습니다.
+// 저장 위치(경로): "<사용자ID>/<날짜>/<파일명>.jpg"
+//   (Storage 접근 규칙으로 본인 폴더만 읽고/쓰게 제한)
+import { supabase } from './supabase'
 
-const DB_NAME = 'soso-photos'
-const STORE = 'photos'
-const VERSION = 1
+const BUCKET = 'diary-photos'
 
-export type PhotoRecord = {
-  id: string
-  date: string // 일기 날짜 "YYYY-MM-DD"
-  blob: Blob // 압축된 이미지
-  createdAt: string
+export type StoredPhoto = {
+  path: string // 서버 내 경로 (삭제에 사용)
+  url: string // 화면 표시용 서명 URL
 }
 
-function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, VERSION)
-    req.onupgradeneeded = () => {
-      const db = req.result
-      if (!db.objectStoreNames.contains(STORE)) {
-        const os = db.createObjectStore(STORE, { keyPath: 'id' })
-        os.createIndex('date', 'date', { unique: false })
-      }
-    }
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
-  })
+// 현재 로그인한 사용자 ID
+async function currentUserId(): Promise<string | null> {
+  const { data } = await supabase.auth.getUser()
+  return data.user?.id ?? null
 }
 
-// 사진 한 장 추가 → 생성된 사진 ID 반환
-export async function addPhoto(date: string, blob: Blob): Promise<string> {
-  const db = await openDB()
-  const id = `photo-${date}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite')
-    tx.objectStore(STORE).put({
-      id,
-      date,
-      blob,
-      createdAt: new Date().toISOString(),
-    } as PhotoRecord)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
+// 사진 한 장 업로드 (압축된 Blob)
+export async function uploadPhoto(
+  userId: string,
+  date: string,
+  blob: Blob,
+): Promise<void> {
+  const rand = Math.random().toString(36).slice(2, 8)
+  const path = `${userId}/${date}/${Date.now()}-${rand}.jpg`
+  const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+    contentType: 'image/jpeg',
+    upsert: false,
   })
-  db.close()
-  return id
+  if (error) throw error
 }
 
-// 특정 날짜의 사진들을 생성순으로 가져오기
-export async function getPhotosByDate(date: string): Promise<PhotoRecord[]> {
-  const db = await openDB()
-  const recs = await new Promise<PhotoRecord[]>((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly')
-    const idx = tx.objectStore(STORE).index('date')
-    const req = idx.getAll(date)
-    req.onsuccess = () => resolve((req.result as PhotoRecord[]) ?? [])
-    req.onerror = () => reject(req.error)
+// 특정 날짜의 사진 목록 (생성순) → 표시용 서명 URL 포함
+export async function getPhotosByDate(date: string): Promise<StoredPhoto[]> {
+  const userId = await currentUserId()
+  if (!userId) return []
+  const prefix = `${userId}/${date}`
+  const { data, error } = await supabase.storage.from(BUCKET).list(prefix, {
+    limit: 100,
+    sortBy: { column: 'name', order: 'asc' },
   })
-  db.close()
-  return recs.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+  if (error || !data) return []
+  // 폴더가 아닌 실제 파일만 (파일은 id 가 있음)
+  const paths = data.filter((f) => f.id).map((f) => `${prefix}/${f.name}`)
+  if (!paths.length) return []
+  const { data: signed } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrls(paths, 3600) // 1시간짜리 표시용 URL
+  if (!signed) return []
+  return signed
+    .filter((s) => s.signedUrl)
+    .map((s) => ({ path: s.path ?? '', url: s.signedUrl as string }))
 }
 
-// 사진 한 장 삭제
-export async function deletePhoto(id: string): Promise<void> {
-  const db = await openDB()
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite')
-    tx.objectStore(STORE).delete(id)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
-  })
-  db.close()
+// 사진 한 장 삭제 (경로로)
+export async function deletePhoto(path: string): Promise<void> {
+  const { error } = await supabase.storage.from(BUCKET).remove([path])
+  if (error) throw error
 }
