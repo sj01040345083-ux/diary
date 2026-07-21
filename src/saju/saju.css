@@ -1,0 +1,354 @@
+/* 사주 앱 스타일 — 일기 앱과 어울리는 따뜻하고 차분한 톤 */
+
+:root {
+  --saju-bg: #f6f1e7;
+  --saju-card: #fffdf8;
+  --saju-ink: #2e2a24;
+  --saju-sub: #7a7266;
+  --saju-line: #e7ddca;
+  --saju-accent: #b5834a;
+  --saju-accent-deep: #8a5f2e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.saju-root {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f9f5ec 0%, #f1e9d8 100%);
+  color: var(--saju-ink);
+  font-family: 'Gowun Dodum', 'Noto Sans KR', system-ui, sans-serif;
+  padding: 24px 16px 64px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* 헤더 */
+.saju-header {
+  text-align: center;
+  margin: 12px 0 24px;
+}
+.saju-logo {
+  font-size: 44px;
+  line-height: 1;
+  color: var(--saju-accent-deep);
+}
+.saju-header h1 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 28px;
+  margin: 10px 0 4px;
+  letter-spacing: 1px;
+}
+.saju-sub {
+  color: var(--saju-sub);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 카드 공통 */
+.saju-card {
+  background: var(--saju-card);
+  border: 1px solid var(--saju-line);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 20px rgba(120, 90, 40, 0.06);
+}
+
+/* 입력 폼 */
+.saju-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.saju-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.saju-field > span {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--saju-accent-deep);
+}
+.saju-field input[type='text'],
+.saju-field input[type='number'] {
+  font: inherit;
+  padding: 11px 12px;
+  border: 1px solid var(--saju-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--saju-ink);
+  width: 100%;
+}
+.saju-field input:focus {
+  outline: none;
+  border-color: var(--saju-accent);
+  box-shadow: 0 0 0 3px rgba(181, 131, 74, 0.15);
+}
+
+.saju-ymd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.saju-ymd input {
+  width: 100% !important;
+  text-align: center;
+}
+.saju-ymd em {
+  font-style: normal;
+  color: var(--saju-sub);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* 성별 세그먼트 */
+.saju-seg {
+  display: flex;
+  gap: 8px;
+}
+.saju-seg button {
+  flex: 1;
+  font: inherit;
+  padding: 11px;
+  border: 1px solid var(--saju-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--saju-sub);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.saju-seg button.on {
+  background: var(--saju-accent);
+  border-color: var(--saju-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.saju-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--saju-sub);
+  cursor: pointer;
+}
+.saju-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--saju-accent);
+}
+
+.saju-submit {
+  font: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--saju-accent) 0%, var(--saju-accent-deep) 100%);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(138, 95, 46, 0.25);
+  transition: transform 0.1s;
+}
+.saju-submit:active {
+  transform: translateY(1px);
+}
+
+.saju-error {
+  color: #c0392b;
+  font-size: 14px;
+  margin: 0;
+}
+.saju-note {
+  font-size: 12px;
+  color: var(--saju-sub);
+  text-align: center;
+  margin: 4px 0 0;
+  line-height: 1.6;
+}
+.saju-note-bottom {
+  margin-top: 8px;
+}
+
+/* 결과 */
+.saju-result {
+  margin-top: 28px;
+  animation: saju-fade 0.4s ease;
+}
+@keyframes saju-fade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.saju-result-title {
+  font-family: 'Gowun Batang', serif;
+  text-align: center;
+  font-size: 22px;
+  margin: 0 0 4px;
+}
+.saju-birth {
+  text-align: center;
+  color: var(--saju-sub);
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+.saju-h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 17px;
+  margin: 0 0 16px;
+  color: var(--saju-accent-deep);
+}
+
+/* 4기둥 */
+.saju-pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.saju-col {
+  text-align: center;
+}
+.saju-col.is-day .saju-col-head {
+  color: var(--saju-accent-deep);
+  font-weight: 800;
+}
+.saju-col-head {
+  font-size: 13px;
+  color: var(--saju-sub);
+  margin-bottom: 8px;
+}
+.saju-col-head span {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+.saju-god {
+  font-size: 11px;
+  color: var(--saju-sub);
+  height: 16px;
+  line-height: 16px;
+  margin: 4px 0;
+  white-space: nowrap;
+}
+.saju-char {
+  border-radius: 12px;
+  padding: 8px 2px 6px;
+  color: #fff;
+  margin: 3px 0;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+}
+.saju-col.is-day .saju-char {
+  outline: 3px solid rgba(138, 95, 46, 0.35);
+  outline-offset: 1px;
+}
+.saju-char-han {
+  display: block;
+  font-family: 'Gowun Batang', serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.saju-char-kor {
+  display: block;
+  font-size: 12px;
+  opacity: 0.95;
+}
+.saju-char-kor em {
+  font-style: normal;
+  opacity: 0.8;
+  margin-left: 3px;
+  font-size: 11px;
+}
+.saju-col-empty {
+  color: var(--saju-sub);
+  font-size: 13px;
+  padding: 30px 0;
+  line-height: 1.5;
+}
+
+/* 오행 막대 */
+.saju-elements {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.saju-el-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.saju-el-name {
+  width: 56px;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.saju-el-bar {
+  flex: 1;
+  height: 12px;
+  background: #efe7d6;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.saju-el-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  min-width: 2px;
+}
+.saju-el-count {
+  width: 20px;
+  text-align: right;
+  font-size: 14px;
+  color: var(--saju-sub);
+  flex-shrink: 0;
+}
+
+/* 오늘의 운세 */
+.saju-fortune {
+  background: linear-gradient(135deg, #fff8ec 0%, #fdeecf 100%);
+  border-color: #eeddb8;
+}
+.saju-fortune-god {
+  display: inline-block;
+  background: var(--saju-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin: 0 0 10px;
+}
+.saju-fortune-msg {
+  margin: 0;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+/* 해석 문단 */
+.saju-para {
+  padding: 14px 0;
+  border-top: 1px dashed var(--saju-line);
+}
+.saju-para:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+.saju-para h4 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  color: var(--saju-accent-deep);
+}
+.saju-para p {
+  margin: 0 0 6px;
+  line-height: 1.75;
+  font-size: 14.5px;
+  color: #453f36;
+}
