@@ -17,25 +17,43 @@ export default function App() {
   const [recovering, setRecovering] = useState(false) // 비밀번호 재설정 중
 
   useEffect(() => {
-    // 1) 앱을 열 때 이미 로그인돼 있는지 확인
-    supabase.auth.getSession().then(async ({ data }) => {
-      const existing = data.session
-      // "자동 로그인"이 꺼져 있고, 이번이 '새로 연 브라우저 세션'이면 로그아웃합니다.
-      // (같은 세션 내 새로고침은 isSessionActive 로 구분되어 로그인 유지)
-      if (existing && !getAutoLogin() && !isSessionActive()) {
-        await supabase.auth.signOut()
-        setSession(null)
-      } else {
-        setSession(existing)
+    // 로딩 화면을 끝내는 안전한 종료 함수 (한 번만 실행)
+    let settled = false
+    const stopChecking = () => {
+      if (!settled) {
+        settled = true
+        setChecking(false)
       }
-      markSessionActive()
-      setChecking(false)
-    })
+    }
+
+    // 1) 앱을 열 때 이미 로그인돼 있는지 확인
+    supabase.auth
+      .getSession()
+      .then(async ({ data }) => {
+        const existing = data.session
+        // "자동 로그인"이 꺼져 있고, 이번이 '새로 연 브라우저 세션'이면 로그아웃합니다.
+        // (같은 세션 내 새로고침은 isSessionActive 로 구분되어 로그인 유지)
+        if (existing && !getAutoLogin() && !isSessionActive()) {
+          await supabase.auth.signOut()
+          setSession(null)
+        } else {
+          setSession(existing)
+        }
+        markSessionActive()
+      })
+      // 네트워크 오류로 확인에 실패해도 로딩 화면에 갇히지 않도록
+      .catch(() => {})
+      .finally(stopChecking)
+
+    // 안전장치: 확인이 너무 오래 걸리면 일단 화면을 진행합니다.
+    // (세션은 아래 실시간 감지가 도착하는 대로 채워줍니다)
+    const timer = setTimeout(stopChecking, 6000)
 
     // 2) 로그인·로그아웃 등 상태 변화를 실시간으로 감지
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         setSession(newSession)
+        stopChecking()
         // 로그아웃하면 로그인 화면으로 되돌립니다.
         if (event === 'SIGNED_OUT') {
           setView('login')
@@ -47,8 +65,11 @@ export default function App() {
       },
     )
 
-    // 화면이 사라질 때 감지를 정리
-    return () => listener.subscription.unsubscribe()
+    // 화면이 사라질 때 정리
+    return () => {
+      clearTimeout(timer)
+      listener.subscription.unsubscribe()
+    }
   }, [])
 
   // 로그인 상태를 확인하는 아주 짧은 순간
