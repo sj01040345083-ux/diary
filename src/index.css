@@ -101,13 +101,14 @@ body::before {
   background-repeat: no-repeat, no-repeat;
 }
 
-/* 로그인 상태를 확인하는 짧은 로딩 화면 */
+/* 로그인 상태를 확인하는 짧은 로딩 화면 (배경 사진은 body에서 보임) */
 .app-loading {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink-soft);
+  color: var(--ink);
+  font-weight: 700;
   font-size: 0.95rem;
-  background: linear-gradient(135deg, #f8f3e7 0%, #eef4e7 100%);
+  text-shadow: var(--text-halo);
 }
