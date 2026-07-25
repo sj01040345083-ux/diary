@@ -12,9 +12,10 @@ export type StoredPhoto = {
 }
 
 // 현재 로그인한 사용자 ID
+// getSession()은 로컬 저장소에서 즉시 읽습니다(네트워크 요청 없음) → 목록 조회가 빨라집니다.
 async function currentUserId(): Promise<string | null> {
-  const { data } = await supabase.auth.getUser()
-  return data.user?.id ?? null
+  const { data } = await supabase.auth.getSession()
+  return data.session?.user?.id ?? null
 }
 
 // 사진 한 장 업로드 (압축된 Blob)

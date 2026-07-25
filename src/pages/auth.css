@@ -2,7 +2,7 @@
    로그인 / 회원가입 화면 전용 스타일
    ───────────────────────────────────────────── */
 
-/* 전체 배경 (숲 이미지 + 따뜻한 반투명 덮개) */
+/* 전체 배경(숲 이미지 + 덮개)은 body::before에 고정으로 깔립니다. */
 .auth-screen {
   position: relative;
   min-height: 100vh;
@@ -10,22 +10,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1.25rem;
-  background-image: var(--app-bg);
-  background-size: cover;
-  background-position: center;
   overflow: hidden;
-}
-
-/* 배경 위에 아주 옅은 막만 덮어 숲은 또렷하게, 카드 글자는 잘 보이게 함 */
-.auth-screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    155deg,
-    rgba(248, 243, 231, 0.34) 0%,
-    rgba(238, 244, 231, 0.28) 100%
-  );
 }
 
 /* 로그인 카드 */
