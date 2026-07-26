@@ -66,7 +66,7 @@
   z-index: 1;
   max-width: var(--app-max);
   margin: 0 auto;
-  padding: 1.05rem 1.35rem 0;
+  padding: 0.7rem 1.35rem 0;
 }
 
 /* 날짜 — 작고 차분하게 (숲 위에서도 잘 보이도록 옅은 흰 그림자) */
@@ -75,10 +75,10 @@
   font-size: 0.82rem;
   letter-spacing: 0.04em;
   color: var(--ink-soft);
-  margin: 0 0 0.45rem;
+  margin: 0 0 0.3rem;
   background: rgba(255, 254, 250, 0.92);
   border-radius: 10px;
-  padding: 0.28rem 0.75rem;
+  padding: 0.24rem 0.7rem;
   box-shadow: var(--shadow-soft);
 }
 
@@ -86,13 +86,13 @@
 .home-greeting {
   display: inline-block;
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.32rem;
+  font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: -0.01em;
   color: var(--ink);
-  margin: 0 0 0.7rem;
-  padding: 0.45rem 0.75rem;
+  margin: 0 0 0.55rem;
+  padding: 0.38rem 0.7rem;
   background: rgba(255, 254, 249, 0.66);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -108,8 +108,8 @@
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   box-shadow: 0 1px 2px rgba(49, 68, 55, 0.04), 0 14px 34px rgba(49, 68, 55, 0.12);
-  padding: 1.05rem 1.25rem;
-  margin-bottom: 0.65rem;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 0.6rem;
   text-align: center; /* 명언이 줄바꿈돼도 가운데 정렬 */
 }
 
@@ -119,16 +119,16 @@
   letter-spacing: 0.1em;
   color: #4f6b4a;
   font-weight: 800;
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.4rem;
 }
 
 /* 명언 본문 — 우아한 명조체 (아담하게) */
 .quote-text {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.96rem;
+  line-height: 1.55;
   color: #3f4f43;
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.45rem;
 }
 
 .quote-author {
@@ -166,8 +166,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.7rem;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
 }
 
 /* 즐겨찾기 저장 버튼 (뚜렷하게) */
@@ -284,6 +284,7 @@
   display: flex;
   gap: 0.6rem;
   align-items: stretch;
+  margin-bottom: 0.7rem;
 }
 .home-actions .home-cta,
 .home-actions .home-shortcut {
@@ -294,9 +295,9 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0.75rem 0.7rem;
+  padding: 0.85rem 0.6rem;
   font-size: 0.95rem;
-  line-height: 1.3;
+  line-height: 1.25;
   word-break: keep-all;
 }
 
@@ -844,6 +845,74 @@
 }
 .cal-clear-btn:hover {
   background: #eef3e8;
+}
+
+/* ── 일기 작성 화면: 날짜 고르기 바 ── */
+.write-datebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.7rem;
+}
+.write-datebtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: rgba(255, 254, 250, 0.95);
+  border: 1.5px solid #cfe0c6;
+  border-radius: 999px;
+  padding: 0.4rem 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.18s ease;
+}
+.write-datebtn:hover {
+  background: var(--accent-soft);
+}
+.write-datebtn-caret {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+.write-date-today {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+}
+.write-date-today:hover {
+  background: #eef3e8;
+}
+/* 작성 화면 안의 달력은 위쪽 여백을 줍니다 */
+.write-cal {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+/* 날짜 고르기 달력: 오늘까지의 날은 누를 수 있음 */
+.write-cal .cal-cell.pick {
+  cursor: pointer;
+  color: var(--ink);
+}
+.write-cal .cal-cell.pick:hover {
+  border-color: #cfe0c6;
+  background: var(--accent-soft);
+}
+.write-cal .cal-cell.today {
+  font-weight: 800;
+  color: var(--accent-strong);
+}
+.write-cal .cal-cell:disabled {
+  opacity: 0.32;
+  cursor: default;
 }
 
 /* 클릭 가능한 기록 아이템 */
