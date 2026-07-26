@@ -123,6 +123,16 @@ export default function HomePage({
           오늘의 한 줄을 남겨보세요 🍀
         </h1>
 
+        {/* 주요 버튼 — 한 줄에 반반 (화면 위쪽에서 바로 보이게) */}
+        <div className="home-actions">
+          <button className="home-cta" onClick={onWrite}>
+            ✏️ 오늘 일기 쓰기
+          </button>
+          <button className="home-shortcut" onClick={onTransactions}>
+            💰 소비·수입 기록
+          </button>
+        </div>
+
         {/* 오늘의 명언 */}
         <section className="quote-card">
           <p className="quote-label">오늘의 명언</p>
@@ -142,18 +152,6 @@ export default function HomePage({
             </button>
           </div>
         </section>
-
-        {/* 주요 버튼 — 한 줄에 반반 */}
-        <div className="home-actions">
-          <button className="home-cta" onClick={onWrite}>
-            ✏️ 오늘 일기
-            <br />쓰기
-          </button>
-          <button className="home-shortcut" onClick={onTransactions}>
-            💰 소비·수입
-            <br />기록
-          </button>
-        </div>
 
         {/* 내 일기 목록 */}
         <section className="diary-section">

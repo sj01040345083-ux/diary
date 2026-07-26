@@ -6,6 +6,7 @@ import { emotions } from '../config/emotions'
 import { compressImage } from '../lib/imageCompress'
 import { uploadPhoto, getPhotosByDate, deletePhoto } from '../lib/photos'
 import { collageClass } from '../components/PhotoCollage'
+import DatePickerCalendar from '../components/DatePickerCalendar'
 import './home.css'
 
 const MAX_PHOTOS = 6
@@ -54,8 +55,11 @@ export default function WritePage({
   onCancel,
   targetDate,
 }: Props) {
-  const workDate = targetDate ?? todayString() // 작성/수정 대상 날짜
+  // 작성/수정 대상 날짜. 새 일기(targetDate 없음)일 때는 달력으로 바꿀 수 있습니다.
+  const [workDate, setWorkDate] = useState(targetDate ?? todayString())
   const isToday = workDate === todayString()
+  const canPickDate = targetDate === undefined // 기록에서 특정 날짜 수정으로 들어온 게 아니면 날짜 선택 가능
+  const [showPicker, setShowPicker] = useState(false)
 
   const [content, setContent] = useState('')
   const [mood, setMood] = useState('') // '' = 기분 선택 안 함
@@ -78,6 +82,11 @@ export default function WritePage({
   const selectedEmotion = emotions.find((e) => e.emoji === mood)
 
   useEffect(() => {
+    // 날짜가 바뀔 때마다 내용을 초기화하고 그 날 일기를 다시 불러옵니다.
+    setLoadingInitial(true)
+    setIsEditing(false)
+    setContent('')
+    setMood('')
     // 해당 날짜 일기가 이미 있으면 불러와 채워둡니다 (수정)
     getDiaryByDate(workDate)
       .then((diary) => {
@@ -92,8 +101,12 @@ export default function WritePage({
   }, [workDate])
 
   useEffect(() => {
-    // 이 날짜에 이미 저장된 사진(서버)을 불러와 미리보기로 채웁니다.
+    // 날짜가 바뀌면 이전 날짜의 사진 선택 기록을 비우고 새로 불러옵니다.
     let alive = true
+    setPhotos([])
+    removedPaths.current = []
+    pickedSigs.current = new Set()
+    // 이 날짜에 이미 저장된 사진(서버)을 불러와 미리보기로 채웁니다.
     getPhotosByDate(workDate)
       .then((recs) => {
         if (!alive) return
@@ -230,7 +243,43 @@ export default function WritePage({
       </header>
 
       <main className="home-container">
-        <p className="home-date">{formatEntryDate(workDate)}</p>
+        {canPickDate ? (
+          <div className="write-datebar">
+            <button
+              type="button"
+              className="write-datebtn"
+              onClick={() => setShowPicker((v) => !v)}
+              aria-expanded={showPicker}
+            >
+              📅 {formatEntryDate(workDate)}
+              {isToday ? ' · 오늘' : ''}
+              <span className="write-datebtn-caret">{showPicker ? '▲' : '▼'}</span>
+            </button>
+            {!isToday && (
+              <button
+                type="button"
+                className="write-date-today"
+                onClick={() => {
+                  setWorkDate(todayString())
+                  setShowPicker(false)
+                }}
+              >
+                오늘로
+              </button>
+            )}
+            {showPicker && (
+              <DatePickerCalendar
+                value={workDate}
+                onChange={(d) => {
+                  setWorkDate(d)
+                  setShowPicker(false)
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <p className="home-date">{formatEntryDate(workDate)}</p>
+        )}
         <h1 className="write-heading">
           {isToday ? '오늘, 마음에 남은 한 줄 🍀' : '이 날의 한 줄 🍀'}
         </h1>
