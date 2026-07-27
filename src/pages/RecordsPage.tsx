@@ -10,17 +10,12 @@ type Props = {
   onEditDiary: (date: string) => void
 }
 
-// 이번 달 "YYYY-MM"
-function thisMonth(): string {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
 export default function RecordsPage({ onEditDiary }: Props) {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string | null>(null) // 달력에서 고른 날짜
-  const [exporting, setExporting] = useState(false)
+  // 워드 내보내기 진행 상태: 개별 일기 id, 또는 'all'(전체), 또는 null
+  const [exportingId, setExportingId] = useState<string | null>(null)
 
   // 삭제 확인
   const [confirmTarget, setConfirmTarget] = useState<Diary | null>(null)
@@ -56,19 +51,26 @@ export default function RecordsPage({ onEditDiary }: Props) {
     }
   }
 
-  // 일기 워드 내보내기 — 고른 날짜의 달(없으면 이번 달) 기준
-  async function handleWord() {
-    setExporting(true)
+  // 일기 한 편을 워드로 내보내기 (제목/날짜 + 본문 + 사진)
+  async function exportOne(d: Diary) {
+    setExportingId(String(d.id))
     try {
-      const targetMonth = selectedDate ? selectedDate.slice(0, 7) : thisMonth()
-      const { exportDiaryDocx } = await import('../lib/exporters')
-      await exportDiaryDocx({
-        month: targetMonth,
-        diaries,
-        transactions: [],
-      })
+      const { exportSingleDiaryDocx } = await import('../lib/exporters')
+      await exportSingleDiaryDocx(d)
     } finally {
-      setExporting(false)
+      setExportingId(null)
+    }
+  }
+
+  // 지금 보이는 일기들을 하나의 워드로 내보내기
+  // (달력에서 날짜를 골랐으면 그 날짜만, 아니면 전체)
+  async function exportAll() {
+    setExportingId('all')
+    try {
+      const { exportDiariesDocx } = await import('../lib/exporters')
+      await exportDiariesDocx(filtered)
+    } finally {
+      setExportingId(null)
     }
   }
 
@@ -139,6 +141,14 @@ export default function RecordsPage({ onEditDiary }: Props) {
                     수정
                   </button>
                   <button
+                    className="diary-word-btn"
+                    onClick={() => exportOne(d)}
+                    disabled={exportingId !== null}
+                    aria-label="이 일기 워드로 다운로드"
+                  >
+                    {exportingId === String(d.id) ? '만드는 중…' : '📝 워드'}
+                  </button>
+                  <button
                     className="diary-delete-btn"
                     onClick={() => {
                       setDeleteError('')
@@ -154,15 +164,19 @@ export default function RecordsPage({ onEditDiary }: Props) {
           </div>
         )}
 
-        {/* 일기 워드 내보내기 */}
-        {!loading && diaries.length > 0 && (
+        {/* 일기 워드 내보내기 (한 파일로 모아서) */}
+        {!loading && filtered.length > 0 && (
           <div className="export-row" style={{ marginTop: '1.5rem' }}>
             <button
               className="export-btn"
-              onClick={handleWord}
-              disabled={exporting}
+              onClick={exportAll}
+              disabled={exportingId !== null}
             >
-              {exporting ? '만드는 중…' : '📝 워드로 내보내기'}
+              {exportingId === 'all'
+                ? '만드는 중…'
+                : selectedDate
+                  ? '📝 이 날짜 워드로 내보내기'
+                  : `📝 전체 일기 워드로 내보내기 (${filtered.length}편)`}
             </button>
           </div>
         )}

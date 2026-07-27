@@ -1202,6 +1202,28 @@
   background: var(--accent-soft);
 }
 
+/* 워드로 다운로드 버튼 (일기 카드) */
+.diary-word-btn {
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #3f6b8a;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.diary-word-btn:hover:not(:disabled) {
+  background: #e6eef5;
+}
+.diary-word-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 /* 각 일기의 은은한 삭제 버튼 (평소엔 옅게, 올리면 부드러운 빨강) */
 .diary-delete-btn {
   flex-shrink: 0;
