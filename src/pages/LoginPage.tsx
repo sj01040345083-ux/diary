@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import AuthLayout from '../components/AuthLayout'
 import { supabase } from '../lib/supabase'
@@ -20,6 +20,25 @@ export default function LoginPage({ onGoSignup }: Props) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState('')
+
+  // 소셜 로그인(카카오 등)이 실패해 앱으로 되돌아오면, Supabase 는 주소 뒤에
+  // #error=...&error_description=... 형태로 원인을 붙여서 보냅니다.
+  // 그 내용을 읽어 화면에 보여주고(진단에 도움), 주소는 깔끔하게 정리합니다.
+  useEffect(() => {
+    const hash = window.location.hash.startsWith('#')
+      ? window.location.hash.slice(1)
+      : ''
+    const params = new URLSearchParams(hash || window.location.search)
+    const errDesc = params.get('error_description') || params.get('error')
+    if (errDesc) {
+      const msg = decodeURIComponent(errDesc.replace(/\+/g, ' '))
+      // eslint-disable-next-line no-console
+      console.error('[OAuth 로그인 오류]', msg)
+      setNotice(`로그인에 실패했어요: ${msg}`)
+      // 주소에서 오류 흔적 제거 (새로고침 시 반복 표시 방지)
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  }, [])
 
   // 입력값 검사 — 문제가 없으면 true 를 돌려줍니다.
   function validate() {
@@ -81,8 +100,16 @@ export default function LoginPage({ onGoSignup }: Props) {
     })
     // 성공 시 카카오 로그인 페이지로 이동합니다. (아래는 실패 시)
     if (error) {
+      // 진단을 위해 실제 오류를 콘솔(F12)에 남깁니다.
+      // 예: "Unsupported provider: provider is not enabled"
+      //  → Supabase 대시보드에서 Kakao 제공자가 아직 켜지지 않은 경우
+      // eslint-disable-next-line no-console
+      console.error('[카카오 로그인 오류]', error.message)
+      const notEnabled = /not enabled|unsupported provider/i.test(error.message)
       setNotice(
-        '카카오 로그인이 아직 준비되지 않았어요. 이메일로 로그인하시거나 잠시 후 다시 시도해주세요 🌿',
+        notEnabled
+          ? '카카오 로그인이 아직 설정되지 않았어요. (관리자: Supabase에서 Kakao 제공자를 켜주세요) 우선 이메일로 로그인해주세요 🌿'
+          : `카카오 로그인에 실패했어요: ${error.message}`,
       )
     }
   }
