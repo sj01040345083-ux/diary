@@ -1018,6 +1018,57 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+/* '내 사진 업로드' 타일 (점선 테두리, + 아이콘) */
+.bg-thumb-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  background: rgba(255, 254, 250, 0.85);
+  border: 2px dashed #b9d3ad;
+  color: var(--accent-strong);
+}
+.bg-thumb-upload:hover:not(:disabled) {
+  background: var(--accent-soft);
+  transform: scale(1.03);
+}
+.bg-thumb-upload:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.bg-thumb-upload-plus {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.bg-thumb-upload-text {
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+/* '기본 배경으로 되돌리기' 버튼 */
+.bg-reset-btn {
+  margin-top: 0.7rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.bg-reset-btn:hover:not(:disabled) {
+  background: #eef3e8;
+}
+.bg-reset-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .opt-btn {
   font-family: inherit;
   font-size: 0.9rem;

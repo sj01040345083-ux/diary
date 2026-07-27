@@ -4,9 +4,54 @@ import { backgroundUrl, defaultBackground } from '../config/backgrounds'
 
 export type Settings = {
   nickname: string // 불러줄 이름 (비어 있으면 이메일 앞부분 사용)
-  bg: string // 배경 사진 값 (bg1~bg6)
+  bg: string // 배경 사진 값 (bg1~bg6, 또는 'custom' = 내가 올린 사진)
   font: string
   font_size: string
+}
+
+// 사용자가 직접 올린 배경 사진을 나타내는 특별한 값
+export const CUSTOM_BG = 'custom'
+// 올린 배경 사진(Data URL)을 저장해 두는 localStorage 키 (기기별 저장)
+const CUSTOM_BG_KEY = 'soso.customBg'
+
+// 내가 올린 배경 사진(Data URL) 가져오기 (없으면 null)
+export function getCustomBg(): string | null {
+  try {
+    return localStorage.getItem(CUSTOM_BG_KEY)
+  } catch {
+    return null
+  }
+}
+
+// 내가 올린 배경 사진 저장. 용량 초과 등으로 실패하면 false 를 돌려줍니다.
+export function setCustomBg(dataUrl: string): boolean {
+  try {
+    localStorage.setItem(CUSTOM_BG_KEY, dataUrl)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// 내가 올린 배경 사진 지우기
+export function clearCustomBg(): void {
+  try {
+    localStorage.removeItem(CUSTOM_BG_KEY)
+  } catch {
+    // 무시
+  }
+}
+
+// 설정의 bg 값을 실제 배경 이미지 주소로 바꿉니다.
+// - 'custom' 이면 내가 올린 사진(Data URL), 없으면 기본 배경으로 대체
+// - 그 외에는 기존 프리셋(bg1~bg6) 주소
+export function resolveBgUrl(bg: string): string {
+  if (bg === CUSTOM_BG) {
+    const custom = getCustomBg()
+    if (custom) return custom
+    return backgroundUrl(defaultBackground)
+  }
+  return backgroundUrl(bg)
 }
 
 export const defaultSettings: Settings = {
@@ -55,6 +100,12 @@ export async function getSettings(): Promise<Settings> {
         font_size: data.font_size,
       }
     : { ...defaultSettings }
+  // 이 기기에서 마지막으로 '내 사진'을 배경으로 골랐다면, 서버 값으로 덮지 않고 유지합니다.
+  // (내가 올린 배경은 기기별 localStorage 에만 저장되므로, 저장 버튼을 안 눌러도 유지되게)
+  const cached = getCachedSettings()
+  if (getCustomBg() && cached?.bg === CUSTOM_BG) {
+    result.bg = CUSTOM_BG
+  }
   cacheSettingsLocal(result) // 다음 접속 때 바로 적용되도록 캐시
   return result
 }
@@ -114,7 +165,7 @@ export function resolveDisplayName(
 export function applySettings(s: Settings): void {
   const el = document.documentElement
   // 배경 사진을 CSS 변수로 지정 → 모든 화면(.home-screen/.auth-screen)이 이 값을 씀
-  el.style.setProperty('--app-bg', `url("${backgroundUrl(s.bg)}")`)
+  el.style.setProperty('--app-bg', `url("${resolveBgUrl(s.bg)}")`)
   el.setAttribute('data-font', s.font)
   el.setAttribute('data-size', s.font_size)
 }
