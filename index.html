@@ -24,5 +24,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- 서비스 워커 등록: 앱을 설치 가능한 PWA로 만들고, 오프라인에서도 열리게 합니다. -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {
+            /* 등록 실패는 조용히 무시 (앱 사용에는 지장 없음) */
+          })
+        })
+      }
+    </script>
   </body>
 </html>
