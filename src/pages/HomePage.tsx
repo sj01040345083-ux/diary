@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { formatToday, getRandomQuote, formatEntryDate } from '../lib/today'
-import { getMyDiaries, deleteDiary } from '../lib/diaries'
+import { getMyDiaries, deleteDiary, todayString } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import {
   isFavorited,
@@ -45,6 +45,8 @@ export default function HomePage({
 
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [loadingDiaries, setLoadingDiaries] = useState(true)
+  // 홈에는 '오늘 쓴 일기'만 보여줍니다. 지난 일기는 '기록' 탭에서 봅니다.
+  const todayDiaries = diaries.filter((d) => d.entry_date === todayString())
 
   // 오늘의 명언 즐겨찾기 상태
   const [isFav, setIsFav] = useState(false)
@@ -153,22 +155,23 @@ export default function HomePage({
           </div>
         </section>
 
-        {/* 내 일기 목록 */}
+        {/* 오늘의 일기 (지난 일기는 '기록' 탭에서 봅니다) */}
         <section className="diary-section">
-          <h2 className="diary-heading">내 일기</h2>
+          <h2 className="diary-heading">오늘의 일기</h2>
 
           {loadingDiaries ? (
             <div className="diary-empty">
               <p>불러오는 중…</p>
             </div>
-          ) : diaries.length === 0 ? (
+          ) : todayDiaries.length === 0 ? (
             <div className="diary-empty">
-              <p>아직 작성한 일기가 없어요.</p>
-              <p>첫 한 줄을 남겨보세요 🌿</p>
+              <p>오늘은 아직 일기를 쓰지 않았어요.</p>
+              <p>오늘의 한 줄을 남겨보세요 🌿</p>
+              <p className="diary-empty-hint">지난 일기는 아래 ‘기록’ 탭에서 볼 수 있어요.</p>
             </div>
           ) : (
             <div className="diary-list">
-              {diaries.map((d) => (
+              {todayDiaries.map((d) => (
                 <article key={d.id} className="diary-item">
                   <div className="diary-item-main">
                     <p className="diary-item-date">

@@ -1093,6 +1093,13 @@
   margin: 0;
 }
 
+/* 지난 일기는 기록 탭에서 볼 수 있다는 작은 안내 */
+.diary-empty-hint {
+  margin-top: 0.6rem !important;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
 /* ── 일기 목록 ── */
 .diary-list {
   display: flex;
