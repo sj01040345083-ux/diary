@@ -63,3 +63,20 @@ export async function compressImage(file: File): Promise<Blob> {
     if (fallbackUrl) URL.revokeObjectURL(fallbackUrl)
   }
 }
+
+// Blob 을 base64 Data URL 문자열로 바꿉니다. (localStorage 에 그대로 저장하기 위함)
+export function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('read failed'))
+    reader.readAsDataURL(blob)
+  })
+}
+
+// 배경으로 쓸 이미지 파일을 압축한 뒤 Data URL 로 돌려줍니다.
+// (배경은 화면을 꽉 채우므로 사진 첨부와 같은 1600px 기준으로 줄입니다.)
+export async function fileToBackgroundDataUrl(file: File): Promise<string> {
+  const blob = await compressImage(file)
+  return blobToDataUrl(blob)
+}

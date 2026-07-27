@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { backgroundOptions } from '../config/backgrounds'
 import { sizeOptions } from '../config/theme'
@@ -6,9 +6,15 @@ import {
   getSettings,
   saveSettings,
   applySettings,
+  cacheSettingsLocal,
   defaultSettings,
+  CUSTOM_BG,
+  getCustomBg,
+  setCustomBg,
+  clearCustomBg,
 } from '../lib/settings'
 import type { Settings } from '../lib/settings'
+import { fileToBackgroundDataUrl } from '../lib/imageCompress'
 import { supabase } from '../lib/supabase'
 import './home.css'
 
@@ -21,8 +27,14 @@ export default function SettingsPage({ session }: Props) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
+  // 내가 올린 배경 사진(Data URL). 미리보기·선택에 사용합니다.
+  const [customBg, setCustomBgState] = useState<string | null>(null)
+  const [bgBusy, setBgBusy] = useState(false)
+  const [bgError, setBgError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    setCustomBgState(getCustomBg())
     getSettings()
       .then((s) => {
         setSettings(s)
@@ -38,6 +50,58 @@ export default function SettingsPage({ session }: Props) {
     setSettings(next)
     applySettings(next)
     setNotice('')
+  }
+
+  // 배경만 바꿀 때: 즉시 적용 + localStorage 캐시에도 저장(새로고침·재접속에도 유지)
+  function pickBackground(value: string) {
+    const next = { ...settings, bg: value }
+    setSettings(next)
+    applySettings(next)
+    cacheSettingsLocal(next)
+    setNotice('')
+    setBgError('')
+  }
+
+  // 파일 선택 → 압축 → Data URL 저장 → 배경으로 즉시 적용
+  async function handleFilePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 같은 파일을 다시 골라도 동작하도록 초기화
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setBgError('이미지 파일(jpg, png 등)만 올릴 수 있어요.')
+      return
+    }
+
+    setBgBusy(true)
+    setBgError('')
+    setNotice('')
+    try {
+      // 큰 사진도 알아서 긴 변 1600px, JPEG 로 줄여 Data URL 로 바꿉니다.
+      const dataUrl = await fileToBackgroundDataUrl(file)
+      // localStorage 저장 (용량이 너무 크면 실패할 수 있음)
+      const ok = setCustomBg(dataUrl)
+      if (!ok) {
+        setBgError(
+          '사진 용량이 너무 커서 저장하지 못했어요. 더 작은 사진으로 올려주세요.',
+        )
+        return
+      }
+      setCustomBgState(dataUrl)
+      pickBackground(CUSTOM_BG) // 올린 사진을 배경으로 즉시 적용 + 저장
+    } catch {
+      setBgError('사진을 불러오지 못했어요. 다른 사진으로 다시 시도해주세요.')
+    } finally {
+      setBgBusy(false)
+    }
+  }
+
+  // 기본 배경으로 되돌리기 (올린 사진 삭제)
+  function resetBackground() {
+    clearCustomBg()
+    setCustomBgState(null)
+    pickBackground(defaultSettings.bg)
+    setNotice('기본 배경으로 되돌렸어요 🌿')
   }
 
   async function handleSave() {
@@ -88,7 +152,7 @@ export default function SettingsPage({ session }: Props) {
                   type="button"
                   className={`bg-thumb ${settings.bg === o.value ? 'is-active' : ''}`}
                   style={{ backgroundImage: `url(${o.url})` }}
-                  onClick={() => pick('bg', o.value)}
+                  onClick={() => pickBackground(o.value)}
                   aria-label={o.label}
                   title={o.label}
                 >
@@ -97,7 +161,58 @@ export default function SettingsPage({ session }: Props) {
                   )}
                 </button>
               ))}
+
+              {/* 내가 올린 사진 미리보기 (있을 때만) */}
+              {customBg && (
+                <button
+                  type="button"
+                  className={`bg-thumb ${settings.bg === CUSTOM_BG ? 'is-active' : ''}`}
+                  style={{ backgroundImage: `url(${customBg})` }}
+                  onClick={() => pickBackground(CUSTOM_BG)}
+                  aria-label="내 사진"
+                  title="내 사진"
+                >
+                  {settings.bg === CUSTOM_BG && (
+                    <span className="bg-thumb-check">✓</span>
+                  )}
+                </button>
+              )}
+
+              {/* 내 사진 업로드 버튼 */}
+              <button
+                type="button"
+                className="bg-thumb bg-thumb-upload"
+                onClick={() => fileRef.current?.click()}
+                disabled={bgBusy}
+                aria-label="내 사진 업로드"
+                title="내 사진 업로드"
+              >
+                <span className="bg-thumb-upload-plus">＋</span>
+                <span className="bg-thumb-upload-text">
+                  {bgBusy ? '준비 중…' : '내 사진'}
+                </span>
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFilePick}
+                style={{ display: 'none' }}
+              />
             </div>
+
+            {bgError && <p className="photo-error">{bgError}</p>}
+
+            {(settings.bg === CUSTOM_BG || customBg) && (
+              <button
+                type="button"
+                className="bg-reset-btn"
+                onClick={resetBackground}
+                disabled={bgBusy}
+              >
+                ↩ 기본 배경으로 되돌리기
+              </button>
+            )}
 
             <p className="report-section-title">글씨 크기</p>
             <div className="opt-row">
