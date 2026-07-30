@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import type { Diary } from '../lib/diaries'
+import { emotions, moodColorByEmoji } from '../config/emotions'
 
-// 일기 기록을 달력으로 보여줍니다.
-// 일기가 있는 날짜에는 그 날의 기분 이모지가 표시되고, 눌러서 그 날 일기를 조회합니다.
+// 일기 기록을 '한 달의 숲' 달력으로 보여줍니다.
+// 일기가 있는 날짜는 그 날의 '기분 색'으로 칠해지고(+이모지), 눌러서 그 날 일기를 조회합니다.
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -61,7 +62,10 @@ export default function DiaryCalendar({
           ◀
         </button>
         <span className="cal-title">
-          {y}년 {m}월
+          한 달의 숲
+          <span className="cal-title-sub">
+            {y}년 {m}월
+          </span>
         </span>
         <button
           className="cal-arrow"
@@ -87,11 +91,22 @@ export default function DiaryCalendar({
           const diary = byDate.get(date)
           const has = !!diary
           const sel = selectedDate === date
+          // 그 날 기분에 해당하는 색 (없으면 기본 초록빛)
+          const moodColor =
+            (diary?.mood && moodColorByEmoji[diary.mood]) || '#8FB98A'
           return (
             <button
               key={date}
               type="button"
               className={`cal-cell ${has ? 'has' : ''} ${sel ? 'sel' : ''}`}
+              style={
+                has
+                  ? {
+                      backgroundColor: `${moodColor}33`,
+                      borderColor: moodColor,
+                    }
+                  : undefined
+              }
               disabled={!has}
               onClick={() => onSelect(sel ? null : date)}
               aria-label={`${m}월 ${d}일${has ? ' 일기 있음' : ''}`}
@@ -101,6 +116,19 @@ export default function DiaryCalendar({
             </button>
           )
         })}
+      </div>
+
+      {/* 기분 색상 범례 */}
+      <div className="cal-legend">
+        {emotions.map((e) => (
+          <span key={e.key} className="cal-legend-item">
+            <span
+              className="cal-legend-dot"
+              style={{ backgroundColor: e.color }}
+            />
+            {e.short}
+          </span>
+        ))}
       </div>
     </div>
   )
