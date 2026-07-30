@@ -155,9 +155,9 @@ export default function SettingsPage({ session }: Props) {
                     o.url
                       ? { backgroundImage: `url(${o.url})` }
                       : {
-                          // 사진이 아닌 단색(올리브) 배경 미리보기
+                          // 사진이 아닌 밝은 단색 배경 미리보기
                           background:
-                            'linear-gradient(170deg, #4a543c 0%, #363d2a 100%)',
+                            'linear-gradient(180deg, #eef1ea 0%, #e5e9e0 100%)',
                         }
                   }
                   onClick={() => pickBackground(o.value)}
