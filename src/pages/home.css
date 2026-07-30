@@ -742,12 +742,48 @@
   background: var(--accent-soft);
 }
 .cal-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
   font-family: 'Gowun Batang', serif;
-  font-size: 1.02rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--ink);
   min-width: 6.5rem;
   text-align: center;
+}
+/* 제목 아래 작은 '2026년 7월' */
+.cal-title-sub {
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+
+/* 기분 색상 범례 */
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.7rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line-soft);
+}
+.cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+.cal-legend-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 .cal-grid {
   display: grid;
