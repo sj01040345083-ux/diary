@@ -241,18 +241,18 @@
   font-weight: 700;
   letter-spacing: 0.01em;
   color: #fff;
-  background: linear-gradient(135deg, #86ab6d 0%, #5f8a4c 55%, #4f7a45 100%);
+  background: var(--accent);
   border: none;
   border-radius: 16px;
   padding: 1rem;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(79, 122, 69, 0.32);
+  box-shadow: 0 4px 14px rgba(86, 111, 77, 0.2);
   transition: filter 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
 }
 
 .home-cta:hover {
-  filter: brightness(0.96);
-  box-shadow: 0 8px 22px rgba(79, 122, 69, 0.4);
+  filter: brightness(0.97);
+  box-shadow: 0 6px 18px rgba(86, 111, 77, 0.28);
 }
 
 .home-cta:active {

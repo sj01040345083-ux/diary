@@ -4,32 +4,33 @@
    ───────────────────────────────────────────── */
 
 :root {
-  /* 배경 계열 — 부드러운 크림/베이지 */
-  --paper: #f6f3eb;
-  --paper-2: #fffdf8;
+  /* 배경 계열 — 차분한 뉴트럴 페이퍼 */
+  --paper: #f2f3ec;
+  --paper-2: #fcfcf8;
 
-  /* 글자 색 — 깊은 숲 초록빛 회색 */
-  --ink: #314437;
-  --ink-soft: #5f6e61;
-  --ink-faint: #8a9886;
+  /* 글자 색 — 깊은 뉴트럴 차콜그린 (채도 낮춤) */
+  --ink: #333b34;
+  --ink-soft: #656d62;
+  --ink-faint: #9aa094;
 
-  /* 선/구분선 */
-  --line: #dfe8d8;
-  --line-soft: #edf3e8;
+  /* 선/구분선 — 아주 옅게 */
+  --line: #e5e8df;
+  --line-soft: #eef1ea;
 
-  /* 메인 포인트 컬러 — 따뜻한 초록 */
-  --accent: #5d8b4b;
-  --accent-soft: #e8f2df;
-  --accent-strong: #426c35;
+  /* 메인 포인트 컬러 — 차분한 세이지 그린 */
+  --accent: #6f8e66;
+  --accent-soft: #eef2ea;
+  --accent-strong: #566f4d;
 
-  /* 오류/경고 — 부드러운 톤 */
-  --danger: #c0674f;
-  --danger-soft: #f7e7e1;
+  /* 오류/경고 — 부드러운 테라코타 */
+  --danger: #b56a5b;
+  --danger-soft: #f3e8e3;
 
   --radius: 18px;
   --radius-sm: 12px;
-  --shadow-card: 0 1px 2px rgba(49, 68, 55, 0.06), 0 18px 40px rgba(49, 68, 55, 0.14);
-  --shadow-soft: 0 1px 2px rgba(49, 68, 55, 0.05), 0 8px 20px rgba(49, 68, 55, 0.08);
+  /* 그림자 — 미니멀하게, 아주 은은하게 */
+  --shadow-card: 0 1px 2px rgba(45, 55, 45, 0.04), 0 8px 24px rgba(45, 55, 45, 0.06);
+  --shadow-soft: 0 1px 2px rgba(45, 55, 45, 0.03), 0 4px 14px rgba(45, 55, 45, 0.05);
 
   /* 앱 콘텐츠 최대 너비 (모바일 감성 유지 + PC에서 가운데 정렬) */
   --app-max: 480px;
