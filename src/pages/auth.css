@@ -2,7 +2,8 @@
    로그인 / 회원가입 화면 전용 스타일
    ───────────────────────────────────────────── */
 
-/* 전체 배경(숲 이미지 + 덮개)은 body::before에 고정으로 깔립니다. */
+/* 로그인/회원가입 화면은 시안처럼 부드러운 연녹색 단색 배경을 씁니다.
+   (숲 사진 배경은 로그인 이후 화면에서만 보입니다) */
 .auth-screen {
   position: relative;
   min-height: 100vh;
@@ -11,6 +12,7 @@
   justify-content: center;
   padding: 2rem 1.25rem;
   overflow: hidden;
+  background: linear-gradient(180deg, #e9f1e6 0%, #e1ebdf 100%);
 }
 
 /* 로그인 카드 */
@@ -38,47 +40,38 @@
   }
 }
 
-/* 상단 로고/이름 영역 */
+/* 상단 로고/이름 영역 — 왼쪽 정렬 (잎사귀 + 이름 한 줄) */
 .auth-brand {
-  text-align: center;
-  margin-bottom: 1.15rem;
+  text-align: left;
+  margin-bottom: 1.4rem;
 }
 
-.auth-logo {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 0.6rem;
-  border-radius: 50%;
+.auth-brandline {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--accent-soft);
-  font-size: 1.6rem;
-  box-shadow: var(--shadow-soft);
+  gap: 0.5rem;
 }
 
-.auth-logo-img {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  display: block;
+.auth-leaf {
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 .auth-title {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
   font-weight: 700;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   margin: 0;
   color: var(--ink);
   letter-spacing: -0.01em;
 }
 
-/* 이름 아래 짧은 부제 (한글이 편안하게 보이도록 자간을 넓히지 않음) */
+/* 이름 아래 짧은 부제 */
 .auth-subtitle {
-  font-size: 0.92rem;
-  letter-spacing: 0.01em;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: var(--ink-soft);
-  margin: 0.35rem 0 0;
+  margin: 0.55rem 0 0;
 }
 
 /* 로그인 환영 문구 */
@@ -355,6 +348,32 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* 하단 링크 줄: 회원가입(왼쪽) · 비밀번호 찾기(오른쪽) */
+.auth-footrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+.auth-footlink {
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+.auth-footlink b {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+.auth-footlink:hover {
+  color: var(--accent);
 }
 
 /* 하단 링크 영역 */
