@@ -20,15 +20,18 @@ const LABELS: Record<string, string> = {
 
 export type BgOption = { value: string; label: string; url: string }
 
+// 기본 배경 = 다크 올리브 그린 단색 (사진 없음). 목록 맨 앞에 둡니다.
+export const OLIVE_VALUE = 'olive'
+
 // 경로에서 파일 이름(확장자 제외)만 뽑아냅니다.
 function baseName(path: string): string {
   const file = path.split('/').pop() ?? path
   return file.replace(/\.[^.]+$/, '')
 }
 
-// 목록 만들기 — value 는 'bg' + 파일이름.
+// 사진 프리셋 목록 — value 는 'bg' + 파일이름.
 // (기존 사용자 설정이 'bg1'~'bg6' 이므로, 숫자 파일명은 그대로 호환됩니다.)
-export const backgroundOptions: BgOption[] = Object.entries(modules)
+const photoOptions: BgOption[] = Object.entries(modules)
   .map(([path, url]) => {
     const base = baseName(path)
     // 알려진 이름은 예쁜 라벨, 나머지는 파일명의 _/- 를 공백으로 바꿔 표시
@@ -39,13 +42,20 @@ export const backgroundOptions: BgOption[] = Object.entries(modules)
     a.value.localeCompare(b.value, undefined, { numeric: true }),
   )
 
+// 최종 목록 — 맨 앞에 '올리브(기본)' 단색, 이어서 사진들.
+// (url 이 빈 문자열이면 사진이 아니라 단색 배경을 뜻합니다.)
+export const backgroundOptions: BgOption[] = [
+  { value: OLIVE_VALUE, label: '올리브(기본)', url: '' },
+  ...photoOptions,
+]
+
 // value → 이미지 주소
 export const backgroundMap: Record<string, string> = Object.fromEntries(
   backgroundOptions.map((o) => [o.value, o.url]),
 )
 
-// 기본 배경 (첫 번째 이미지, 보통 'bg1')
-export const defaultBackground = backgroundOptions[0]?.value ?? 'bg1'
+// 기본 배경 = 올리브 단색
+export const defaultBackground = OLIVE_VALUE
 
 export function backgroundUrl(value: string): string {
   return (

@@ -1,6 +1,6 @@
 // 사용자 설정(배경 사진·글씨체·글씨크기)을 저장/불러오고, 화면에 적용합니다.
 import { supabase } from './supabase'
-import { backgroundUrl, defaultBackground } from '../config/backgrounds'
+import { backgroundUrl, defaultBackground, OLIVE_VALUE } from '../config/backgrounds'
 
 export type Settings = {
   nickname: string // 불러줄 이름 (비어 있으면 이메일 앞부분 사용)
@@ -42,16 +42,29 @@ export function clearCustomBg(): void {
   }
 }
 
-// 설정의 bg 값을 실제 배경 이미지 주소로 바꿉니다.
-// - 'custom' 이면 내가 올린 사진(Data URL), 없으면 기본 배경으로 대체
-// - 그 외에는 기존 프리셋(bg1~bg6) 주소
-export function resolveBgUrl(bg: string): string {
-  if (bg === CUSTOM_BG) {
-    const custom = getCustomBg()
-    if (custom) return custom
-    return backgroundUrl(defaultBackground)
-  }
+// 설정의 bg 값을 '배경 사진 주소'로 바꿉니다. (사진이 없으면 빈 문자열 → 올리브 단색)
+// - 'olive' 이면 사진 없음(빈 문자열)
+// - 'custom' 이면 내가 올린 사진(Data URL), 없으면 빈 문자열
+// - 그 외에는 기존 프리셋(bg1~bg6) 사진 주소
+export function resolveBgPhoto(bg: string): string {
+  if (bg === OLIVE_VALUE) return ''
+  if (bg === CUSTOM_BG) return getCustomBg() ?? ''
   return backgroundUrl(bg)
+}
+
+// 예전 기본값(숲 사진 'bg1')을 쓰던 사용자를 새 기본(올리브)으로 '한 번만' 옮겨줍니다.
+// (직접 다른 사진을 고른 사용자는 그대로 둡니다)
+const BG_MIGRATED_KEY = 'soso.bgOliveMigrated'
+function migrateLegacyBg(s: Settings): Settings {
+  try {
+    if (!localStorage.getItem(BG_MIGRATED_KEY)) {
+      localStorage.setItem(BG_MIGRATED_KEY, '1')
+      if (s.bg === 'bg1') return { ...s, bg: OLIVE_VALUE }
+    }
+  } catch {
+    // 무시
+  }
+  return s
 }
 
 export const defaultSettings: Settings = {
@@ -79,7 +92,7 @@ export function getCachedSettings(): Settings | null {
     const raw = localStorage.getItem(LOCAL_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw) as Partial<Settings>
-    return { ...defaultSettings, ...parsed }
+    return migrateLegacyBg({ ...defaultSettings, ...parsed })
   } catch {
     return null
   }
@@ -106,8 +119,9 @@ export async function getSettings(): Promise<Settings> {
   if (getCustomBg() && cached?.bg === CUSTOM_BG) {
     result.bg = CUSTOM_BG
   }
-  cacheSettingsLocal(result) // 다음 접속 때 바로 적용되도록 캐시
-  return result
+  const migrated = migrateLegacyBg(result)
+  cacheSettingsLocal(migrated) // 다음 접속 때 바로 적용되도록 캐시
+  return migrated
 }
 
 // 설정 저장 (한 사용자당 한 줄, 있으면 수정)
@@ -164,8 +178,9 @@ export function resolveDisplayName(
 // 선택한 설정을 화면 전체에 즉시 적용합니다.
 export function applySettings(s: Settings): void {
   const el = document.documentElement
-  // 배경 사진을 CSS 변수로 지정 → 모든 화면(.home-screen/.auth-screen)이 이 값을 씀
-  el.style.setProperty('--app-bg', `url("${resolveBgUrl(s.bg)}")`)
+  // 배경 사진이 있으면 그 사진을, 없으면 'none'(→ 올리브 단색이 보임)을 지정합니다.
+  const photo = resolveBgPhoto(s.bg)
+  el.style.setProperty('--app-bg-photo', photo ? `url("${photo}")` : 'none')
   el.setAttribute('data-font', s.font)
   el.setAttribute('data-size', s.font_size)
 }

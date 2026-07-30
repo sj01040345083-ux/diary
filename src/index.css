@@ -86,29 +86,30 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* 배경 사진을 body에 '한 번만' 고정으로 깔아, 화면(탭)을 오갈 때
-   배경이 다시 그려지며 깜빡이던 현상을 없앱니다.
-   (옅은 덮개 그라데이션 + 배경 이미지를 함께, 화면에 고정) */
+/* 앱 전체 배경 — 기본은 '다크 올리브 그린' 단색(그라데이션).
+   사용자가 설정에서 사진을 고르면 그 사진이 위에 덮입니다(--app-bg-photo).
+   화면(탭)을 오갈 때 깜빡이지 않도록 body에 한 번만 고정으로 깝니다. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: linear-gradient(160deg, var(--tint-1) 0%, var(--tint-2) 100%),
-    var(--app-bg);
+  background-color: #3f4831;
+  background-image: var(--app-bg-photo, none),
+    linear-gradient(170deg, #4a543c 0%, #363d2a 100%);
   background-size: cover, cover;
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
 }
 
-/* 로그인 상태를 확인하는 짧은 로딩 화면 (배경 사진은 body에서 보임) */
+/* 로그인 상태를 확인하는 짧은 로딩 화면 (다크 배경 위 밝은 글씨) */
 .app-loading {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink);
+  color: #eef1e6;
   font-weight: 700;
   font-size: 0.95rem;
-  text-shadow: var(--text-halo);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }

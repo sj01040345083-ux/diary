@@ -151,7 +151,15 @@ export default function SettingsPage({ session }: Props) {
                   key={o.value}
                   type="button"
                   className={`bg-thumb ${settings.bg === o.value ? 'is-active' : ''}`}
-                  style={{ backgroundImage: `url(${o.url})` }}
+                  style={
+                    o.url
+                      ? { backgroundImage: `url(${o.url})` }
+                      : {
+                          // 사진이 아닌 단색(올리브) 배경 미리보기
+                          background:
+                            'linear-gradient(170deg, #4a543c 0%, #363d2a 100%)',
+                        }
+                  }
                   onClick={() => pickBackground(o.value)}
                   aria-label={o.label}
                   title={o.label}
