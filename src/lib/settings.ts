@@ -1,6 +1,6 @@
 // 사용자 설정(배경 사진·글씨체·글씨크기)을 저장/불러오고, 화면에 적용합니다.
 import { supabase } from './supabase'
-import { backgroundUrl, defaultBackground, OLIVE_VALUE } from '../config/backgrounds'
+import { backgroundUrl, defaultBackground, PLAIN_VALUE } from '../config/backgrounds'
 
 export type Settings = {
   nickname: string // 불러줄 이름 (비어 있으면 이메일 앞부분 사용)
@@ -42,24 +42,24 @@ export function clearCustomBg(): void {
   }
 }
 
-// 설정의 bg 값을 '배경 사진 주소'로 바꿉니다. (사진이 없으면 빈 문자열 → 올리브 단색)
-// - 'olive' 이면 사진 없음(빈 문자열)
+// 설정의 bg 값을 '배경 사진 주소'로 바꿉니다. (사진이 없으면 빈 문자열 → 밝은 단색)
+// - 'plain' 이면 사진 없음(빈 문자열)
 // - 'custom' 이면 내가 올린 사진(Data URL), 없으면 빈 문자열
 // - 그 외에는 기존 프리셋(bg1~bg6) 사진 주소
 export function resolveBgPhoto(bg: string): string {
-  if (bg === OLIVE_VALUE) return ''
+  if (bg === PLAIN_VALUE) return ''
   if (bg === CUSTOM_BG) return getCustomBg() ?? ''
   return backgroundUrl(bg)
 }
 
-// 예전 기본값(숲 사진 'bg1')을 쓰던 사용자를 새 기본(올리브)으로 '한 번만' 옮겨줍니다.
-// (직접 다른 사진을 고른 사용자는 그대로 둡니다)
-const BG_MIGRATED_KEY = 'soso.bgOliveMigrated'
+// 예전 기본값(숲 사진 'bg1' 또는 잠깐 쓰였던 'olive')을 새 기본(밝은 단색)으로
+// '한 번만' 옮겨줍니다. (직접 다른 사진을 고른 사용자는 그대로 둡니다)
+const BG_MIGRATED_KEY = 'soso.bgPlainMigrated'
 function migrateLegacyBg(s: Settings): Settings {
   try {
     if (!localStorage.getItem(BG_MIGRATED_KEY)) {
       localStorage.setItem(BG_MIGRATED_KEY, '1')
-      if (s.bg === 'bg1') return { ...s, bg: OLIVE_VALUE }
+      if (s.bg === 'bg1' || s.bg === 'olive') return { ...s, bg: PLAIN_VALUE }
     }
   } catch {
     // 무시

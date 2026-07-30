@@ -20,8 +20,8 @@ const LABELS: Record<string, string> = {
 
 export type BgOption = { value: string; label: string; url: string }
 
-// 기본 배경 = 다크 올리브 그린 단색 (사진 없음). 목록 맨 앞에 둡니다.
-export const OLIVE_VALUE = 'olive'
+// 기본 배경 = 밝고 깔끔한 단색 (사진 없음). 목록 맨 앞에 둡니다.
+export const PLAIN_VALUE = 'plain'
 
 // 경로에서 파일 이름(확장자 제외)만 뽑아냅니다.
 function baseName(path: string): string {
@@ -45,7 +45,7 @@ const photoOptions: BgOption[] = Object.entries(modules)
 // 최종 목록 — 맨 앞에 '올리브(기본)' 단색, 이어서 사진들.
 // (url 이 빈 문자열이면 사진이 아니라 단색 배경을 뜻합니다.)
 export const backgroundOptions: BgOption[] = [
-  { value: OLIVE_VALUE, label: '올리브(기본)', url: '' },
+  { value: PLAIN_VALUE, label: '기본(밝은 배경)', url: '' },
   ...photoOptions,
 ]
 
@@ -54,8 +54,8 @@ export const backgroundMap: Record<string, string> = Object.fromEntries(
   backgroundOptions.map((o) => [o.value, o.url]),
 )
 
-// 기본 배경 = 올리브 단색
-export const defaultBackground = OLIVE_VALUE
+// 기본 배경 = 밝은 단색
+export const defaultBackground = PLAIN_VALUE
 
 export function backgroundUrl(value: string): string {
   return (

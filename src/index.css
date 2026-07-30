@@ -94,22 +94,21 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-color: #3f4831;
+  background-color: #edf0e8;
   background-image: var(--app-bg-photo, none),
-    linear-gradient(170deg, #4a543c 0%, #363d2a 100%);
+    linear-gradient(180deg, #eef1ea 0%, #e5e9e0 100%);
   background-size: cover, cover;
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
 }
 
-/* 로그인 상태를 확인하는 짧은 로딩 화면 (다크 배경 위 밝은 글씨) */
+/* 로그인 상태를 확인하는 짧은 로딩 화면 */
 .app-loading {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #eef1e6;
+  color: var(--ink);
   font-weight: 700;
   font-size: 0.95rem;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
