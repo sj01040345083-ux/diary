@@ -351,6 +351,35 @@
   color: #c0674f;
 }
 
+/* 남은 금액 (이 달 마감) */
+.tx-balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 0.85rem 1.1rem;
+  margin: -0.4rem 0 1.1rem;
+  box-shadow: var(--shadow-soft);
+}
+.tx-balance-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.tx-balance-value {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.tx-balance-value.plus {
+  color: #4f8a6b;
+}
+.tx-balance-value.minus {
+  color: var(--danger);
+}
+
 .tx-form {
   background: rgba(255, 254, 250, 0.97);
   border: 1px solid rgba(223, 232, 216, 0.7);
