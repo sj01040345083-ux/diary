@@ -32,9 +32,24 @@ function won(n: number): string {
   return n.toLocaleString('ko-KR')
 }
 
+// 이번 달 "YYYY-MM"
+function thisMonth(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+// 달 이동 ("2026-07" +1 -> "2026-08")
+function shiftMonth(month: string, delta: number): string {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y, m - 1 + delta, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
 export default function TransactionsPage({ session, onBack }: Props) {
   const [items, setItems] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  // 지금 보고 있는 달 (기본: 이번 달). 달마다 따로 마감·집계됩니다.
+  const [month, setMonth] = useState(thisMonth())
 
   const [type, setType] = useState<TxType>('expense')
   const [txDate, setTxDate] = useState(todayString()) // 기록 날짜 (달력 선택)
@@ -194,12 +209,21 @@ export default function TransactionsPage({ session, onBack }: Props) {
     }
   }
 
-  const incomeSum = items
+  // 지금 보고 있는 달의 기록만 (최신 날짜가 위로)
+  const monthItems = items
+    .filter((t) => t.tx_date.startsWith(month))
+    .sort((a, b) => b.tx_date.localeCompare(a.tx_date))
+
+  const incomeSum = monthItems
     .filter((t) => t.type === 'income')
     .reduce((s, t) => s + Number(t.amount), 0)
-  const expenseSum = items
+  const expenseSum = monthItems
     .filter((t) => t.type === 'expense')
     .reduce((s, t) => s + Number(t.amount), 0)
+  const balance = incomeSum - expenseSum
+
+  const [my, mm] = month.split('-').map(Number)
+  const isCurrentMonth = month === thisMonth()
 
   return (
     <div
@@ -214,7 +238,29 @@ export default function TransactionsPage({ session, onBack }: Props) {
       </header>
 
       <main className="home-container">
-        {/* 합계 요약 */}
+        {/* 달 이동 — 달마다 따로 마감/집계됩니다 */}
+        <div className="stat-month">
+          <button
+            className="stat-month-arrow"
+            onClick={() => setMonth((mo) => shiftMonth(mo, -1))}
+            aria-label="이전 달"
+          >
+            ◀
+          </button>
+          <span className="stat-month-label">
+            {my}년 {mm}월 {isCurrentMonth ? '· 이번 달' : '· 마감'}
+          </span>
+          <button
+            className="stat-month-arrow"
+            onClick={() => setMonth((mo) => shiftMonth(mo, 1))}
+            disabled={isCurrentMonth}
+            aria-label="다음 달"
+          >
+            ▶
+          </button>
+        </div>
+
+        {/* 이 달 합계 요약 */}
         <div className="tx-summary">
           <div className="tx-sum-box income">
             <span className="tx-sum-label">수입</span>
@@ -224,6 +270,16 @@ export default function TransactionsPage({ session, onBack }: Props) {
             <span className="tx-sum-label">지출</span>
             <span className="tx-sum-value">-{won(expenseSum)}원</span>
           </div>
+        </div>
+        {/* 남은 금액 (이 달 마감 기준) */}
+        <div className="tx-balance">
+          <span className="tx-balance-label">남은 금액</span>
+          <span
+            className={`tx-balance-value ${balance >= 0 ? 'plus' : 'minus'}`}
+          >
+            {balance >= 0 ? '+' : '-'}
+            {won(Math.abs(balance))}원
+          </span>
         </div>
 
         {/* 입력 */}
@@ -340,21 +396,27 @@ export default function TransactionsPage({ session, onBack }: Props) {
           )}
         </div>
 
-        {/* 목록 */}
+        {/* 이 달 내역 */}
         <section className="diary-section">
-          <h2 className="diary-heading">기록 목록</h2>
+          <h2 className="diary-heading">{mm}월 내역</h2>
           {loading ? (
             <div className="diary-empty">
               <p>불러오는 중…</p>
             </div>
-          ) : items.length === 0 ? (
+          ) : monthItems.length === 0 ? (
             <div className="diary-empty">
-              <p>아직 기록이 없어요.</p>
-              <p>오늘의 소비·수입을 남겨보세요 🌿</p>
+              {isCurrentMonth ? (
+                <>
+                  <p>이번 달은 아직 기록이 없어요.</p>
+                  <p>오늘의 소비·수입을 남겨보세요 🌿</p>
+                </>
+              ) : (
+                <p>이 달에는 기록이 없어요.</p>
+              )}
             </div>
           ) : (
             <div className="diary-list">
-              {items.map((t) => (
+              {monthItems.map((t) => (
                 <article
                   key={t.id}
                   className={`diary-item ${editingId === t.id ? 'is-editing' : ''}`}
