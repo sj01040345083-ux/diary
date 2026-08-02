@@ -1,14 +1,15 @@
 /* ─────────────────────────────────────────────
    소소 다이어리 서비스 워커 (Service Worker)
-   - 앱을 한 번 열어두면, 인터넷이 없어도 앱 화면이 열리도록 캐싱합니다.
+   - 인터넷이 있으면 '항상 최신' 화면을 보여주고(network-first),
+     인터넷이 없을 때만 저장해 둔 화면을 보여줍니다(오프라인 대비).
    - 일기/가계부 '데이터'는 Supabase 서버에 있으므로 오프라인에서는
      화면만 열리고, 데이터 저장·불러오기는 인터넷이 있어야 동작합니다.
    ───────────────────────────────────────────── */
 
-// 캐시 이름(버전). 캐싱 방식을 바꾸면 v2, v3... 으로 올리면 옛 캐시가 정리됩니다.
-const CACHE = 'soso-diary-v1'
+// 캐시 이름(버전). 방식을 바꾸면 v3, v4... 로 올리면 옛 캐시가 자동 정리됩니다.
+const CACHE = 'soso-diary-v2'
 
-// 설치할 때 미리 저장해 둘 기본 파일들 (앱 '껍데기')
+// 설치할 때 미리 저장해 둘 기본 파일들 (오프라인 대비용 앱 '껍데기')
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -19,7 +20,7 @@ const APP_SHELL = [
   '/icons/icon-512x512.png',
 ]
 
-// 1) 설치: 기본 파일을 캐시에 담아둡니다.
+// 1) 설치: 기본 파일을 담아두고, 새 버전을 곧바로 활성화합니다.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
@@ -29,7 +30,7 @@ self.addEventListener('install', (event) => {
   )
 })
 
-// 2) 활성화: 예전 버전 캐시를 정리합니다.
+// 2) 활성화: 예전 버전 캐시를 모두 지우고, 바로 제어권을 가져옵니다.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
@@ -41,7 +42,7 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// 3) 요청 가로채기
+// 3) 요청 가로채기 — '인터넷 우선', 실패하면 캐시(오프라인)
 self.addEventListener('fetch', (event) => {
   const req = event.request
 
@@ -53,30 +54,26 @@ self.addEventListener('fetch', (event) => {
   // 다른 사이트(구글 폰트, Supabase 서버 등)는 건드리지 않고 그대로 둡니다.
   if (url.origin !== self.location.origin) return
 
-  // 페이지 이동(주소로 접속·새로고침): 인터넷 우선, 실패하면 저장해 둔 앱 껍데기
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).catch(() =>
-        caches.match('/index.html').then((r) => r || caches.match('/')),
-      ),
-    )
-    return
-  }
-
-  // 그 외 같은 사이트의 파일(자바스크립트/CSS/이미지 등):
-  // 저장된 게 있으면 먼저 보여주고(빠름), 뒤에서 새 버전을 받아 캐시를 갱신합니다.
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const network = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === 'basic') {
-            const copy = res.clone()
-            caches.open(CACHE).then((cache) => cache.put(req, copy))
-          }
-          return res
-        })
-        .catch(() => cached)
-      return cached || network
-    }),
+    fetch(req)
+      .then((res) => {
+        // 성공하면 최신 응답을 캐시에 저장(오프라인 대비)하고 그대로 보여줍니다.
+        if (res && res.status === 200 && res.type === 'basic') {
+          const copy = res.clone()
+          caches.open(CACHE).then((cache) => cache.put(req, copy))
+        }
+        return res
+      })
+      .catch(async () => {
+        // 인터넷이 안 되면: 저장해 둔 것 → (페이지 이동이면) 앱 껍데기
+        const cached = await caches.match(req)
+        if (cached) return cached
+        if (req.mode === 'navigate') {
+          return (
+            (await caches.match('/index.html')) || (await caches.match('/'))
+          )
+        }
+        return Response.error()
+      }),
   )
 })
