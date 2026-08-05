@@ -17,6 +17,7 @@ export default function LoginPage({ onGoSignup }: Props) {
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [loading, setLoading] = useState(false)
+  const [forgotLoading, setForgotLoading] = useState(false)
   const [notice, setNotice] = useState('')
 
   // 소셜 로그인 등에서 실패해 앱으로 되돌아오면, 주소 뒤에 붙는
@@ -63,14 +64,17 @@ export default function LoginPage({ onGoSignup }: Props) {
 
   // 비밀번호 재설정 메일 보내기 (위 이메일 칸에 적힌 주소로)
   async function handleForgot() {
+    if (forgotLoading) return
     setNotice('')
     if (!email.trim() || !EMAIL_RULE.test(email)) {
       setNotice('비밀번호를 재설정할 이메일을 위 칸에 먼저 입력해주세요.')
       return
     }
+    setForgotLoading(true)
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin,
     })
+    setForgotLoading(false)
     if (error) {
       setNotice(translateAuthError(error.message))
       return
@@ -128,8 +132,13 @@ export default function LoginPage({ onGoSignup }: Props) {
         <button type="button" className="auth-footlink" onClick={onGoSignup}>
           처음이신가요? <b>회원가입</b>
         </button>
-        <button type="button" className="auth-footlink" onClick={handleForgot}>
-          비밀번호를 잊었어요
+        <button
+          type="button"
+          className="auth-footlink"
+          onClick={handleForgot}
+          disabled={forgotLoading}
+        >
+          {forgotLoading ? '메일 보내는 중…' : '비밀번호를 잊었어요'}
         </button>
       </div>
     </AuthLayout>
