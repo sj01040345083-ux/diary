@@ -213,6 +213,49 @@
   border: 2px solid var(--tarot-gold);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
   transform-origin: center bottom;
+  overflow: hidden;
+}
+
+/* 섞기 전: 카드가 쌓여 있는 덱 */
+.tarot-deck-stack {
+  position: relative;
+  width: 118px;
+  height: 172px;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.tarot-deck-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+.tarot-deck-card:nth-child(1) { transform: rotate(-9deg) translate(-6px, 2px); }
+.tarot-deck-card:nth-child(2) { transform: rotate(-5deg) translate(-3px, 1px); }
+.tarot-deck-card:nth-child(3) { transform: rotate(-1deg); }
+.tarot-deck-card:nth-child(4) { transform: rotate(3deg) translate(3px, 1px); }
+.tarot-deck-card:nth-child(5) { transform: rotate(7deg) translate(6px, 2px); }
+.tarot-deck-card:nth-child(6) { transform: rotate(11deg) translate(9px, 3px); }
+
+.tarot-shuffle-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tarot-deep);
+  background: linear-gradient(150deg, var(--tarot-gold-soft), var(--tarot-gold));
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(217, 180, 91, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.tarot-shuffle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(217, 180, 91, 0.45);
 }
 
 /* 다섯 장이 좌우로 갈라졌다 다시 모이며 섞이는 느낌 */
@@ -274,7 +317,7 @@
   .tarot-shuffle-card {
     animation-duration: 0.001s;
   }
-  .tarot-pool-card {
+  .tarot-grid-card {
     animation: none;
   }
 }
@@ -310,68 +353,92 @@
   margin: 0.1rem 0 0.6rem;
 }
 
-/* 뒷면 카드들을 부채꼴처럼 펼쳐 보여줍니다. */
-.tarot-pool {
-  position: relative;
+/* 뒷면 카드들을 그리드로 쫙 펼쳐 보여줍니다. (이 중에서 골라요) */
+.tarot-pool-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
   width: 100%;
-  height: 230px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: 1.2rem;
+  margin: 0.5rem 0 0.8rem;
 }
 
-.tarot-pool-card {
-  position: absolute;
-  top: 0;
-  width: 74px;
-  height: 116px;
-  margin: 0;
+.tarot-grid-card {
+  position: relative;
+  aspect-ratio: 5 / 7;
   padding: 0;
-  border-radius: 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--tarot-gold);
+  background: linear-gradient(160deg, var(--tarot-night-2), var(--tarot-deep));
   cursor: pointer;
-  background: linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
-  border: 2px solid var(--tarot-gold);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* 가운데(0)를 기준으로 좌우로 부채꼴 회전·이동 (--n: 카드 위치)
-     간격을 넓혀 카드가 서로 덜 겹치게 합니다. */
-  transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg));
-  transform-origin: bottom center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
-  /* 들어올 때 살짝 펼쳐지는 느낌 */
-  animation: tarot-fan-in 0.45s ease both;
-  animation-delay: calc((var(--n) + 3) * 0.05s);
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.25s ease;
+  animation: tarot-grid-in 0.4s ease both;
 }
 
-@keyframes tarot-fan-in {
+@keyframes tarot-grid-in {
   from {
     opacity: 0;
-    transform: translateX(0) rotate(0deg) translateY(10px);
+    transform: translateY(8px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg));
+    transform: translateY(0) scale(1);
   }
 }
 
-.tarot-pool-card:hover:not(:disabled) {
-  transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg))
-    translateY(-16px);
-  box-shadow: 0 16px 30px rgba(217, 180, 91, 0.35);
-  z-index: 5;
+.tarot-grid-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 18px rgba(217, 180, 91, 0.4);
+  z-index: 2;
 }
 
-.tarot-pool-card.is-picked {
-  opacity: 0;
+.tarot-grid-card.is-picked {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 2px var(--tarot-gold-soft), 0 10px 18px rgba(217, 180, 91, 0.5);
   pointer-events: none;
 }
 
-.tarot-pool-mark {
-  font-size: 1.5rem;
-  color: rgba(240, 220, 160, 0.85);
+/* ── 카드 뒷면 그림 (달 + 별) — 여러 곳에서 재사용 ── */
+.tarot-cardback-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  overflow: hidden;
+  /* 별 점들 + 은은한 중앙 광 */
+  background-image:
+    radial-gradient(1.3px 1.3px at 24% 22%, rgba(240, 220, 160, 0.95), transparent),
+    radial-gradient(1px 1px at 68% 18%, rgba(240, 220, 160, 0.7), transparent),
+    radial-gradient(1.4px 1.4px at 82% 62%, rgba(240, 220, 160, 0.85), transparent),
+    radial-gradient(1px 1px at 30% 78%, rgba(240, 220, 160, 0.6), transparent),
+    radial-gradient(1px 1px at 58% 82%, rgba(240, 220, 160, 0.55), transparent),
+    radial-gradient(1px 1px at 46% 40%, rgba(240, 220, 160, 0.5), transparent),
+    radial-gradient(70% 55% at 50% 52%, rgba(217, 180, 91, 0.2), transparent 72%);
+}
+
+/* 초승달 — 금빛 원에서 살짝 겹친 어두운 원으로 초승달 모양을 냅니다. */
+.tarot-moon {
+  position: relative;
+  width: 46%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 36% 34%,
+    var(--tarot-gold-soft),
+    var(--tarot-gold)
+  );
+  box-shadow: 0 0 10px rgba(217, 180, 91, 0.55);
+}
+.tarot-moon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--tarot-deep);
+  transform: translate(26%, -18%);
 }
 
 /* ── 3) 결과 ── */
@@ -471,16 +538,10 @@
 }
 
 .tarot-back {
-  background:
-    radial-gradient(circle at 50% 32%, rgba(217, 180, 91, 0.28), transparent 60%),
-    linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
+  background: linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
   border: 2px solid var(--tarot-gold);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
-}
-
-.tarot-back-mark {
-  font-size: 2.2rem;
-  color: var(--tarot-gold-soft);
+  overflow: hidden;
 }
 
 .tarot-front {

@@ -14,7 +14,6 @@ import {
   currentTimeSlot,
   threePositions,
   tarotTopics,
-  POOL_SIZE,
 } from '../lib/tarot'
 import type {
   DrawnCard,
@@ -39,6 +38,15 @@ type Props = {
   onBack: () => void
 }
 
+// 카드 뒷면 그림 (달 + 별). 저작권 문제 없이 CSS로 직접 그립니다.
+function CardBackArt() {
+  return (
+    <span className="tarot-cardback-art" aria-hidden>
+      <span className="tarot-moon" />
+    </span>
+  )
+}
+
 // 결과 화면에서 카드 한 장(앞면)을 보여주는 컴포넌트.
 function ResultCard({
   drawn,
@@ -61,7 +69,7 @@ function ResultCard({
       >
         <div className="tarot-card-inner">
           <div className="tarot-face tarot-back">
-            <span className="tarot-back-mark">✦</span>
+            <CardBackArt />
           </div>
           <div className={`tarot-face tarot-front ${reversed ? 'is-reversed' : ''}`}>
             <span className="tarot-emoji">{card.emoji}</span>
@@ -85,6 +93,7 @@ export default function TarotPage({ session, onBack }: Props) {
   // 골라 뽑기: 뒷면 카드 묶음 + 사용자가 고른 순서(인덱스)
   const [pool, setPool] = useState<DrawnCard[]>([])
   const [picked, setPicked] = useState<number[]>([])
+  const [shufflePlaying, setShufflePlaying] = useState(false) // 섞기 애니메이션 재생 중
 
   // 결과: 고른 카드들 + 뒤집힘 여부 + 이 결과가 정해진 시간대
   const [cards, setCards] = useState<DrawnCard[]>([])
@@ -98,7 +107,7 @@ export default function TarotPage({ session, onBack }: Props) {
 
   const need = neededCount(spread)
 
-  // 스프레드를 고르면: 카드를 섞는 연출을 보여준 뒤 '고르기' 단계로
+  // 스프레드를 고르면: 카드 섞기 화면으로 (사용자가 '카드 섞기'를 누름)
   function startPicking(kind: SpreadKind) {
     setSpread(kind)
     setPool(buildPool())
@@ -107,9 +116,19 @@ export default function TarotPage({ session, onBack }: Props) {
     setRevealed(false)
     setSaved(false)
     setSaveError('')
+    setShufflePlaying(false)
     setStage('shuffling')
-    // 섞는 연출을 잠깐 보여준 뒤 고르기 화면으로
-    setTimeout(() => setStage('picking'), 1500)
+  }
+
+  // '카드 섞기' 버튼: 섞는 애니메이션을 보여준 뒤 그리드 고르기로
+  function shuffleNow() {
+    if (shufflePlaying) return
+    setPool(buildPool()) // 실제로 다시 섞습니다
+    setShufflePlaying(true)
+    setTimeout(() => {
+      setShufflePlaying(false)
+      setStage('picking')
+    }, 1400)
   }
 
   // 뒷면 카드 하나를 고름
@@ -296,46 +315,68 @@ export default function TarotPage({ session, onBack }: Props) {
           </div>
         )}
 
-        {/* ── 2) 카드 섞기 연출 ── */}
+        {/* ── 2) 카드 섞기 ── */}
         {stage === 'shuffling' && (
           <div className="tarot-shuffle">
-            <div className="tarot-shuffle-deck">
-              <span className="tarot-shuffle-card" />
-              <span className="tarot-shuffle-card" />
-              <span className="tarot-shuffle-card" />
-              <span className="tarot-shuffle-card" />
-              <span className="tarot-shuffle-card" />
-            </div>
-            <p className="tarot-shuffle-text">카드를 섞고 있어요…</p>
+            <p className="tarot-pick-topic">
+              {topic.emoji} {topic.label}
+            </p>
+            {shufflePlaying ? (
+              <>
+                <div className="tarot-shuffle-deck">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <span key={i} className="tarot-shuffle-card">
+                      <CardBackArt />
+                    </span>
+                  ))}
+                </div>
+                <p className="tarot-shuffle-text">카드를 섞고 있어요…</p>
+              </>
+            ) : (
+              <>
+                <div className="tarot-deck-stack">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <span key={i} className="tarot-deck-card">
+                      <CardBackArt />
+                    </span>
+                  ))}
+                </div>
+                <p className="tarot-shuffle-text">
+                  마음속으로 질문을 떠올리며 카드를 섞어 주세요.
+                </p>
+                <button className="tarot-shuffle-btn" onClick={shuffleNow}>
+                  🔀 카드 섞기
+                </button>
+              </>
+            )}
           </div>
         )}
 
-        {/* ── 3) 직접 카드 고르기 ── */}
+        {/* ── 3) 직접 카드 고르기 (그리드) ── */}
         {stage === 'picking' && (
           <div className="tarot-picking">
             <p className="tarot-pick-topic">
               {topic.emoji} {topic.label}
             </p>
             <h2 className="tarot-pick-heading">
-              마음이 이끄는 카드를 골라주세요
+              타로 카드를 {need}장 골라주세요
             </h2>
             <p className="tarot-pick-count">
               {picked.length} / {need} 장 선택
             </p>
 
-            <div className="tarot-pool">
+            <div className="tarot-pool-grid">
               {pool.map((_, i) => (
                 <button
                   key={i}
-                  className={`tarot-pool-card ${
+                  className={`tarot-grid-card ${
                     picked.includes(i) ? 'is-picked' : ''
                   }`}
-                  style={{ ['--n' as string]: `${i - (POOL_SIZE - 1) / 2}` }}
                   onClick={() => pick(i)}
                   disabled={picked.includes(i)}
                   aria-label={`${i + 1}번째 카드 고르기`}
                 >
-                  <span className="tarot-pool-mark">✦</span>
+                  <CardBackArt />
                 </button>
               ))}
             </div>

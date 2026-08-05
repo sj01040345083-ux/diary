@@ -18,8 +18,8 @@ export type SpreadKind = 'one' | 'three'
 // 3장 스프레드에서 각 자리가 뜻하는 것
 export const threePositions = ['과거', '현재', '미래'] as const
 
-// 골라 뽑기 화면에서 보여주는 뒷면 카드 장수 (이 중에서 골라요)
-export const POOL_SIZE = 7
+// 골라 뽑기 화면(그리드)에서 펼쳐 보여주는 뒷면 카드 장수 (이 중에서 골라요)
+export const POOL_SIZE = 21
 
 // 무엇을 물어보는 타로인지 — 주제
 export type TarotTopic = {
