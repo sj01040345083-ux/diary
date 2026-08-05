@@ -56,6 +56,70 @@ export function drawCards(count: number): DrawnCard[] {
   }))
 }
 
+// ── 시간대(아침·점심·저녁) ──
+// 같은 날, 같은 시간대에는 같은 카드가 나오도록 하는 데 씁니다.
+export type TimeSlot = { key: string; label: string }
+
+export function currentTimeSlot(now = new Date()): TimeSlot {
+  const h = now.getHours()
+  if (h < 12) return { key: 'morning', label: '아침' }
+  if (h < 18) return { key: 'afternoon', label: '점심' }
+  return { key: 'evening', label: '저녁' }
+}
+
+// ── 씨앗(seed) 기반 난수 ──
+// 같은 문자열(seed)을 넣으면 항상 같은 순서의 난수가 나옵니다.
+// (사람+날짜+시간대+주제가 같으면 카드가 항상 똑같이 나오게 하는 원리)
+function makeRng(seed: string): () => number {
+  // 문자열 → 32bit 정수
+  let h = 1779033703 ^ seed.length
+  for (let i = 0; i < seed.length; i++) {
+    h = Math.imul(h ^ seed.charCodeAt(i), 3432918353)
+    h = (h << 13) | (h >>> 19)
+  }
+  let a = h >>> 0
+  // mulberry32
+  return function () {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+// 씨앗을 기준으로 '항상 같은' 카드들을 뽑습니다.
+// 같은 seed면 몇 번을 다시 뽑아도 결과가 똑같습니다.
+export function drawSeeded(seed: string, count: number): DrawnCard[] {
+  const rand = makeRng(seed)
+  const arr = [...tarotDeck]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr.slice(0, count).map((card) => ({
+    card,
+    reversed: rand() < 0.5,
+  }))
+}
+
+// 오늘·이 시간대에 이 사람이 이 주제로 뽑을 카드를 정하는 seed 문자열
+export function readingSeed(params: {
+  userId: string
+  dateStr: string // "2026-08-05"
+  slotKey: string // 'morning' | 'afternoon' | 'evening'
+  topicKey: string
+  spread: SpreadKind
+}): string {
+  return [
+    params.userId,
+    params.dateStr,
+    params.slotKey,
+    params.topicKey,
+    params.spread,
+  ].join('|')
+}
+
 // 골라 뽑기용 '뒷면 카드 묶음'을 만듭니다.
 // 사용자는 이 중에서 원하는 만큼 직접 골라요. (각 카드의 앞면은 미리 정해져 있음)
 export function buildPool(): DrawnCard[] {
