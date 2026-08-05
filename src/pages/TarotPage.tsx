@@ -3,10 +3,9 @@ import type { Session } from '@supabase/supabase-js'
 import {
   buildPool,
   neededCount,
-  readingText,
+  buildReading,
   directionLabel,
   cardCategoryLabel,
-  topicReflection,
   formatReadingForDiary,
   drawSeeded,
   drawCards,
@@ -457,13 +456,20 @@ export default function TarotPage({ session, onBack }: Props) {
                     <p className="tarot-reading-cat">
                       {cardCategoryLabel(drawn.card)}
                     </p>
-                    <p className="tarot-reading-text">{readingText(drawn)}</p>
-                    <p className="tarot-reading-lens">
-                      <span className="tarot-reading-lens-label">
-                        {topic.emoji} {topic.label}
-                      </span>
-                      {topicReflection(topic.key, drawn)}
-                    </p>
+                    <div className="tarot-reading-sections">
+                      {buildReading(drawn, topic, {
+                        position:
+                          spread === 'three' ? threePositions[i] : undefined,
+                        withLead: i === 0,
+                      }).map((s) => (
+                        <div key={s.label} className="tarot-reading-section">
+                          <span className="tarot-reading-section-label">
+                            {s.label}
+                          </span>
+                          <p className="tarot-reading-section-text">{s.text}</p>
+                        </div>
+                      ))}
+                    </div>
                   </article>
                 ))}
               </div>

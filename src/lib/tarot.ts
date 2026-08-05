@@ -59,6 +59,165 @@ export function topicReflection(topicKey: string, drawn: DrawnCard): string {
   }
 }
 
+// ─────────────────────────────────────────────
+// 이야기처럼 길게 풀어주는 해석 엔진
+// 카드의 실제 뜻 + 방향(정/역) + 주제를 엮어 여러 문단으로 만듭니다.
+// (특정 사이트 문구를 베끼지 않은 100% 원본 구성)
+// ─────────────────────────────────────────────
+
+export type ReadingSection = { label: string; text: string }
+
+// 카드 종류별 '무대' 설명
+function cardTheme(card: TarotCard): string {
+  if (card.arcana === 'major') return '인생의 큰 흐름을 비추는 메이저 아르카나'
+  switch (card.suit) {
+    case 'wands':
+      return '열정과 행동을 다루는 완드'
+    case 'cups':
+      return '감정과 관계를 비추는 컵'
+    case 'swords':
+      return '생각과 판단을 다루는 소드'
+    case 'pentacles':
+      return '현실과 물질을 다루는 펜타클'
+    default:
+      return '타로'
+  }
+}
+
+// 주제별 이야기 (lead 인사 + 정/역 본문). k = 대표 키워드
+const topicStory: Record<
+  string,
+  { lead: string; up: (k: string) => string; rev: (k: string) => string }
+> = {
+  today: {
+    lead: '오늘 하루의 전반적인 흐름을 물으셨죠.',
+    up: (k) =>
+      `전반적인 공기는 맑은 편이에요. ‘${k}’의 기운이 하루 곳곳에서 작은 신호로 나타나니, 서두르지 말고 그 결을 따라가 보세요.`,
+    rev: (k) =>
+      `다만 흐름이 조금 엉켜 있을 수 있어요. ‘${k}’에 억지로 매달리기보다, 한 박자 쉬어가며 나만의 페이스를 지키는 편이 좋겠습니다.`,
+  },
+  love: {
+    lead: '연애와 사람 사이의 마음을 물으셨죠.',
+    up: (k) =>
+      `지금은 마음을 열고 한 걸음 다가가도 좋은 흐름이에요. ‘${k}’의 온기가 두 사람 사이에 다정함을 더해 줍니다.`,
+    rev: (k) =>
+      `지금은 서로의 속도를 살필 때예요. ‘${k}’의 결이 오해로 엉키지 않도록, 솔직하고 부드러운 표현이 필요합니다.`,
+  },
+  work: {
+    lead: '일과 금전의 흐름을 물으셨죠.',
+    up: (k) =>
+      `노력이 결실로 이어질 바탕이 마련돼 있어요. ‘${k}’ 하나를 방향키 삼아 한곳에 집중하면 성과가 뒤따라옵니다.`,
+    rev: (k) =>
+      `지금은 무리한 확장보다 정리가 먼저예요. ‘${k}’의 기운이 새어 나가지 않도록 우선순위를 다시 세워 보세요.`,
+  },
+  mind: {
+    lead: '지금 마음의 자리를 물으셨죠.',
+    up: (k) =>
+      `당신 안에는 이미 답의 실마리가 있어요. ‘${k}’의 자리를 가만히 바라보면, 흐릿하던 감정이 조금씩 또렷해질 거예요.`,
+    rev: (k) =>
+      `마음이 조금 무겁고 뒤엉켜 있을 수 있어요. ‘${k}’의 감정을 억누르기보다 이름 붙여 인정해 줄 때, 매듭이 풀리기 시작합니다.`,
+  },
+  relations: {
+    lead: '사람들과의 관계 흐름을 물으셨죠.',
+    up: (k) =>
+      `곁을 나누고 함께 나아가기 좋은 때예요. ‘${k}’의 기운이 사람들 사이에 신뢰의 다리를 놓아 줍니다.`,
+    rev: (k) =>
+      `지금은 거리와 경계를 살필 때예요. ‘${k}’의 기운이 헛되이 소모되지 않도록, 맞지 않는 관계엔 부드럽게 선을 그어도 괜찮습니다.`,
+  },
+}
+
+// 카드 종류별 조언 (정/역)
+const adviceStory: Record<string, { up: string; rev: string }> = {
+  major: {
+    up: '큰 흐름이 당신 편이에요. 작은 두려움에 발을 멈추지 말고, 마음이 가리키는 방향으로 한 걸음 내디뎌 보세요.',
+    rev: '큰 흐름이 잠시 안으로 굽어 있어요. 밖에서 답을 찾기보다, 스스로에게 솔직해지는 시간이 지금은 더 큰 힘이 됩니다.',
+  },
+  wands: {
+    up: '망설임보다 행동이 답이에요. 지금 떠오른 그 열정을 오늘 작은 실천 하나로 옮겨 보세요.',
+    rev: '불씨가 여기저기 흩어지기 쉬운 때예요. 여러 갈래로 힘을 쓰기보다, 정말 하고 싶은 하나에 에너지를 모아 보세요.',
+  },
+  cups: {
+    up: '마음을 표현하는 일을 아끼지 마세요. 솔직한 감정 한 마디가 관계에 따뜻한 물길을 내어 줍니다.',
+    rev: '감정이 고이면 무거워져요. 담아 둔 마음을 글이나 대화로 흘려보내면 한결 가벼워질 거예요.',
+  },
+  swords: {
+    up: '생각이 맑아지는 때예요. 복잡할수록 사실과 감정을 나누어, 한 가지 기준으로 결정을 내려 보세요.',
+    rev: '생각이 너무 많아 스스로를 찌르고 있진 않나요. 판단을 잠시 멈추고 머리를 비우는 휴식이 필요합니다.',
+  },
+  pentacles: {
+    up: '차근차근 쌓는 것이 힘이 되는 때예요. 조급함을 내려놓고, 눈앞의 현실적인 한 걸음을 단단히 다져 보세요.',
+    rev: '조바심이 실수를 부를 수 있어요. 돈과 시간을 어디에 쓰는지 점검하고, 기초를 다시 살펴보세요.',
+  },
+}
+
+// 방향별 마무리 (카드마다 조금씩 다르게 고르도록 2개씩)
+const closingStory: Record<'up' | 'rev', string[]> = {
+  up: [
+    '이 카드는 재촉이 아니라 다정한 응원이에요. 오늘의 힌트로 가볍게 품고 하루를 걸어 보세요. 🌙',
+    '결국 방향을 정하는 건 당신이에요. 카드는 그저 등을 살며시 밀어 줄 뿐이랍니다. ✨',
+  ],
+  rev: [
+    '역방향은 나쁜 뜻이 아니라 ‘잠깐 살펴보라’는 신호예요. 천천히 돌아보면 길은 다시 열립니다. 🌙',
+    '지금의 머뭇거림도 흐름의 한 부분이에요. 스스로에게 조금 더 너그러워도 괜찮습니다. ✨',
+  ],
+}
+
+function catKey(card: TarotCard): string {
+  return card.arcana === 'major' ? 'major' : (card.suit ?? 'major')
+}
+
+// 카드 한 장을 여러 문단(섹션)으로 풀어 줍니다.
+export function buildReading(
+  drawn: DrawnCard,
+  topic: TarotTopic,
+  opts?: { position?: string; withLead?: boolean },
+): ReadingSection[] {
+  const { card, reversed } = drawn
+  const dir = reversed ? 'rev' : 'up'
+  const k = card.keywords[0]
+  const theme = cardTheme(card)
+  const pos = opts?.position
+  const withLead = opts?.withLead ?? true
+
+  // 1) 이 카드는 (무대 + 키워드 + 방향)
+  const posPrefix = pos ? `‘${pos}’ 자리에 놓였어요. ` : ''
+  const dirFrame = reversed
+    ? '지금은 이 기운이 살짝 뒤집혀 있어, 밖보다 안을 먼저 살피라는 신호예요.'
+    : '지금 이 기운이 바로 서서 당신을 향하고 있어요.'
+  const intro = `${posPrefix}‘${card.name}’ 카드는 ${theme}예요. 키워드는 ${card.keywords.join(
+    ' · ',
+  )}. ${dirFrame}`
+
+  // 2) 지금의 메시지 (카드 고유 해석)
+  const message = reversed ? card.reversed : card.upright
+
+  // 3) 주제 이야기
+  const story = topicStory[topic.key] ?? topicStory.today
+  const topicText = `${withLead ? story.lead + ' ' : ''}${
+    reversed ? story.rev(k) : story.up(k)
+  }`
+
+  // 4) 조언
+  const advice = (adviceStory[catKey(card)] ?? adviceStory.major)[dir]
+
+  // 5) 마무리 (카드 id 길이로 문구를 번갈아 고름)
+  const variants = closingStory[dir]
+  const closing = variants[card.id.length % variants.length]
+
+  return [
+    { label: '🔮 이 카드는', text: intro },
+    { label: '📖 지금의 메시지', text: message },
+    { label: `${topic.emoji} ${topic.label} 이야기`, text: topicText },
+    { label: '🧭 조언', text: advice },
+    { label: '🌙 마무리', text: closing },
+  ]
+}
+
+// 일기 저장용으로 섹션들을 문단 텍스트로 합칩니다.
+export function readingSectionsToText(sections: ReadingSection[]): string {
+  return sections.map((s) => s.text).join('\n')
+}
+
 // 배열을 무작위로 섞습니다. (피셔–예이츠 셔플)
 function shuffle<T>(list: T[]): T[] {
   const arr = [...list]
@@ -189,10 +348,13 @@ export function formatReadingForDiary(
   const lines: string[] = [head]
   cards.forEach((drawn, i) => {
     const pos = kind === 'three' ? `${threePositions[i]} · ` : ''
-    lines.push(
-      `· ${pos}${drawn.card.name} (${directionLabel(drawn)})`,
-    )
-    lines.push(`  ${readingText(drawn)}`)
+    lines.push('')
+    lines.push(`· ${pos}${drawn.card.name} (${directionLabel(drawn)})`)
+    const sections = buildReading(drawn, topic, {
+      position: kind === 'three' ? threePositions[i] : undefined,
+      withLead: i === 0,
+    })
+    sections.forEach((s) => lines.push(`  ${s.text}`))
   })
   return lines.join('\n')
 }

@@ -728,32 +728,41 @@
   margin: 0 0 0.55rem;
 }
 
-.tarot-reading-text {
-  font-size: 0.96rem;
-  line-height: 1.65;
-  color: #3a3350;
-  margin: 0;
+/* 여러 문단(섹션)으로 길게 풀어주는 해석 */
+.tarot-reading-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.2rem;
 }
 
-/* 주제에 맞춘 관점 한 줄 */
-.tarot-reading-lens {
-  margin: 0.7rem 0 0;
-  padding-top: 0.7rem;
-  border-top: 1px dashed rgba(217, 180, 91, 0.5);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: #4a4230;
+.tarot-reading-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
 }
 
-.tarot-reading-lens-label {
-  display: inline-block;
-  font-size: 0.74rem;
+.tarot-reading-section + .tarot-reading-section {
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(217, 180, 91, 0.45);
+}
+
+.tarot-reading-section-label {
+  align-self: flex-start;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--tarot-deep);
   background: var(--tarot-gold);
   border-radius: 999px;
-  padding: 0.12rem 0.55rem;
-  margin-right: 0.45rem;
+  padding: 0.14rem 0.6rem;
+}
+
+.tarot-reading-section-text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #3a3350;
+  margin: 0;
+  white-space: pre-line;
 }
 
 /* ── '타로 카드가 궁금하다면?' 펼쳐보기 ── */
