@@ -133,6 +133,17 @@ export default function TarotPage({ session, onBack }: Props) {
     }
   }
 
+  // 헤더 '뒤로': 단계에 따라 한 걸음씩 뒤로 갑니다.
+  //  - 주제 선택(intro)에서 누르면 → 앱 홈으로 나가기
+  //  - 카드 고르기/결과에서 누르면 → 주제 선택 화면으로
+  function goBack() {
+    if (stage === 'intro') {
+      onBack()
+    } else {
+      reset()
+    }
+  }
+
   // 다시 뽑기 (처음 화면으로)
   function reset() {
     setStage('intro')
@@ -153,7 +164,7 @@ export default function TarotPage({ session, onBack }: Props) {
     setSaveError('')
     try {
       const date = todayString()
-      const text = formatReadingForDiary(topic, spread, cards)
+      const text = formatReadingForDiary(topic, spread, cards, slot.label)
       const existing = await getDiaryByDate(date)
       const content = existing?.content
         ? `${existing.content}\n\n${text}`
@@ -170,7 +181,7 @@ export default function TarotPage({ session, onBack }: Props) {
   return (
     <div className="home-screen tarot-screen">
       <header className="home-header tarot-header">
-        <button className="icon-btn" onClick={onBack}>
+        <button className="icon-btn" onClick={goBack}>
           ← 뒤로
         </button>
         <div className="write-title">오늘의 타로</div>
@@ -315,7 +326,7 @@ export default function TarotPage({ session, onBack }: Props) {
         {stage === 'result' && (
           <div className="tarot-result">
             <p className="tarot-result-topic">
-              {topic.emoji} {topic.label} · {slot.label}
+              {topic.emoji} {topic.label} · {slot.emoji} {slot.label}
             </p>
             <p className="tarot-result-hint">
               {revealed
@@ -399,8 +410,8 @@ export default function TarotPage({ session, onBack }: Props) {
 
             {revealed && (
               <p className="tarot-slot-note">
-                💡 같은 날 같은 시간대(아침·점심·저녁)에는 같은 카드가 나와요.
-                시간대가 바뀌면 새로운 카드를 만날 수 있어요.
+                💡 같은 날 같은 시간대(아침·점심·저녁·밤)에는 같은 카드가
+                나와요. 시간대가 바뀌면 새로운 카드를 만날 수 있어요.
               </p>
             )}
 

@@ -56,15 +56,16 @@ export function drawCards(count: number): DrawnCard[] {
   }))
 }
 
-// ── 시간대(아침·점심·저녁) ──
+// ── 시간대(아침·점심·저녁·밤) ──
 // 같은 날, 같은 시간대에는 같은 카드가 나오도록 하는 데 씁니다.
-export type TimeSlot = { key: string; label: string }
+export type TimeSlot = { key: string; label: string; emoji: string }
 
 export function currentTimeSlot(now = new Date()): TimeSlot {
   const h = now.getHours()
-  if (h < 12) return { key: 'morning', label: '아침' }
-  if (h < 18) return { key: 'afternoon', label: '점심' }
-  return { key: 'evening', label: '저녁' }
+  if (h >= 5 && h < 11) return { key: 'morning', label: '아침', emoji: '🌅' }
+  if (h >= 11 && h < 17) return { key: 'noon', label: '점심', emoji: '☀️' }
+  if (h >= 17 && h < 22) return { key: 'evening', label: '저녁', emoji: '🌇' }
+  return { key: 'night', label: '밤', emoji: '🌙' } // 22:00~04:59
 }
 
 // ── 씨앗(seed) 기반 난수 ──
@@ -157,8 +158,12 @@ export function formatReadingForDiary(
   topic: TarotTopic,
   kind: SpreadKind,
   cards: DrawnCard[],
+  slotLabel?: string,
 ): string {
-  const lines: string[] = [`🔮 오늘의 타로 — ${topic.label}`]
+  const head = slotLabel
+    ? `🔮 오늘의 타로 — ${topic.label} (${slotLabel})`
+    : `🔮 오늘의 타로 — ${topic.label}`
+  const lines: string[] = [head]
   cards.forEach((drawn, i) => {
     const pos = kind === 'three' ? `${threePositions[i]} · ` : ''
     lines.push(
