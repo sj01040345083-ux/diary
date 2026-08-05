@@ -20,6 +20,7 @@ type Props = {
   onEditDiary: (date: string) => void // 일기 카드 "수정" → 작성(수정) 화면으로
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
+  onTarot: () => void // "오늘의 타로" 바로가기
 }
 
 export default function HomePage({
@@ -28,6 +29,7 @@ export default function HomePage({
   onEditDiary,
   onTransactions,
   onFavorites,
+  onTarot,
 }: Props) {
   // 설정에서 정한 닉네임을 불러옵니다. (이름 표시에 사용)
   const [nickname, setNickname] = useState<string | null>(null)
@@ -134,6 +136,20 @@ export default function HomePage({
             💰 소비·수입 기록
           </button>
         </div>
+
+        {/* 오늘의 타로 바로가기 */}
+        <button className="home-tarot" onClick={onTarot}>
+          <span className="home-tarot-icon" aria-hidden>
+            🔮
+          </span>
+          <span className="home-tarot-text">
+            <span className="home-tarot-title">오늘의 타로</span>
+            <span className="home-tarot-desc">카드 한 장으로 마음을 들여다봐요</span>
+          </span>
+          <span className="home-tarot-arrow" aria-hidden>
+            →
+          </span>
+        </button>
 
         {/* 오늘의 명언 */}
         <section className="quote-card">

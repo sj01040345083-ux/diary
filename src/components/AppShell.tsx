@@ -10,6 +10,7 @@ import FavoritesPage from '../pages/FavoritesPage'
 import StatsPage from '../pages/StatsPage'
 import SettingsPage from '../pages/SettingsPage'
 import RecordsPage from '../pages/RecordsPage'
+import TarotPage from '../pages/TarotPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
 // 아래 탭바로 화면을 오가고, 전체 화면(작성 등)은 위에 덮어서 띄웁니다.
@@ -18,7 +19,7 @@ type Props = {
 }
 
 // 탭바 위에 전체 화면으로 덮이는 화면들
-type Overlay = null | 'write' | 'transactions' | 'favorites'
+type Overlay = null | 'write' | 'transactions' | 'favorites' | 'tarot'
 
 export default function AppShell({ session }: Props) {
   const [tab, setTab] = useState<Tab>('home')
@@ -78,6 +79,11 @@ export default function AppShell({ session }: Props) {
     return <FavoritesPage onBack={() => setOverlay(null)} />
   }
 
+  // 오늘의 타로 화면
+  if (overlay === 'tarot') {
+    return <TarotPage onBack={() => setOverlay(null)} />
+  }
+
   return (
     <div className="app-shell">
       {tab === 'home' && (
@@ -87,6 +93,7 @@ export default function AppShell({ session }: Props) {
           onEditDiary={openEdit}
           onTransactions={() => setOverlay('transactions')}
           onFavorites={() => setOverlay('favorites')}
+          onTarot={() => setOverlay('tarot')}
         />
       )}
       {tab === 'records' && <RecordsPage onEditDiary={openEdit} />}

@@ -313,6 +313,62 @@
   border-color: #cfe0c6;
 }
 
+/* ── 오늘의 타로 바로가기 ── */
+.home-tarot {
+  width: 100%;
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem;
+  font-family: inherit;
+  text-align: left;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(49, 68, 55, 0.08);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+}
+
+.home-tarot:hover {
+  background: #eef3e8;
+  border-color: #cfe0c6;
+  transform: translateY(-1px);
+}
+
+.home-tarot-icon {
+  font-size: 1.7rem;
+  flex-shrink: 0;
+}
+
+.home-tarot-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-tarot-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4f6b4a;
+}
+
+.home-tarot-desc {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+.home-tarot-arrow {
+  font-size: 1.1rem;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
 /* ── 소비/수입 ── */
 .tx-summary {
   display: flex;
