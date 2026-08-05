@@ -5,6 +5,7 @@ import {
   neededCount,
   readingText,
   directionLabel,
+  cardCategoryLabel,
   formatReadingForDiary,
   threePositions,
   tarotTopics,
@@ -68,6 +69,7 @@ export default function TarotPage({ session, onBack }: Props) {
   const [stage, setStage] = useState<Stage>('intro')
   const [topic, setTopic] = useState<TarotTopic>(tarotTopics[0])
   const [spread, setSpread] = useState<SpreadKind>('one')
+  const [showGuide, setShowGuide] = useState(false) // '타로 카드가 궁금하다면?' 펼침 여부
 
   // 골라 뽑기: 뒷면 카드 묶음 + 사용자가 고른 순서(인덱스)
   const [pool, setPool] = useState<DrawnCard[]>([])
@@ -207,6 +209,49 @@ export default function TarotPage({ session, onBack }: Props) {
                 </span>
               </button>
             </div>
+
+            {/* 타로 카드가 궁금하다면? (펼쳐보기) */}
+            <div className="tarot-guide">
+              <button
+                className="tarot-guide-toggle"
+                onClick={() => setShowGuide((v) => !v)}
+                aria-expanded={showGuide}
+              >
+                🔎 타로 카드가 궁금하다면? {showGuide ? '▲' : '▼'}
+              </button>
+              {showGuide && (
+                <div className="tarot-guide-body">
+                  <p>
+                    타로는 모두 <b>78장</b>이에요. 크게 두 종류로 나뉘어요.
+                  </p>
+                  <p>
+                    <b>✨ 메이저 아르카나 (22장)</b>
+                    <br />
+                    태양·달·연인처럼 <b>인생의 큰 흐름</b>을 담은 카드예요.
+                  </p>
+                  <p>
+                    <b>🃏 마이너 아르카나 (56장)</b>
+                    <br />
+                    <b>4가지 무늬</b>로 일상을 세밀하게 나타내요.
+                  </p>
+                  <ul className="tarot-guide-suits">
+                    <li>🔥 <b>완드</b> — 열정 · 행동</li>
+                    <li>💧 <b>컵</b> — 감정 · 관계</li>
+                    <li>🗡️ <b>소드</b> — 생각 · 갈등</li>
+                    <li>🪙 <b>펜타클</b> — 현실 · 재물</li>
+                  </ul>
+                  <p>
+                    각 무늬는 <b>에이스~10</b> 숫자 카드와{' '}
+                    <b>시종·기사·여왕·왕</b> 인물 카드로 이루어져요.
+                  </p>
+                  <p className="tarot-guide-ex">
+                    예) <b>‘소드 5’</b> = 🗡️소드(생각·갈등) 무늬의 5번 카드
+                    <br />
+                    <b>‘소드 시종’</b> = 🗡️소드 무늬의 시종(인물) 카드
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -300,6 +345,9 @@ export default function TarotPage({ session, onBack }: Props) {
                         </span>
                       </div>
                     </div>
+                    <p className="tarot-reading-cat">
+                      {cardCategoryLabel(drawn.card)}
+                    </p>
                     <p className="tarot-reading-text">{readingText(drawn)}</p>
                   </article>
                 ))}
