@@ -1,8 +1,36 @@
 /* ─────────────────────────────────────────────
    타로 화면 전용 스타일
-   앱 전체 디자인 토큰(index.css)의 세이지 그린·페이퍼 톤을 따르되,
-   타로다운 잔잔한 신비로움을 살짝 더했습니다.
+   앱의 차분한 톤은 유지하되, 타로 화면만큼은 '깊은 밤하늘 + 골드'의
+   신비로운 분위기를 냅니다. (카드·배경은 타로 화면에서만 적용)
    ───────────────────────────────────────────── */
+
+.tarot-screen {
+  /* 타로 화면 전용 색 */
+  --tarot-night: #241b3d; /* 깊은 밤보라 */
+  --tarot-night-2: #3a2a63; /* 보라 */
+  --tarot-deep: #171129; /* 가장 어두운 배경 */
+  --tarot-gold: #d9b45b; /* 금색 포인트 */
+  --tarot-gold-soft: #f0dca0; /* 밝은 금색 */
+  --tarot-parch: #fbf4e2; /* 카드 앞면(양피지) */
+  --tarot-ink: #2c2440; /* 카드 위 글자 */
+
+  /* 밤하늘 그라데이션 배경으로 덮습니다. */
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(120, 92, 190, 0.35), transparent 70%),
+    radial-gradient(900px 500px at 90% 20%, rgba(90, 70, 160, 0.25), transparent 70%),
+    linear-gradient(180deg, var(--tarot-night) 0%, var(--tarot-deep) 100%);
+  background-attachment: fixed;
+}
+
+/* 헤더도 밤하늘 톤에 맞춰 어둡게 */
+.tarot-header {
+  background: rgba(23, 17, 41, 0.72) !important;
+  border-bottom: 1px solid rgba(217, 180, 91, 0.28) !important;
+}
+.tarot-header .icon-btn,
+.tarot-header .write-title {
+  color: var(--tarot-gold-soft) !important;
+}
 
 .tarot-main {
   display: flex;
@@ -10,13 +38,13 @@
   align-items: center;
 }
 
-/* ── 1) 인트로: 스프레드 선택 ── */
+/* ── 1) 인트로 ── */
 .tarot-intro {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.6rem;
+  gap: 1.2rem;
   padding-top: 1rem;
 }
 
@@ -25,8 +53,9 @@
 }
 
 .tarot-hero-mark {
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   display: inline-block;
+  filter: drop-shadow(0 4px 14px rgba(217, 180, 91, 0.5));
   animation: tarot-float 3.2s ease-in-out infinite;
 }
 
@@ -42,138 +71,194 @@
 
 .tarot-heading {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.32rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--tarot-gold-soft);
   margin: 0.7rem 0 0.35rem;
-  text-shadow: var(--text-halo);
 }
 
 .tarot-sub {
   font-size: 0.94rem;
-  color: var(--ink-soft);
+  color: rgba(240, 236, 255, 0.72);
   line-height: 1.55;
   margin: 0;
-  text-shadow: var(--text-halo);
 }
 
+/* 주제 고르기 (2×2 칩) */
+.tarot-topics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.tarot-topic {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 0.9rem;
+  font-family: inherit;
+  border-radius: 14px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(217, 180, 91, 0.28);
+  color: rgba(240, 236, 255, 0.85);
+  transition: background 0.18s ease, border-color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.tarot-topic:hover {
+  transform: translateY(-1px);
+  border-color: rgba(217, 180, 91, 0.6);
+}
+
+.tarot-topic.is-active {
+  background: linear-gradient(150deg, var(--tarot-night-2), var(--tarot-night));
+  border-color: var(--tarot-gold);
+  box-shadow: 0 6px 18px rgba(217, 180, 91, 0.22);
+}
+
+.tarot-topic-emoji {
+  font-size: 1.3rem;
+}
+
+.tarot-topic-label {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tarot-topic-hint {
+  font-size: 0.88rem;
+  color: var(--tarot-gold-soft);
+  margin: -0.2rem 0 0.2rem;
+  text-align: center;
+}
+
+/* 스프레드(장수) 고르기 */
 .tarot-spread-choices {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.8rem;
 }
 
 .tarot-spread-btn {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.35rem;
+  gap: 0.3rem;
   width: 100%;
-  padding: 1.2rem 1.3rem;
-  background: var(--glass-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
+  padding: 1.1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(217, 180, 91, 0.35);
+  border-radius: 16px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: transform 0.18s ease, box-shadow 0.18s ease,
-    border-color 0.18s ease;
+  transition: transform 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease;
 }
 
 .tarot-spread-btn:hover {
   transform: translateY(-2px);
-  border-color: var(--accent);
-  box-shadow: 0 2px 6px rgba(45, 55, 45, 0.08),
-    0 14px 30px rgba(45, 55, 45, 0.1);
-}
-
-.tarot-spread-btn:active {
-  transform: translateY(0);
+  border-color: var(--tarot-gold);
+  background: rgba(255, 255, 255, 0.11);
 }
 
 .tarot-spread-emoji {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
 }
 
 .tarot-spread-name {
-  font-size: 1.08rem;
+  font-size: 1.04rem;
   font-weight: 700;
-  color: var(--ink);
+  color: #fff;
 }
 
 .tarot-spread-desc {
-  font-size: 0.88rem;
-  color: var(--ink-soft);
+  font-size: 0.86rem;
+  color: rgba(240, 236, 255, 0.65);
 }
 
-/* ── 2) 섞기 연출 ── */
-.tarot-shuffle {
+/* ── 2) 카드 고르기 ── */
+.tarot-picking {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.6rem;
-  padding-top: 4rem;
+  gap: 0.5rem;
+  padding-top: 0.6rem;
 }
 
-.tarot-shuffle-cards {
+.tarot-pick-topic {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--tarot-gold);
+  margin: 0;
+}
+
+.tarot-pick-heading {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.2rem;
+  color: var(--tarot-gold-soft);
+  margin: 0.2rem 0 0;
+  text-align: center;
+}
+
+.tarot-pick-count {
+  font-size: 0.9rem;
+  color: rgba(240, 236, 255, 0.7);
+  margin: 0.1rem 0 0.6rem;
+}
+
+/* 뒷면 카드들을 부채꼴처럼 살짝 펼쳐 보여줍니다. */
+.tarot-pool {
   position: relative;
-  width: 120px;
-  height: 160px;
+  width: 100%;
+  height: 210px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 1rem;
 }
 
-.tarot-shuffle-card {
+.tarot-pool-card {
   position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  background: linear-gradient(150deg, var(--accent-strong), var(--accent));
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  box-shadow: var(--shadow-card);
+  top: 0;
+  width: 78px;
+  height: 122px;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  background: linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 가운데(0)를 기준으로 좌우로 부채꼴 회전·이동 (--n: 카드 위치) */
+  transform: translateX(calc(var(--n) * 34px)) rotate(calc(var(--n) * 7deg));
+  transform-origin: bottom center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
 }
 
-.tarot-shuffle-card:nth-child(1) {
-  animation: tarot-shuffle-1 1.2s ease-in-out infinite;
-}
-.tarot-shuffle-card:nth-child(2) {
-  animation: tarot-shuffle-2 1.2s ease-in-out infinite;
-}
-.tarot-shuffle-card:nth-child(3) {
-  animation: tarot-shuffle-3 1.2s ease-in-out infinite;
+.tarot-pool-card:hover:not(:disabled) {
+  transform: translateX(calc(var(--n) * 34px)) rotate(calc(var(--n) * 7deg))
+    translateY(-14px);
+  box-shadow: 0 16px 30px rgba(217, 180, 91, 0.35);
+  z-index: 5;
 }
 
-@keyframes tarot-shuffle-1 {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(-6deg);
-  }
-  50% {
-    transform: translate(-26px, -10px) rotate(-14deg);
-  }
-}
-@keyframes tarot-shuffle-2 {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(0, -18px) rotate(2deg);
-  }
-}
-@keyframes tarot-shuffle-3 {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(6deg);
-  }
-  50% {
-    transform: translate(26px, -10px) rotate(14deg);
-  }
+.tarot-pool-card.is-picked {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.tarot-shuffle-text {
-  font-size: 1rem;
-  color: var(--ink-soft);
-  text-shadow: var(--text-halo);
+.tarot-pool-mark {
+  font-size: 1.5rem;
+  color: rgba(240, 220, 160, 0.85);
 }
 
 /* ── 3) 결과 ── */
@@ -182,15 +267,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.3rem;
+  gap: 1.1rem;
+}
+
+.tarot-result-topic {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tarot-gold);
+  margin: 0.4rem 0 0;
 }
 
 .tarot-result-hint {
-  font-size: 0.95rem;
-  color: var(--ink-soft);
+  font-size: 0.92rem;
+  color: rgba(240, 236, 255, 0.7);
   text-align: center;
-  margin: 0.4rem 0 0;
-  text-shadow: var(--text-halo);
+  margin: 0;
 }
 
 .tarot-cards {
@@ -201,7 +292,7 @@
 }
 
 .tarot-cards.is-three {
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 .tarot-card-slot {
@@ -214,20 +305,15 @@
 .tarot-position {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--accent-strong);
+  color: var(--tarot-gold-soft);
   margin: 0;
-  text-shadow: var(--text-halo);
 }
 
 /* 카드 뒤집기 (3D) */
 .tarot-card {
-  width: 116px;
-  height: 176px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  perspective: 900px;
+  width: 118px;
+  height: 180px;
+  perspective: 1000px;
   animation: tarot-deal 0.5s ease both;
 }
 
@@ -251,7 +337,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
   transform-style: preserve-3d;
 }
 
@@ -269,23 +355,28 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-card);
 }
 
 .tarot-back {
-  background: linear-gradient(150deg, var(--accent-strong), var(--accent));
-  border: 2px solid rgba(255, 255, 255, 0.55);
+  background:
+    radial-gradient(circle at 50% 32%, rgba(217, 180, 91, 0.28), transparent 60%),
+    linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
 }
 
 .tarot-back-mark {
-  font-size: 2rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 2.2rem;
+  color: var(--tarot-gold-soft);
 }
 
 .tarot-front {
   transform: rotateY(180deg);
-  background: var(--glass-strong);
-  border: 2px solid var(--accent-soft);
+  background:
+    radial-gradient(circle at 50% 30%, #fff, var(--tarot-parch) 70%);
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 4px rgba(217, 180, 91, 0.25);
   gap: 0.5rem;
   padding: 0.6rem;
 }
@@ -296,7 +387,7 @@
 }
 
 .tarot-emoji {
-  font-size: 2.6rem;
+  font-size: 2.7rem;
   line-height: 1;
 }
 
@@ -306,9 +397,9 @@
 
 .tarot-name {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--tarot-ink);
   text-align: center;
   line-height: 1.3;
 }
@@ -321,29 +412,13 @@
   font-size: 0.9rem;
 }
 
-.tarot-flipall-btn {
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--accent-strong);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 0.55rem 1.3rem;
-  cursor: pointer;
-  transition: background 0.18s ease;
-}
-
-.tarot-flipall-btn:hover {
-  background: #e2ecdb;
-}
-
-/* 해석 카드 */
+/* 해석 카드 (밤하늘 위에 떠 있는 양피지 느낌) */
 .tarot-readings {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  animation: tarot-fade 0.5s ease both;
+  animation: tarot-fade 0.6s ease both;
 }
 
 @keyframes tarot-fade {
@@ -358,10 +433,10 @@
 }
 
 .tarot-reading-card {
-  background: var(--glass-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
+  background: rgba(251, 244, 226, 0.97);
+  border: 1px solid rgba(217, 180, 91, 0.5);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
   padding: 1.1rem 1.2rem;
 }
 
@@ -375,8 +450,8 @@
 .tarot-reading-pos {
   font-size: 0.76rem;
   font-weight: 700;
-  color: #fff;
-  background: var(--accent);
+  color: var(--tarot-deep);
+  background: var(--tarot-gold);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
   flex-shrink: 0;
@@ -396,57 +471,116 @@
 
 .tarot-reading-name {
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.02rem;
+  font-size: 1.04rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--tarot-ink);
 }
 
 .tarot-reading-dir {
   font-size: 0.8rem;
   font-weight: 400;
-  color: var(--ink-faint);
+  color: #8a7d63;
 }
 
 .tarot-reading-keywords {
   font-size: 0.82rem;
-  color: var(--accent-strong);
+  color: #9a7a2e;
+  font-weight: 600;
 }
 
 .tarot-reading-text {
   font-size: 0.96rem;
   line-height: 1.65;
-  color: var(--ink);
+  color: #3a3350;
   margin: 0;
 }
 
+/* 결과 아래 버튼들 */
 .tarot-result-actions {
-  margin-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.tarot-save-btn {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tarot-deep);
+  background: linear-gradient(150deg, var(--tarot-gold-soft), var(--tarot-gold));
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(217, 180, 91, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarot-save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(217, 180, 91, 0.45);
+}
+
+.tarot-save-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.tarot-saved-msg {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--tarot-gold-soft);
+  text-align: center;
+  margin: 0.2rem 0;
+}
+
+.tarot-save-error {
+  font-size: 0.86rem;
+  color: #f0a99a;
+  margin: 0;
 }
 
 .tarot-again-btn {
   font-family: inherit;
-  font-size: 0.98rem;
+  font-size: 0.96rem;
   font-weight: 600;
-  color: #fff;
-  background: var(--accent);
-  border: none;
+  color: var(--tarot-gold-soft);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(217, 180, 91, 0.45);
   border-radius: 999px;
-  padding: 0.7rem 1.7rem;
+  padding: 0.65rem 1.6rem;
   cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: background 0.18s ease, transform 0.18s ease;
+  transition: background 0.18s ease;
 }
 
 .tarot-again-btn:hover {
-  background: var(--accent-strong);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 텍스트 버튼 (처음으로) */
+.tarot-text-btn {
+  margin-top: 0.8rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: rgba(240, 236, 255, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.tarot-text-btn:hover {
+  color: var(--tarot-gold-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .tarot-disclaimer {
   font-size: 0.82rem;
-  color: var(--ink-faint);
+  color: rgba(240, 236, 255, 0.5);
   text-align: center;
   line-height: 1.55;
-  margin: 0.3rem 0 0;
-  text-shadow: var(--text-halo);
+  margin: 0.4rem 0 0;
 }

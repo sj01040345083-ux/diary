@@ -81,7 +81,7 @@ export default function AppShell({ session }: Props) {
 
   // 오늘의 타로 화면
   if (overlay === 'tarot') {
-    return <TarotPage onBack={() => setOverlay(null)} />
+    return <TarotPage session={session} onBack={() => setOverlay(null)} />
   }
 
   return (
