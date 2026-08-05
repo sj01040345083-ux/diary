@@ -145,35 +145,49 @@
   opacity: 0.85;
 }
 
-/* 카드 장수 간단 토글 */
-.tarot-count-toggle {
-  display: flex;
-  gap: 0.4rem;
+/* 맨 아래: 과거·현재·미래(3장) 선택 토글 */
+.tarot-spread-toggle {
   width: 100%;
-  background: rgba(20, 16, 40, 0.5);
-  border: 1px solid rgba(217, 180, 91, 0.25);
-  border-radius: 999px;
-  padding: 0.3rem;
-}
-
-.tarot-count-btn {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
   font-family: inherit;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--tarot-gold-soft);
-  background: transparent;
-  border: none;
-  border-radius: 999px;
-  padding: 0.55rem 0.4rem;
+  background: rgba(20, 16, 40, 0.5);
+  border: 1px solid rgba(217, 180, 91, 0.3);
+  border-radius: 14px;
+  padding: 0.85rem 1.1rem;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.tarot-count-btn.is-on {
+.tarot-spread-toggle-main {
+  text-align: left;
+}
+
+.tarot-spread-toggle-state {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  background: rgba(217, 180, 91, 0.18);
+  color: var(--tarot-gold-soft);
+}
+
+.tarot-spread-toggle.is-on {
   color: var(--tarot-deep);
   background: linear-gradient(150deg, var(--tarot-gold-soft), var(--tarot-gold));
-  box-shadow: 0 3px 10px rgba(217, 180, 91, 0.35);
+  border-color: var(--tarot-gold);
+  box-shadow: 0 6px 16px rgba(217, 180, 91, 0.35);
+}
+
+.tarot-spread-toggle.is-on .tarot-spread-toggle-state {
+  background: rgba(30, 20, 50, 0.85);
+  color: var(--tarot-gold-soft);
 }
 
 /* 스프레드(장수) 고르기 */
