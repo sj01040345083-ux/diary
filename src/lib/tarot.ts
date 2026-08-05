@@ -31,10 +31,31 @@ export type TarotTopic = {
 
 export const tarotTopics: TarotTopic[] = [
   { key: 'today', label: '오늘의 운세', emoji: '🌅', hint: '오늘 하루의 전반적인 흐름' },
-  { key: 'love', label: '연애·관계', emoji: '💗', hint: '사랑과 사람 사이의 마음' },
+  { key: 'love', label: '연애·관계', emoji: '💗', hint: '사랑과 연인 사이의 마음' },
   { key: 'work', label: '일·금전', emoji: '💼', hint: '일·공부·돈에 관한 흐름' },
   { key: 'mind', label: '마음·고민', emoji: '🌿', hint: '지금 마음속 고민' },
+  { key: 'relations', label: '인간관계', emoji: '👥', hint: '사람들과의 관계 흐름' },
 ]
+
+// 주제에 맞춰 카드를 바라보는 '관점 한 줄' (질문형, 예언하지 않음).
+// 카드의 대표 키워드를 그 주제 쪽으로 비춰 봅니다.
+export function topicReflection(topicKey: string, drawn: DrawnCard): string {
+  const k = drawn.card.keywords[0]
+  switch (topicKey) {
+    case 'today':
+      return `오늘 하루, ‘${k}’의 기운이 어디에서 느껴지나요?`
+    case 'love':
+      return `연애·관계에서 ‘${k}’의 결이 어떻게 다가오나요?`
+    case 'work':
+      return `일·금전에서 ‘${k}’의 흐름을 어떻게 살리면 좋을까요?`
+    case 'mind':
+      return `지금 마음속 ‘${k}’의 자리는 무엇과 닿아 있나요?`
+    case 'relations':
+      return `사람들과의 사이에서 ‘${k}’의 기운이 어떻게 작용하나요?`
+    default:
+      return `‘${k}’의 기운을 지금 어디에서 느끼나요?`
+  }
+}
 
 // 배열을 무작위로 섞습니다. (피셔–예이츠 셔플)
 function shuffle<T>(list: T[]): T[] {

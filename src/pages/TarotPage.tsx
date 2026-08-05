@@ -6,6 +6,7 @@ import {
   readingText,
   directionLabel,
   cardCategoryLabel,
+  topicReflection,
   formatReadingForDiary,
   drawSeeded,
   drawCards,
@@ -404,6 +405,12 @@ export default function TarotPage({ session, onBack }: Props) {
                       {cardCategoryLabel(drawn.card)}
                     </p>
                     <p className="tarot-reading-text">{readingText(drawn)}</p>
+                    <p className="tarot-reading-lens">
+                      <span className="tarot-reading-lens-label">
+                        {topic.emoji} {topic.label}
+                      </span>
+                      {topicReflection(topic.key, drawn)}
+                    </p>
                   </article>
                 ))}
               </div>
