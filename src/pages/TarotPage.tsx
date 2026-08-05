@@ -38,6 +38,14 @@ type Props = {
   onBack: () => void
 }
 
+// '과거·현재·미래' 3장 리딩용 주제 (그리드 칩에는 없고, 전체 흐름을 봅니다)
+const flowTopic: TarotTopic = {
+  key: 'flow',
+  label: '과거 · 현재 · 미래',
+  emoji: '🕰️',
+  hint: '지난 흐름과 앞으로 다가올 흐름',
+}
+
 // 카드 뒷면 그림 (달 + 별). 저작권 문제 없이 CSS로 직접 그립니다.
 function CardBackArt() {
   return (
@@ -229,7 +237,7 @@ export default function TarotPage({ session, onBack }: Props) {
               </p>
             </div>
 
-            {/* 주제 고르기 — 누르면 바로 타로 진행 */}
+            {/* 주제 고르기 — 누르면 바로 카드 1장 리딩 시작 */}
             <div className="tarot-topics">
               {tarotTopics.map((t) => (
                 <button
@@ -237,7 +245,7 @@ export default function TarotPage({ session, onBack }: Props) {
                   className="tarot-topic"
                   onClick={() => {
                     setTopic(t)
-                    startPicking(spread)
+                    startPicking('one')
                   }}
                 >
                   <span className="tarot-topic-emoji">{t.emoji}</span>
@@ -245,30 +253,21 @@ export default function TarotPage({ session, onBack }: Props) {
                 </button>
               ))}
             </div>
-            <p className="tarot-topic-hint">
-              {spread === 'three'
-                ? '주제를 누르면 3장(과거·현재·미래)으로 봐요'
-                : '주제를 누르면 바로 카드 1장을 뽑아요'}
-            </p>
+            <p className="tarot-topic-hint">누르면 카드 1장으로 봐요</p>
 
-            {/* 맨 아래: '과거·현재·미래 3장' 옵션 (체크하면 위 주제를 3장으로) */}
+            {/* 맨 아래: 과거·현재·미래 3장 리딩 — 누르면 바로 시작 */}
             <button
-              className={`tarot-spread-check ${
-                spread === 'three' ? 'is-on' : ''
-              }`}
-              onClick={() => setSpread(spread === 'three' ? 'one' : 'three')}
-              role="checkbox"
-              aria-checked={spread === 'three'}
+              className="tarot-flow-btn"
+              onClick={() => {
+                setTopic(flowTopic)
+                startPicking('three')
+              }}
             >
-              <span className="tarot-check-box" aria-hidden>
-                {spread === 'three' ? '✓' : ''}
-              </span>
-              <span className="tarot-check-text">
-                <span className="tarot-check-title">
-                  🕰️ 과거 · 현재 · 미래 (카드 3장)으로 보기
-                </span>
-                <span className="tarot-check-desc">
-                  체크하면, 누른 주제를 카드 3장으로 더 자세히 풀이해요
+              <span className="tarot-flow-emoji">🕰️</span>
+              <span className="tarot-flow-text">
+                <span className="tarot-flow-title">과거 · 현재 · 미래</span>
+                <span className="tarot-flow-desc">
+                  카드 3장으로 흐름을 자세히 봐요
                 </span>
               </span>
             </button>

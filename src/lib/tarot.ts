@@ -52,6 +52,8 @@ export function topicReflection(topicKey: string, drawn: DrawnCard): string {
       return `지금 마음속 ‘${k}’의 자리는 무엇과 닿아 있나요?`
     case 'relations':
       return `사람들과의 사이에서 ‘${k}’의 기운이 어떻게 작용하나요?`
+    case 'flow':
+      return `‘${k}’의 기운이 과거에서 지금, 앞으로 어떻게 흘러가나요?`
     default:
       return `‘${k}’의 기운을 지금 어디에서 느끼나요?`
   }
