@@ -108,6 +108,11 @@
     transform 0.12s ease;
 }
 
+/* 홀수 번째(5번째=인간관계) 칩은 한 줄 전체를 차지해 균형을 맞춥니다. */
+.tarot-topics .tarot-topic:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
 .tarot-topic:hover {
   transform: translateY(-1px);
   border-color: rgba(217, 180, 91, 0.6);
@@ -611,6 +616,27 @@
   line-height: 1.65;
   color: #3a3350;
   margin: 0;
+}
+
+/* 주제에 맞춘 관점 한 줄 */
+.tarot-reading-lens {
+  margin: 0.7rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px dashed rgba(217, 180, 91, 0.5);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #4a4230;
+}
+
+.tarot-reading-lens-label {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--tarot-deep);
+  background: var(--tarot-gold);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  margin-right: 0.45rem;
 }
 
 /* ── '타로 카드가 궁금하다면?' 펼쳐보기 ── */
