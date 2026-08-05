@@ -245,21 +245,31 @@ export default function TarotPage({ session, onBack }: Props) {
                 </button>
               ))}
             </div>
-            <p className="tarot-topic-hint">주제를 누르면 바로 카드를 뽑아요</p>
+            <p className="tarot-topic-hint">
+              {spread === 'three'
+                ? '주제를 누르면 3장(과거·현재·미래)으로 봐요'
+                : '주제를 누르면 바로 카드 1장을 뽑아요'}
+            </p>
 
-            {/* 맨 아래: 과거·현재·미래(3장)으로 볼지 선택 */}
+            {/* 맨 아래: '과거·현재·미래 3장' 옵션 (체크하면 위 주제를 3장으로) */}
             <button
-              className={`tarot-spread-toggle ${
+              className={`tarot-spread-check ${
                 spread === 'three' ? 'is-on' : ''
               }`}
               onClick={() => setSpread(spread === 'three' ? 'one' : 'three')}
-              aria-pressed={spread === 'three'}
+              role="checkbox"
+              aria-checked={spread === 'three'}
             >
-              <span className="tarot-spread-toggle-main">
-                🕰️ 과거 · 현재 · 미래 (카드 3장)으로 보기
+              <span className="tarot-check-box" aria-hidden>
+                {spread === 'three' ? '✓' : ''}
               </span>
-              <span className="tarot-spread-toggle-state">
-                {spread === 'three' ? '켜짐 ✓' : '꺼짐'}
+              <span className="tarot-check-text">
+                <span className="tarot-check-title">
+                  🕰️ 과거 · 현재 · 미래 (카드 3장)으로 보기
+                </span>
+                <span className="tarot-check-desc">
+                  체크하면, 누른 주제를 카드 3장으로 더 자세히 풀이해요
+                </span>
               </span>
             </button>
 
