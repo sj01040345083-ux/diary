@@ -313,44 +313,11 @@
   border-color: #cfe0c6;
 }
 
-/* ── 일기 작성: '하루 한 장' 질문 인용구 ── */
-.write-prompt-quote {
-  background: var(--accent-soft);
-  border: 1px solid var(--glass-border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius-sm);
-  padding: 0.8rem 1rem;
-  margin-bottom: 1rem;
-}
-
-.write-prompt-label {
-  display: block;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  font-weight: 800;
-  color: var(--accent-strong);
-  margin-bottom: 0.35rem;
-}
-
-.write-prompt-text {
-  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.02rem;
-  line-height: 1.55;
-  color: var(--ink);
-  margin: 0;
-}
-
-/* ── 타로 바로가기 묶음 (운세형 + 하루 한 장) ── */
-.home-tarot-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  margin: 0.9rem 0 1.3rem; /* 위 버튼들 / 아래 '오늘의 명언' 카드와 간격 */
-}
-
-/* ── 타로 바로가기 ── */
+/* ── 오늘의 타로 바로가기 ── */
 .home-tarot {
   width: 100%;
+  margin-top: 0.9rem;
+  margin-bottom: 1.3rem; /* 아래 '오늘의 명언' 카드와 간격 */
   display: flex;
   align-items: center;
   gap: 0.9rem;

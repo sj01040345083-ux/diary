@@ -47,7 +47,6 @@ type Props = {
   onDone: () => void // 저장 후 (홈/기록으로)
   onCancel: () => void // 뒤로 (저장 안 함)
   targetDate?: string // 수정할 날짜 (없으면 오늘)
-  promptQuote?: string // '하루 한 장'의 질문 (상단 인용구로만 노출, 본문에 미리 채우지 않음)
 }
 
 export default function WritePage({
@@ -55,7 +54,6 @@ export default function WritePage({
   onDone,
   onCancel,
   targetDate,
-  promptQuote,
 }: Props) {
   // 작성/수정 대상 날짜. 새 일기(targetDate 없음)일 때는 달력으로 바꿀 수 있습니다.
   const [workDate, setWorkDate] = useState(targetDate ?? todayString())
@@ -285,14 +283,6 @@ export default function WritePage({
         <h1 className="write-heading">
           {isToday ? '오늘, 마음에 남은 한 줄 🍀' : '이 날의 한 줄 🍀'}
         </h1>
-
-        {/* '하루 한 장'에서 넘어온 질문 — 답을 강요하지 않는 안내용 인용구 */}
-        {promptQuote && (
-          <div className="write-prompt-quote">
-            <span className="write-prompt-label">오늘의 카드가 건넨 물음</span>
-            <p className="write-prompt-text">{promptQuote}</p>
-          </div>
-        )}
 
         {loadingInitial ? (
           <div className="diary-empty">
