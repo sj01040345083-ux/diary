@@ -3,7 +3,7 @@
 // 화면(pages/TarotPage.tsx)에서 이 함수들을 불러 씁니다.
 // ─────────────────────────────────────────────
 
-import { tarotDeck } from '../config/tarot'
+import { tarotDeck, suitInfo } from '../config/tarot'
 import type { TarotCard } from '../config/tarot'
 
 // 뽑힌 카드 하나 — 어떤 카드인지 + 정방향/역방향 여부
@@ -75,6 +75,17 @@ export function readingText(drawn: DrawnCard): string {
 // 카드 방향을 한글로 ('정방향' / '역방향')
 export function directionLabel(drawn: DrawnCard): string {
   return drawn.reversed ? '역방향' : '정방향'
+}
+
+// 카드가 어떤 종류인지 한 줄로 설명합니다.
+// 예) 메이저 → "메이저 아르카나 · 인생의 큰 흐름"
+//     소드 5 → "🗡️ 소드 · 공기 · 생각과 갈등"
+export function cardCategoryLabel(card: TarotCard): string {
+  if (card.arcana === 'major') {
+    return '✨ 메이저 아르카나 · 인생의 큰 흐름'
+  }
+  const s = suitInfo[card.suit!]
+  return `${s.emoji} ${s.name} · ${s.element}`
 }
 
 // 일기에 저장할 때 넣을 '타로 결과 글'을 예쁘게 만듭니다.

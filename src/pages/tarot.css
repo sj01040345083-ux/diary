@@ -488,11 +488,93 @@
   font-weight: 600;
 }
 
+/* 카드 종류(무늬·계열) 한 줄 설명 */
+.tarot-reading-cat {
+  font-size: 0.82rem;
+  color: #8a7d63;
+  background: rgba(217, 180, 91, 0.14);
+  border-radius: 8px;
+  padding: 0.3rem 0.55rem;
+  margin: 0 0 0.55rem;
+}
+
 .tarot-reading-text {
   font-size: 0.96rem;
   line-height: 1.65;
   color: #3a3350;
   margin: 0;
+}
+
+/* ── '타로 카드가 궁금하다면?' 펼쳐보기 ── */
+.tarot-guide {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.tarot-guide-toggle {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--tarot-gold-soft);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(217, 180, 91, 0.3);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.tarot-guide-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tarot-guide-body {
+  margin-top: 0.6rem;
+  padding: 1rem 1.1rem;
+  background: rgba(251, 244, 226, 0.96);
+  border: 1px solid rgba(217, 180, 91, 0.5);
+  border-radius: 14px;
+  animation: tarot-fade 0.35s ease both;
+}
+
+.tarot-guide-body p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #3a3350;
+  margin: 0 0 0.7rem;
+}
+
+.tarot-guide-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tarot-guide-body b {
+  color: var(--tarot-ink);
+}
+
+.tarot-guide-suits {
+  list-style: none;
+  margin: 0 0 0.7rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(217, 180, 91, 0.14);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tarot-guide-suits li {
+  font-size: 0.9rem;
+  color: #3a3350;
+}
+
+.tarot-guide-ex {
+  font-size: 0.86rem !important;
+  color: #6a5f48 !important;
+  background: rgba(217, 180, 91, 0.12);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
 }
 
 /* 결과 아래 버튼들 */
