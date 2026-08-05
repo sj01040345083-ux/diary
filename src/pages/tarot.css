@@ -138,10 +138,42 @@
 }
 
 .tarot-topic-hint {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: var(--tarot-gold-soft);
-  margin: -0.2rem 0 0.2rem;
+  margin: 0.1rem 0 0.2rem;
   text-align: center;
+  opacity: 0.85;
+}
+
+/* 카드 장수 간단 토글 */
+.tarot-count-toggle {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+  background: rgba(20, 16, 40, 0.5);
+  border: 1px solid rgba(217, 180, 91, 0.25);
+  border-radius: 999px;
+  padding: 0.3rem;
+}
+
+.tarot-count-btn {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--tarot-gold-soft);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 0.4rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tarot-count-btn.is-on {
+  color: var(--tarot-deep);
+  background: linear-gradient(150deg, var(--tarot-gold-soft), var(--tarot-gold));
+  box-shadow: 0 3px 10px rgba(217, 180, 91, 0.35);
 }
 
 /* 스프레드(장수) 고르기 */
