@@ -229,31 +229,7 @@ export default function TarotPage({ session, onBack }: Props) {
               </p>
             </div>
 
-            {/* 카드 장수 (간단 토글) — 주제를 누르면 이 장수로 시작해요 */}
-            <div
-              className="tarot-count-toggle"
-              role="group"
-              aria-label="카드 장수 선택"
-            >
-              <button
-                className={`tarot-count-btn ${spread === 'one' ? 'is-on' : ''}`}
-                onClick={() => setSpread('one')}
-                aria-pressed={spread === 'one'}
-              >
-                🃏 1장
-              </button>
-              <button
-                className={`tarot-count-btn ${
-                  spread === 'three' ? 'is-on' : ''
-                }`}
-                onClick={() => setSpread('three')}
-                aria-pressed={spread === 'three'}
-              >
-                🕰️ 3장 · 과거·현재·미래
-              </button>
-            </div>
-
-            {/* 주제 고르기 — 누르면 바로 시작 */}
+            {/* 주제 고르기 — 누르면 바로 타로 진행 */}
             <div className="tarot-topics">
               {tarotTopics.map((t) => (
                 <button
@@ -269,9 +245,23 @@ export default function TarotPage({ session, onBack }: Props) {
                 </button>
               ))}
             </div>
-            <p className="tarot-topic-hint">
-              주제를 누르면 카드 섞기로 이동해요 · 장수는 위에서 바꿀 수 있어요
-            </p>
+            <p className="tarot-topic-hint">주제를 누르면 바로 카드를 뽑아요</p>
+
+            {/* 맨 아래: 과거·현재·미래(3장)으로 볼지 선택 */}
+            <button
+              className={`tarot-spread-toggle ${
+                spread === 'three' ? 'is-on' : ''
+              }`}
+              onClick={() => setSpread(spread === 'three' ? 'one' : 'three')}
+              aria-pressed={spread === 'three'}
+            >
+              <span className="tarot-spread-toggle-main">
+                🕰️ 과거 · 현재 · 미래 (카드 3장)으로 보기
+              </span>
+              <span className="tarot-spread-toggle-state">
+                {spread === 'three' ? '켜짐 ✓' : '꺼짐'}
+              </span>
+            </button>
 
             {/* 타로 카드가 궁금하다면? (펼쳐보기) */}
             <div className="tarot-guide">
