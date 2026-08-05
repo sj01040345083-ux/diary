@@ -7,11 +7,19 @@ import {
   directionLabel,
   cardCategoryLabel,
   formatReadingForDiary,
+  drawSeeded,
+  readingSeed,
+  currentTimeSlot,
   threePositions,
   tarotTopics,
   POOL_SIZE,
 } from '../lib/tarot'
-import type { DrawnCard, SpreadKind, TarotTopic } from '../lib/tarot'
+import type {
+  DrawnCard,
+  SpreadKind,
+  TarotTopic,
+  TimeSlot,
+} from '../lib/tarot'
 import { suitInfo } from '../config/tarot'
 import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
 import './home.css'
@@ -75,9 +83,10 @@ export default function TarotPage({ session, onBack }: Props) {
   const [pool, setPool] = useState<DrawnCard[]>([])
   const [picked, setPicked] = useState<number[]>([])
 
-  // 결과: 고른 카드들 + 뒤집힘 여부
+  // 결과: 고른 카드들 + 뒤집힘 여부 + 이 결과가 정해진 시간대
   const [cards, setCards] = useState<DrawnCard[]>([])
   const [revealed, setRevealed] = useState(false)
+  const [slot, setSlot] = useState<TimeSlot>(() => currentTimeSlot())
 
   // 저장 상태
   const [saving, setSaving] = useState(false)
@@ -105,7 +114,18 @@ export default function TarotPage({ session, onBack }: Props) {
     setPicked(nextPicked)
     // 필요한 만큼 다 골랐으면 → 결과로 넘어가 카드를 뒤집어 보여줌
     if (nextPicked.length === neededCount(spread)) {
-      const chosen = nextPicked.map((idx) => pool[idx])
+      // 결과 카드는 '사람+오늘 날짜+시간대+주제'로 정해집니다.
+      // → 같은 시간대(아침·점심·저녁)에는 다시 뽑아도 항상 같은 카드가 나와요.
+      const nowSlot = currentTimeSlot()
+      setSlot(nowSlot)
+      const seed = readingSeed({
+        userId: session.user.id,
+        dateStr: todayString(),
+        slotKey: nowSlot.key,
+        topicKey: topic.key,
+        spread,
+      })
+      const chosen = drawSeeded(seed, neededCount(spread))
       setCards(chosen)
       setStage('result')
       // 살짝 뒤에 뒤집어서 '펼쳐지는' 느낌을 줍니다.
@@ -295,7 +315,7 @@ export default function TarotPage({ session, onBack }: Props) {
         {stage === 'result' && (
           <div className="tarot-result">
             <p className="tarot-result-topic">
-              {topic.emoji} {topic.label}
+              {topic.emoji} {topic.label} · {slot.label}
             </p>
             <p className="tarot-result-hint">
               {revealed
@@ -375,6 +395,13 @@ export default function TarotPage({ session, onBack }: Props) {
                   🔄 다시 뽑기
                 </button>
               </div>
+            )}
+
+            {revealed && (
+              <p className="tarot-slot-note">
+                💡 같은 날 같은 시간대(아침·점심·저녁)에는 같은 카드가 나와요.
+                시간대가 바뀌면 새로운 카드를 만날 수 있어요.
+              </p>
             )}
 
             <p className="tarot-disclaimer">

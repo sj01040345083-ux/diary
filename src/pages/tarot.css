@@ -95,8 +95,9 @@
 .tarot-topic {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 0.9rem;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.8rem 0.55rem;
   font-family: inherit;
   border-radius: 14px;
   cursor: pointer;
@@ -119,13 +120,16 @@
 }
 
 .tarot-topic-emoji {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .tarot-topic-label {
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #fff;
+  white-space: nowrap; /* '오늘의 운세'가 한 줄로 나오게 */
+  word-break: keep-all;
 }
 
 .tarot-topic-hint {
@@ -657,6 +661,20 @@
   color: var(--tarot-gold-soft);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* 시간대 안내 (같은 시간대엔 같은 카드) */
+.tarot-slot-note {
+  width: 100%;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--tarot-gold-soft);
+  background: rgba(217, 180, 91, 0.12);
+  border: 1px solid rgba(217, 180, 91, 0.3);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  text-align: center;
+  margin: 0;
 }
 
 .tarot-disclaimer {
