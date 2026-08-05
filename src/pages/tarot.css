@@ -145,51 +145,59 @@
   opacity: 0.85;
 }
 
-/* 맨 아래: 과거·현재·미래 3장 리딩 버튼 (누르면 바로 시작) */
-.tarot-flow-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-align: left;
-  font-family: inherit;
+/* 섞기 화면: '이 주제를 몇 장으로 볼까요?' 선택 */
+.tarot-shuffle-ask {
+  font-size: 1.05rem;
+  color: var(--tarot-parch);
+  margin: 0;
+  text-align: center;
+}
+.tarot-shuffle-ask b {
   color: var(--tarot-gold-soft);
-  background: rgba(20, 16, 40, 0.55);
-  border: 1px solid rgba(217, 180, 91, 0.35);
-  border-radius: 14px;
-  padding: 0.85rem 1.1rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease,
-    background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.tarot-flow-btn:hover {
-  transform: translateY(-1px);
-  border-color: var(--tarot-gold);
-  background: rgba(217, 180, 91, 0.12);
-  box-shadow: 0 6px 16px rgba(217, 180, 91, 0.25);
+.tarot-count-seg {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
 }
 
-.tarot-flow-emoji {
-  flex-shrink: 0;
-  font-size: 1.4rem;
-}
-
-.tarot-flow-text {
+.tarot-count-btn {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.15rem;
-}
-
-.tarot-flow-title {
-  font-size: 0.98rem;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--tarot-gold-soft);
+  background: rgba(20, 16, 40, 0.5);
+  border: 1.5px solid rgba(217, 180, 91, 0.3);
+  border-radius: 14px;
+  padding: 0.8rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.tarot-count-btn small {
+  font-size: 0.74rem;
+  font-weight: 500;
+  opacity: 0.85;
 }
 
-.tarot-flow-desc {
-  font-size: 0.8rem;
-  color: rgba(230, 220, 245, 0.7);
+.tarot-count-btn.is-on {
+  color: var(--tarot-deep);
+  background: linear-gradient(150deg, var(--tarot-gold-soft), var(--tarot-gold));
+  border-color: var(--tarot-gold);
+  box-shadow: 0 4px 12px rgba(217, 180, 91, 0.35);
+}
+
+.tarot-shuffle-note {
+  font-size: 0.85rem;
+  color: var(--tarot-gold-soft);
+  margin: 0;
+  text-align: center;
+  opacity: 0.9;
 }
 
 /* 스프레드(장수) 고르기 */
@@ -243,8 +251,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.8rem;
-  padding-top: 4.5rem;
+  gap: 1.1rem;
+  padding-top: 1.4rem;
 }
 
 .tarot-shuffle-deck {
