@@ -176,15 +176,13 @@ export function buildReading(
   const dir = reversed ? 'rev' : 'up'
   const k = card.keywords[0]
   const theme = cardTheme(card)
-  const pos = opts?.position
   const withLead = opts?.withLead ?? true
 
   // 1) 이 카드는 (무대 + 키워드 + 방향)
-  const posPrefix = pos ? `‘${pos}’ 자리에 놓였어요. ` : ''
   const dirFrame = reversed
     ? '지금은 이 기운이 살짝 뒤집혀 있어, 밖보다 안을 먼저 살피라는 신호예요.'
     : '지금 이 기운이 바로 서서 당신을 향하고 있어요.'
-  const intro = `${posPrefix}‘${card.name}’ 카드는 ${theme}예요. 키워드는 ${card.keywords.join(
+  const intro = `‘${card.name}’ 카드는 ${theme}예요. 키워드는 ${card.keywords.join(
     ' · ',
   )}. ${dirFrame}`
 
