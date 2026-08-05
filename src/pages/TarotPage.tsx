@@ -225,50 +225,53 @@ export default function TarotPage({ session, onBack }: Props) {
               <span className="tarot-hero-mark">🔮</span>
               <h1 className="tarot-heading">무엇이 궁금하신가요?</h1>
               <p className="tarot-sub">
-                궁금한 주제를 고르고, 조용히 마음속으로 떠올려 보세요.
+                궁금한 주제를 누르면 바로 카드를 뽑아요.
               </p>
             </div>
 
-            {/* 주제 고르기 */}
+            {/* 카드 장수 (간단 토글) — 주제를 누르면 이 장수로 시작해요 */}
+            <div
+              className="tarot-count-toggle"
+              role="group"
+              aria-label="카드 장수 선택"
+            >
+              <button
+                className={`tarot-count-btn ${spread === 'one' ? 'is-on' : ''}`}
+                onClick={() => setSpread('one')}
+                aria-pressed={spread === 'one'}
+              >
+                🃏 1장
+              </button>
+              <button
+                className={`tarot-count-btn ${
+                  spread === 'three' ? 'is-on' : ''
+                }`}
+                onClick={() => setSpread('three')}
+                aria-pressed={spread === 'three'}
+              >
+                🕰️ 3장 · 과거·현재·미래
+              </button>
+            </div>
+
+            {/* 주제 고르기 — 누르면 바로 시작 */}
             <div className="tarot-topics">
               {tarotTopics.map((t) => (
                 <button
                   key={t.key}
-                  className={`tarot-topic ${
-                    topic.key === t.key ? 'is-active' : ''
-                  }`}
-                  onClick={() => setTopic(t)}
+                  className="tarot-topic"
+                  onClick={() => {
+                    setTopic(t)
+                    startPicking(spread)
+                  }}
                 >
                   <span className="tarot-topic-emoji">{t.emoji}</span>
                   <span className="tarot-topic-label">{t.label}</span>
                 </button>
               ))}
             </div>
-            <p className="tarot-topic-hint">“{topic.hint}”에 대해 물어봐요</p>
-
-            {/* 스프레드(장수) 고르기 */}
-            <div className="tarot-spread-choices">
-              <button
-                className="tarot-spread-btn"
-                onClick={() => startPicking('one')}
-              >
-                <span className="tarot-spread-emoji">🃏</span>
-                <span className="tarot-spread-name">카드 1장</span>
-                <span className="tarot-spread-desc">
-                  한 장으로 핵심 메시지를 받아요
-                </span>
-              </button>
-              <button
-                className="tarot-spread-btn"
-                onClick={() => startPicking('three')}
-              >
-                <span className="tarot-spread-emoji">🕰️</span>
-                <span className="tarot-spread-name">카드 3장 · 과거·현재·미래</span>
-                <span className="tarot-spread-desc">
-                  세 장으로 흐름을 읽어요
-                </span>
-              </button>
-            </div>
+            <p className="tarot-topic-hint">
+              주제를 누르면 카드 섞기로 이동해요 · 장수는 위에서 바꿀 수 있어요
+            </p>
 
             {/* 타로 카드가 궁금하다면? (펼쳐보기) */}
             <div className="tarot-guide">
