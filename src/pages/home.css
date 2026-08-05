@@ -160,16 +160,16 @@
   margin-top: 0.55rem;
 }
 
-/* 즐겨찾기 저장 버튼 (뚜렷하게) */
+/* 즐겨찾기 저장 버튼 (작고 은은하게) */
 .quote-fav-btn {
   font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #d9594c;
-  background: #fdece9;
-  border: 1.5px solid #f2c4bd;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c26658;
+  background: rgba(253, 236, 233, 0.7);
+  border: 1px solid #f0cdc7;
   border-radius: 999px;
-  padding: 0.45rem 1.2rem;
+  padding: 0.32rem 0.85rem;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
 }
@@ -177,15 +177,15 @@
   background: #fbddd8;
 }
 .quote-fav-btn.is-fav:hover:not(:disabled) {
-  background: #d1544a;
+  background: rgba(230, 184, 176, 0.7);
 }
 .quote-fav-btn:active:not(:disabled) {
   transform: scale(0.97);
 }
 .quote-fav-btn.is-fav {
-  color: #fff;
-  background: #e0685a;
-  border-color: #e0685a;
+  color: #b85647;
+  background: rgba(240, 205, 199, 0.55);
+  border-color: #e6b8b0;
 }
 .quote-fav-btn:disabled {
   opacity: 0.6;
@@ -317,6 +317,7 @@
 .home-tarot {
   width: 100%;
   margin-top: 0.9rem;
+  margin-bottom: 1.3rem; /* 아래 '오늘의 명언' 카드와 간격 */
   display: flex;
   align-items: center;
   gap: 0.9rem;
