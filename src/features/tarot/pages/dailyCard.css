@@ -1,0 +1,276 @@
+/* ─────────────────────────────────────────────
+   '하루 한 장' 화면 스타일
+   기존 '이끼와 안개' 테마 토큰만 사용 (새 색상 추가하지 않음).
+   금박·별·달 같은 오컬트 장식 없이, 단색 + 얇은 선으로 차분하게.
+   ───────────────────────────────────────────── */
+
+.dc-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  padding-top: 1.2rem;
+}
+
+.dc-loading {
+  color: var(--ink-soft);
+  margin-top: 2rem;
+}
+
+.dc-lead {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.15rem;
+  color: var(--ink);
+  text-align: center;
+  margin: 0.4rem 0 0.2rem;
+  text-shadow: var(--text-halo);
+}
+
+/* ── 카드 (뒤집기) ── */
+.dc-card {
+  width: 200px;
+  height: 320px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  perspective: 1200px;
+}
+
+.dc-card:disabled {
+  cursor: default;
+}
+
+.dc-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.dc-card.is-flipped .dc-card-inner {
+  transform: rotateY(180deg);
+}
+
+.dc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+}
+
+/* 뒷면 — 단색 + 얇은 선 테두리, 은은한 격자 */
+.dc-back {
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+}
+
+.dc-back-pattern {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid var(--accent);
+  border-radius: calc(var(--radius) - 8px);
+  opacity: 0.5;
+  background-image: linear-gradient(
+      var(--accent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+  background-size: 18px 18px;
+  background-position: center;
+  /* 격자를 아주 옅게 */
+  mask-image: radial-gradient(circle at center, #000 55%, transparent 78%);
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    #000 55%,
+    transparent 78%
+  );
+  opacity: 0.18;
+}
+
+/* 앞면 — 페이퍼 톤, 이름/키워드 타이포 */
+.dc-front {
+  transform: rotateY(180deg);
+  background: var(--glass-strong);
+  border: 1.5px solid var(--accent);
+  padding: 1.4rem;
+}
+
+/* 역방향: 앞면 내용을 상하 반전 */
+.dc-front.is-reversed .dc-face-content {
+  transform: rotate(180deg);
+}
+
+.dc-face-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: center;
+}
+
+.dc-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  color: var(--ink-faint);
+}
+
+.dc-name {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.dc-name-en {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+}
+
+.dc-keywords {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--accent-strong);
+}
+
+.dc-reversed-tag {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+/* ── 뽑기 버튼 / 안내 ── */
+.dc-draw-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 2rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.dc-draw-btn:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.dc-drawing {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  text-shadow: var(--text-halo);
+}
+
+/* ── 질문 블록 ── */
+.dc-prompt {
+  width: 100%;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 1.3rem 1.3rem 1.2rem;
+  text-align: center;
+  animation: dc-fade 0.5s ease both;
+}
+
+@keyframes dc-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dc-prompt-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--accent-strong);
+  margin: 0 0 0.6rem;
+}
+
+.dc-prompt-text {
+  font-family: 'Gowun Batang', 'Gowun Dodum', serif;
+  font-size: 1.18rem;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0;
+}
+
+.dc-prompt-reversed {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0.7rem 0 0;
+}
+
+.dc-write-btn {
+  margin-top: 1.1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.6rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.dc-write-btn:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.dc-save-warning {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+  margin: 0;
+}
+
+.dc-note {
+  font-size: 0.84rem;
+  color: var(--ink-faint);
+  text-align: center;
+  line-height: 1.55;
+  margin: 0.2rem 0 0;
+  text-shadow: var(--text-halo);
+}
+
+/* ── 움직임 최소화 설정 존중 ── */
+@media (prefers-reduced-motion: reduce) {
+  .dc-card-inner {
+    transition: none;
+  }
+  .dc-prompt {
+    animation: none;
+  }
+}

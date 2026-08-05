@@ -11,6 +11,7 @@ import StatsPage from '../pages/StatsPage'
 import SettingsPage from '../pages/SettingsPage'
 import RecordsPage from '../pages/RecordsPage'
 import TarotPage from '../pages/TarotPage'
+import DailyCardPage from '../features/tarot/pages/DailyCardPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
 // 아래 탭바로 화면을 오가고, 전체 화면(작성 등)은 위에 덮어서 띄웁니다.
@@ -19,13 +20,21 @@ type Props = {
 }
 
 // 탭바 위에 전체 화면으로 덮이는 화면들
-type Overlay = null | 'write' | 'transactions' | 'favorites' | 'tarot'
+type Overlay =
+  | null
+  | 'write'
+  | 'transactions'
+  | 'favorites'
+  | 'tarot'
+  | 'daily-card'
 
 export default function AppShell({ session }: Props) {
   const [tab, setTab] = useState<Tab>('home')
   const [overlay, setOverlay] = useState<Overlay>(null)
   // 일기 작성/수정 대상 날짜 (null = 오늘 새로 쓰기)
   const [editDate, setEditDate] = useState<string | null>(null)
+  // '하루 한 장'에서 넘어온 질문 (일기 작성 화면 상단에 인용구로 보여줌)
+  const [writePrompt, setWritePrompt] = useState<string | null>(null)
 
   useEffect(() => {
     // 1) 로컬 캐시가 있으면 먼저 즉시 적용 (서버 응답을 기다리지 않고 배경 유지)
@@ -40,12 +49,21 @@ export default function AppShell({ session }: Props) {
   // 새 일기 쓰기 (오늘)
   function openWrite() {
     setEditDate(null)
+    setWritePrompt(null)
+    setOverlay('write')
+  }
+
+  // '하루 한 장'의 질문을 들고 오늘 일기 쓰기
+  function openWriteWithPrompt(prompt: string) {
+    setEditDate(null)
+    setWritePrompt(prompt)
     setOverlay('write')
   }
 
   // 기록에서 특정 날짜 일기 수정
   function openEdit(date: string) {
     setEditDate(date)
+    setWritePrompt(null)
     setOverlay('write')
   }
 
@@ -55,15 +73,18 @@ export default function AppShell({ session }: Props) {
       <WritePage
         session={session}
         targetDate={editDate ?? undefined}
+        promptQuote={writePrompt ?? undefined}
         onDone={() => {
           setOverlay(null)
           // 오늘 새로 쓴 경우 홈으로(목록 새로고침), 과거 수정은 있던 탭 유지
           if (editDate === null) setTab('home')
           setEditDate(null)
+          setWritePrompt(null)
         }}
         onCancel={() => {
           setOverlay(null)
           setEditDate(null)
+          setWritePrompt(null)
         }}
       />
     )
@@ -79,9 +100,20 @@ export default function AppShell({ session }: Props) {
     return <FavoritesPage onBack={() => setOverlay(null)} />
   }
 
-  // 오늘의 타로 화면
+  // 오늘의 타로 화면 (운세형)
   if (overlay === 'tarot') {
     return <TarotPage session={session} onBack={() => setOverlay(null)} />
+  }
+
+  // 오늘의 한 장 (하루 한 장 · 일기 트리거)
+  if (overlay === 'daily-card') {
+    return (
+      <DailyCardPage
+        session={session}
+        onBack={() => setOverlay(null)}
+        onWrite={openWriteWithPrompt}
+      />
+    )
   }
 
   return (
@@ -94,6 +126,7 @@ export default function AppShell({ session }: Props) {
           onTransactions={() => setOverlay('transactions')}
           onFavorites={() => setOverlay('favorites')}
           onTarot={() => setOverlay('tarot')}
+          onDailyCard={() => setOverlay('daily-card')}
         />
       )}
       {tab === 'records' && <RecordsPage onEditDiary={openEdit} />}
