@@ -38,14 +38,6 @@ type Props = {
   onBack: () => void
 }
 
-// '과거·현재·미래' 3장 리딩용 주제 (그리드 칩에는 없고, 전체 흐름을 봅니다)
-const flowTopic: TarotTopic = {
-  key: 'flow',
-  label: '과거 · 현재 · 미래',
-  emoji: '🕰️',
-  hint: '지난 흐름과 앞으로 다가올 흐름',
-}
-
 // 카드 뒷면 그림 (달 + 별). 저작권 문제 없이 CSS로 직접 그립니다.
 function CardBackArt() {
   return (
@@ -237,7 +229,7 @@ export default function TarotPage({ session, onBack }: Props) {
               </p>
             </div>
 
-            {/* 주제 고르기 — 누르면 바로 카드 1장 리딩 시작 */}
+            {/* 주제 고르기 — 누르면 다음 화면에서 장수(1장/3장)를 정해요 */}
             <div className="tarot-topics">
               {tarotTopics.map((t) => (
                 <button
@@ -253,24 +245,9 @@ export default function TarotPage({ session, onBack }: Props) {
                 </button>
               ))}
             </div>
-            <p className="tarot-topic-hint">누르면 카드 1장으로 봐요</p>
-
-            {/* 맨 아래: 과거·현재·미래 3장 리딩 — 누르면 바로 시작 */}
-            <button
-              className="tarot-flow-btn"
-              onClick={() => {
-                setTopic(flowTopic)
-                startPicking('three')
-              }}
-            >
-              <span className="tarot-flow-emoji">🕰️</span>
-              <span className="tarot-flow-text">
-                <span className="tarot-flow-title">과거 · 현재 · 미래</span>
-                <span className="tarot-flow-desc">
-                  카드 3장으로 흐름을 자세히 봐요
-                </span>
-              </span>
-            </button>
+            <p className="tarot-topic-hint">
+              먼저 궁금한 주제를 골라주세요
+            </p>
 
             {/* 타로 카드가 궁금하다면? (펼쳐보기) */}
             <div className="tarot-guide">
@@ -336,6 +313,42 @@ export default function TarotPage({ session, onBack }: Props) {
               </>
             ) : (
               <>
+                {/* '이 주제'를 몇 장으로 볼지 정합니다 */}
+                <p className="tarot-shuffle-ask">
+                  <b>{topic.label}</b>, 몇 장으로 볼까요?
+                </p>
+                <div
+                  className="tarot-count-seg"
+                  role="group"
+                  aria-label="카드 장수 선택"
+                >
+                  <button
+                    className={`tarot-count-btn ${
+                      spread === 'one' ? 'is-on' : ''
+                    }`}
+                    onClick={() => setSpread('one')}
+                    aria-pressed={spread === 'one'}
+                  >
+                    🃏 1장
+                    <small>핵심 메시지</small>
+                  </button>
+                  <button
+                    className={`tarot-count-btn ${
+                      spread === 'three' ? 'is-on' : ''
+                    }`}
+                    onClick={() => setSpread('three')}
+                    aria-pressed={spread === 'three'}
+                  >
+                    🕰️ 3장
+                    <small>과거·현재·미래</small>
+                  </button>
+                </div>
+                <p className="tarot-shuffle-note">
+                  {spread === 'three'
+                    ? `‘${topic.label}’의 지난 흐름 → 지금 → 앞으로를 3장으로 봐요`
+                    : `‘${topic.label}’의 핵심 메시지를 1장으로 봐요`}
+                </p>
+
                 <div className="tarot-deck-stack">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <span key={i} className="tarot-deck-card">
@@ -343,9 +356,6 @@ export default function TarotPage({ session, onBack }: Props) {
                     </span>
                   ))}
                 </div>
-                <p className="tarot-shuffle-text">
-                  마음속으로 질문을 떠올리며 카드를 섞어 주세요.
-                </p>
                 <button className="tarot-shuffle-btn" onClick={shuffleNow}>
                   🔀 카드 섞기
                 </button>
