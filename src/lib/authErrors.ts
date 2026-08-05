@@ -19,6 +19,23 @@ export function translateAuthError(message: string): string {
   if (m.includes('unable to validate email') || m.includes('invalid email')) {
     return '이메일 형식이 올바르지 않아요.'
   }
+  // "For security purposes, you can only request this after 55 seconds."
+  // 보안상 일정 시간(초)마다 한 번만 요청할 수 있어 나오는 안내입니다.
+  if (
+    m.includes('for security purposes') ||
+    m.includes('you can only request this after')
+  ) {
+    const sec = message.match(/after (\d+)\s*seconds?/i)?.[1]
+    return sec
+      ? `보안을 위해 ${sec}초 뒤에 다시 시도할 수 있어요. 잠시만 기다렸다가 눌러주세요 🌿`
+      : '보안을 위해 잠시 후 다시 시도할 수 있어요. 잠시만 기다렸다가 눌러주세요 🌿'
+  }
+  if (
+    m.includes('email rate limit exceeded') ||
+    m.includes('over_email_send_rate_limit')
+  ) {
+    return '메일 발송 한도를 잠시 넘었어요. 1~2분 뒤에 다시 시도해주세요 🌿'
+  }
   if (m.includes('rate limit') || m.includes('too many')) {
     return '요청이 너무 많아요. 잠시 후 다시 시도해주세요.'
   }
