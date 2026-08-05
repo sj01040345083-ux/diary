@@ -20,8 +20,7 @@ type Props = {
   onEditDiary: (date: string) => void // 일기 카드 "수정" → 작성(수정) 화면으로
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
-  onTarot: () => void // "오늘의 타로"(운세형) 바로가기
-  onDailyCard: () => void // "오늘의 한 장"(하루 한 장·일기 트리거) 바로가기
+  onTarot: () => void // "오늘의 타로" 바로가기
 }
 
 export default function HomePage({
@@ -31,7 +30,6 @@ export default function HomePage({
   onTransactions,
   onFavorites,
   onTarot,
-  onDailyCard,
 }: Props) {
   // 설정에서 정한 닉네임을 불러옵니다. (이름 표시에 사용)
   const [nickname, setNickname] = useState<string | null>(null)
@@ -139,38 +137,19 @@ export default function HomePage({
           </button>
         </div>
 
-        {/* 타로 바로가기 (운세형 · 하루 한 장) */}
-        <div className="home-tarot-group">
-          <button className="home-tarot" onClick={onTarot}>
-            <span className="home-tarot-icon" aria-hidden>
-              🔮
-            </span>
-            <span className="home-tarot-text">
-              <span className="home-tarot-title">오늘의 타로</span>
-              <span className="home-tarot-desc">
-                카드 한 장으로 마음을 들여다봐요
-              </span>
-            </span>
-            <span className="home-tarot-arrow" aria-hidden>
-              →
-            </span>
-          </button>
-
-          <button className="home-tarot" onClick={onDailyCard}>
-            <span className="home-tarot-icon" aria-hidden>
-              🍃
-            </span>
-            <span className="home-tarot-text">
-              <span className="home-tarot-title">오늘의 한 장</span>
-              <span className="home-tarot-desc">
-                하루 한 번, 카드가 건네는 물음
-              </span>
-            </span>
-            <span className="home-tarot-arrow" aria-hidden>
-              →
-            </span>
-          </button>
-        </div>
+        {/* 오늘의 타로 바로가기 */}
+        <button className="home-tarot" onClick={onTarot}>
+          <span className="home-tarot-icon" aria-hidden>
+            🔮
+          </span>
+          <span className="home-tarot-text">
+            <span className="home-tarot-title">오늘의 타로</span>
+            <span className="home-tarot-desc">카드 한 장으로 마음을 들여다봐요</span>
+          </span>
+          <span className="home-tarot-arrow" aria-hidden>
+            →
+          </span>
+        </button>
 
         {/* 오늘의 명언 */}
         <section className="quote-card">
