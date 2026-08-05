@@ -185,6 +185,95 @@
   color: rgba(240, 236, 255, 0.65);
 }
 
+/* ── 카드 섞기 연출 ── */
+.tarot-shuffle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.8rem;
+  padding-top: 4.5rem;
+}
+
+.tarot-shuffle-deck {
+  position: relative;
+  width: 96px;
+  height: 150px;
+}
+
+.tarot-shuffle-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(155deg, var(--tarot-night-2), var(--tarot-deep));
+  border: 2px solid var(--tarot-gold);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
+  transform-origin: center bottom;
+}
+
+/* 다섯 장이 좌우로 갈라졌다 다시 모이며 섞이는 느낌 */
+.tarot-shuffle-card:nth-child(1) {
+  animation: tarot-riffle 1.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+.tarot-shuffle-card:nth-child(2) {
+  animation: tarot-riffle 1.5s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+.tarot-shuffle-card:nth-child(3) {
+  animation: tarot-riffle-mid 1.5s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+.tarot-shuffle-card:nth-child(4) {
+  animation: tarot-riffle-r 1.5s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+.tarot-shuffle-card:nth-child(5) {
+  animation: tarot-riffle-r 1.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+@keyframes tarot-riffle {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-34px, -14px) rotate(-16deg);
+  }
+}
+@keyframes tarot-riffle-r {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(34px, -14px) rotate(16deg);
+  }
+}
+@keyframes tarot-riffle-mid {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+.tarot-shuffle-text {
+  font-size: 1rem;
+  color: var(--tarot-gold-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot-shuffle-card {
+    animation-duration: 0.001s;
+  }
+  .tarot-pool-card {
+    animation: none;
+  }
+}
+
 /* ── 2) 카드 고르기 ── */
 .tarot-picking {
   width: 100%;
@@ -216,22 +305,22 @@
   margin: 0.1rem 0 0.6rem;
 }
 
-/* 뒷면 카드들을 부채꼴처럼 살짝 펼쳐 보여줍니다. */
+/* 뒷면 카드들을 부채꼴처럼 펼쳐 보여줍니다. */
 .tarot-pool {
   position: relative;
   width: 100%;
-  height: 210px;
+  height: 230px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
 }
 
 .tarot-pool-card {
   position: absolute;
   top: 0;
-  width: 78px;
-  height: 122px;
+  width: 74px;
+  height: 116px;
   margin: 0;
   padding: 0;
   border-radius: 12px;
@@ -242,15 +331,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 가운데(0)를 기준으로 좌우로 부채꼴 회전·이동 (--n: 카드 위치) */
-  transform: translateX(calc(var(--n) * 34px)) rotate(calc(var(--n) * 7deg));
+  /* 가운데(0)를 기준으로 좌우로 부채꼴 회전·이동 (--n: 카드 위치)
+     간격을 넓혀 카드가 서로 덜 겹치게 합니다. */
+  transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg));
   transform-origin: bottom center;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+  /* 들어올 때 살짝 펼쳐지는 느낌 */
+  animation: tarot-fan-in 0.45s ease both;
+  animation-delay: calc((var(--n) + 3) * 0.05s);
+}
+
+@keyframes tarot-fan-in {
+  from {
+    opacity: 0;
+    transform: translateX(0) rotate(0deg) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg));
+  }
 }
 
 .tarot-pool-card:hover:not(:disabled) {
-  transform: translateX(calc(var(--n) * 34px)) rotate(calc(var(--n) * 7deg))
-    translateY(-14px);
+  transform: translateX(calc(var(--n) * 46px)) rotate(calc(var(--n) * 8deg))
+    translateY(-16px);
   box-shadow: 0 16px 30px rgba(217, 180, 91, 0.35);
   z-index: 5;
 }
