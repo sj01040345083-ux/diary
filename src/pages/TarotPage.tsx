@@ -8,6 +8,7 @@ import {
   cardCategoryLabel,
   formatReadingForDiary,
   drawSeeded,
+  drawCards,
   readingSeed,
   currentTimeSlot,
   threePositions,
@@ -27,9 +28,10 @@ import './tarot.css'
 
 // 화면이 거치는 단계
 //  - intro : 주제 + 스프레드(1장/3장)를 고르는 첫 화면
+//  - shuffling : 카드를 섞는 연출 (그다음 고르기로)
 //  - picking : 뒷면 카드들 중에서 직접 카드를 고르는 화면
 //  - result : 고른 카드가 뒤집히고 해석을 보여주는 화면
-type Stage = 'intro' | 'picking' | 'result'
+type Stage = 'intro' | 'shuffling' | 'picking' | 'result'
 
 type Props = {
   session: Session
@@ -95,7 +97,7 @@ export default function TarotPage({ session, onBack }: Props) {
 
   const need = neededCount(spread)
 
-  // 스프레드를 고르면: 뒷면 카드 묶음을 만들고 '고르기' 단계로
+  // 스프레드를 고르면: 카드를 섞는 연출을 보여준 뒤 '고르기' 단계로
   function startPicking(kind: SpreadKind) {
     setSpread(kind)
     setPool(buildPool())
@@ -104,7 +106,9 @@ export default function TarotPage({ session, onBack }: Props) {
     setRevealed(false)
     setSaved(false)
     setSaveError('')
-    setStage('picking')
+    setStage('shuffling')
+    // 섞는 연출을 잠깐 보여준 뒤 고르기 화면으로
+    setTimeout(() => setStage('picking'), 1500)
   }
 
   // 뒷면 카드 하나를 고름
@@ -114,18 +118,23 @@ export default function TarotPage({ session, onBack }: Props) {
     setPicked(nextPicked)
     // 필요한 만큼 다 골랐으면 → 결과로 넘어가 카드를 뒤집어 보여줌
     if (nextPicked.length === neededCount(spread)) {
-      // 결과 카드는 '사람+오늘 날짜+시간대+주제'로 정해집니다.
-      // → 같은 시간대(아침·점심·저녁)에는 다시 뽑아도 항상 같은 카드가 나와요.
-      const nowSlot = currentTimeSlot()
-      setSlot(nowSlot)
-      const seed = readingSeed({
-        userId: session.user.id,
-        dateStr: todayString(),
-        slotKey: nowSlot.key,
-        topicKey: topic.key,
-        spread,
-      })
-      const chosen = drawSeeded(seed, neededCount(spread))
+      let chosen: DrawnCard[]
+      if (topic.key === 'today') {
+        // '오늘의 운세'만: 같은 시간대(아침·점심·저녁·밤)에는 항상 같은 카드.
+        const nowSlot = currentTimeSlot()
+        setSlot(nowSlot)
+        const seed = readingSeed({
+          userId: session.user.id,
+          dateStr: todayString(),
+          slotKey: nowSlot.key,
+          topicKey: topic.key,
+          spread,
+        })
+        chosen = drawSeeded(seed, neededCount(spread))
+      } else {
+        // 연애·일·마음 등은 물어볼 때마다 상황이 다르므로 매번 새로 뽑습니다.
+        chosen = drawCards(neededCount(spread))
+      }
       setCards(chosen)
       setStage('result')
       // 살짝 뒤에 뒤집어서 '펼쳐지는' 느낌을 줍니다.
@@ -286,7 +295,21 @@ export default function TarotPage({ session, onBack }: Props) {
           </div>
         )}
 
-        {/* ── 2) 직접 카드 고르기 ── */}
+        {/* ── 2) 카드 섞기 연출 ── */}
+        {stage === 'shuffling' && (
+          <div className="tarot-shuffle">
+            <div className="tarot-shuffle-deck">
+              <span className="tarot-shuffle-card" />
+              <span className="tarot-shuffle-card" />
+              <span className="tarot-shuffle-card" />
+              <span className="tarot-shuffle-card" />
+              <span className="tarot-shuffle-card" />
+            </div>
+            <p className="tarot-shuffle-text">카드를 섞고 있어요…</p>
+          </div>
+        )}
+
+        {/* ── 3) 직접 카드 고르기 ── */}
         {stage === 'picking' && (
           <div className="tarot-picking">
             <p className="tarot-pick-topic">
@@ -326,7 +349,8 @@ export default function TarotPage({ session, onBack }: Props) {
         {stage === 'result' && (
           <div className="tarot-result">
             <p className="tarot-result-topic">
-              {topic.emoji} {topic.label} · {slot.emoji} {slot.label}
+              {topic.emoji} {topic.label}
+              {topic.key === 'today' && ` · ${slot.emoji} ${slot.label}`}
             </p>
             <p className="tarot-result-hint">
               {revealed
@@ -408,10 +432,16 @@ export default function TarotPage({ session, onBack }: Props) {
               </div>
             )}
 
-            {revealed && (
+            {revealed && topic.key === 'today' && (
               <p className="tarot-slot-note">
-                💡 같은 날 같은 시간대(아침·점심·저녁·밤)에는 같은 카드가
+                💡 오늘의 운세는 같은 시간대(아침·점심·저녁·밤)에는 같은 카드가
                 나와요. 시간대가 바뀌면 새로운 카드를 만날 수 있어요.
+              </p>
+            )}
+            {revealed && topic.key !== 'today' && (
+              <p className="tarot-slot-note">
+                💡 이 주제는 물어볼 때마다 새로운 카드가 나와요. 마음이 바뀌면
+                다시 뽑아 보세요.
               </p>
             )}
 
