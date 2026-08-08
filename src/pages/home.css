@@ -97,9 +97,9 @@
 .home-greeting {
   display: block;
   font-family: 'Gowun Batang', 'Gowun Dodum', serif;
-  font-size: 1.12rem;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.4;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 0;
@@ -118,13 +118,13 @@
   text-align: center; /* 명언이 줄바꿈돼도 가운데 정렬 */
 }
 
-/* "오늘의 명언" 라벨 — 작고 은은한 세이지 그린 */
+/* "오늘의 명언" 라벨 — 은은한 세이지 그린 (조금 크게) */
 .quote-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
   color: #4f6b4a;
   font-weight: 800;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.5rem;
 }
 
 /* 명언 본문 — 우아한 명조체 (아담하게) */
