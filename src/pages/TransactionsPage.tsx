@@ -307,15 +307,17 @@ export default function TransactionsPage({ session, onBack }: Props) {
             onChange={(e) => setTxDate(e.target.value)}
           />
 
+          <label className="tx-date-label">금액</label>
           <input
             className="tx-input"
             type="text"
             inputMode="numeric"
-            placeholder="금액 (숫자)"
+            placeholder="예: 12000 (숫자만)"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
 
+          <label className="tx-date-label">카테고리</label>
           <div className="tx-cat-row">
             {/* 기본 카테고리 */}
             {defaults.map((c) => (
@@ -365,10 +367,11 @@ export default function TransactionsPage({ session, onBack }: Props) {
             </button>
           </div>
 
+          <label className="tx-date-label">메모 (선택)</label>
           <input
             className="tx-input"
             type="text"
-            placeholder="메모 (선택)"
+            placeholder="예: 점심 식사 (안 써도 돼요)"
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
           />
