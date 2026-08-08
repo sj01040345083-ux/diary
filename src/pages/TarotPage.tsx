@@ -11,7 +11,6 @@ import {
   drawCards,
   readingSeed,
   currentTimeSlot,
-  threePositions,
   tarotTopics,
 } from '../lib/tarot'
 import type {
@@ -86,7 +85,8 @@ function ResultCard({
 export default function TarotPage({ session, onBack }: Props) {
   const [stage, setStage] = useState<Stage>('intro')
   const [topic, setTopic] = useState<TarotTopic>(tarotTopics[0])
-  const [spread, setSpread] = useState<SpreadKind>('one')
+  // 항상 3장을 뽑습니다. (1장/3장 선택 없음, 과거·현재·미래 자리 구분 없음)
+  const [spread] = useState<SpreadKind>('three')
   const [showGuide, setShowGuide] = useState(false) // '타로 카드가 궁금하다면?' 펼침 여부
 
   // 골라 뽑기: 뒷면 카드 묶음 + 사용자가 고른 순서(인덱스)
@@ -106,9 +106,8 @@ export default function TarotPage({ session, onBack }: Props) {
 
   const need = neededCount(spread)
 
-  // 스프레드를 고르면: 카드 섞기 화면으로 (사용자가 '카드 섞기'를 누름)
-  function startPicking(kind: SpreadKind) {
-    setSpread(kind)
+  // 주제를 고르면: 카드 섞기 화면으로 (사용자가 '카드 섞기'를 누름)
+  function startPicking() {
     setPool(buildPool())
     setPicked([])
     setCards([])
@@ -192,7 +191,7 @@ export default function TarotPage({ session, onBack }: Props) {
     setSaveError('')
     try {
       const date = todayString()
-      const text = formatReadingForDiary(topic, spread, cards, slot.label)
+      const text = formatReadingForDiary(topic, cards, slot.label)
       const existing = await getDiaryByDate(date)
       const content = existing?.content
         ? `${existing.content}\n\n${text}`
@@ -236,7 +235,7 @@ export default function TarotPage({ session, onBack }: Props) {
                   className="tarot-topic"
                   onClick={() => {
                     setTopic(t)
-                    startPicking('one')
+                    startPicking()
                   }}
                 >
                   <span className="tarot-topic-emoji">{t.emoji}</span>
@@ -287,6 +286,16 @@ export default function TarotPage({ session, onBack }: Props) {
                     <br />
                     <b>‘소드 시종’</b> = 🗡️소드 무늬의 시종(인물) 카드
                   </p>
+
+                  {/* 주의할 점 (가볍게 참고) */}
+                  <div className="tarot-guide-caution">
+                    <p className="tarot-guide-caution-title">🌙 볼 때 주의할 점</p>
+                    <ul>
+                      <li>하루 한 번 정도, 같은 질문을 반복하지 않기</li>
+                      <li>원하는 답이 나올 때까지 다시 뽑으면 의미가 흐려져요</li>
+                      <li>건강·법률·투자처럼 중요한 결정은 전문가와 함께</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
@@ -312,40 +321,11 @@ export default function TarotPage({ session, onBack }: Props) {
               </>
             ) : (
               <>
-                {/* '이 주제'를 몇 장으로 볼지 정합니다 */}
                 <p className="tarot-shuffle-ask">
-                  <b>{topic.label}</b>, 몇 장으로 볼까요?
+                  <b>{topic.label}</b>, 카드를 섞어 <b>3장</b>을 뽑아요
                 </p>
-                <div
-                  className="tarot-count-seg"
-                  role="group"
-                  aria-label="카드 장수 선택"
-                >
-                  <button
-                    className={`tarot-count-btn ${
-                      spread === 'one' ? 'is-on' : ''
-                    }`}
-                    onClick={() => setSpread('one')}
-                    aria-pressed={spread === 'one'}
-                  >
-                    🃏 1장
-                    <small>핵심 메시지</small>
-                  </button>
-                  <button
-                    className={`tarot-count-btn ${
-                      spread === 'three' ? 'is-on' : ''
-                    }`}
-                    onClick={() => setSpread('three')}
-                    aria-pressed={spread === 'three'}
-                  >
-                    🕰️ 3장
-                    <small>과거·현재·미래</small>
-                  </button>
-                </div>
                 <p className="tarot-shuffle-note">
-                  {spread === 'three'
-                    ? `‘${topic.label}’의 지난 흐름 → 지금 → 앞으로를 3장으로 봐요`
-                    : `‘${topic.label}’의 핵심 메시지를 1장으로 봐요`}
+                  마음을 편히 하고 ‘카드 섞기’를 눌러주세요
                 </p>
 
                 <div className="tarot-deck-stack">
@@ -411,16 +391,11 @@ export default function TarotPage({ session, onBack }: Props) {
                 : '카드를 펼치는 중…'}
             </p>
 
-            <div
-              className={`tarot-cards ${
-                spread === 'three' ? 'is-three' : 'is-one'
-              }`}
-            >
+            <div className="tarot-cards is-three">
               {cards.map((drawn, i) => (
                 <ResultCard
                   key={drawn.card.id}
                   drawn={drawn}
-                  position={spread === 'three' ? threePositions[i] : undefined}
                   index={i}
                   flipped={revealed}
                 />
@@ -433,11 +408,6 @@ export default function TarotPage({ session, onBack }: Props) {
                 {cards.map((drawn, i) => (
                   <article key={drawn.card.id} className="tarot-reading-card">
                     <div className="tarot-reading-head">
-                      {spread === 'three' && (
-                        <span className="tarot-reading-pos">
-                          {threePositions[i]}
-                        </span>
-                      )}
                       <span className="tarot-reading-emoji">
                         {drawn.card.emoji}
                       </span>
@@ -458,8 +428,6 @@ export default function TarotPage({ session, onBack }: Props) {
                     </p>
                     <div className="tarot-reading-sections">
                       {buildReading(drawn, topic, {
-                        position:
-                          spread === 'three' ? threePositions[i] : undefined,
                         withLead: i === 0,
                       }).map((s) => (
                         <div key={s.label} className="tarot-reading-section">

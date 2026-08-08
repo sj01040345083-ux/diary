@@ -19,7 +19,7 @@ export type SpreadKind = 'one' | 'three'
 export const threePositions = ['과거', '현재', '미래'] as const
 
 // 골라 뽑기 화면(그리드)에서 펼쳐 보여주는 뒷면 카드 장수 (이 중에서 골라요)
-export const POOL_SIZE = 21
+export const POOL_SIZE = 12
 
 // 무엇을 물어보는 타로인지 — 주제
 export type TarotTopic = {
@@ -66,23 +66,6 @@ export function topicReflection(topicKey: string, drawn: DrawnCard): string {
 // ─────────────────────────────────────────────
 
 export type ReadingSection = { label: string; text: string }
-
-// 카드 종류별 '무대' 설명
-function cardTheme(card: TarotCard): string {
-  if (card.arcana === 'major') return '인생의 큰 흐름을 비추는 메이저 아르카나'
-  switch (card.suit) {
-    case 'wands':
-      return '열정과 행동을 다루는 완드'
-    case 'cups':
-      return '감정과 관계를 비추는 컵'
-    case 'swords':
-      return '생각과 판단을 다루는 소드'
-    case 'pentacles':
-      return '현실과 물질을 다루는 펜타클'
-    default:
-      return '타로'
-  }
-}
 
 // 주제별 이야기 (lead 인사 + 정/역 본문). k = 대표 키워드
 const topicStory: Record<
@@ -166,48 +149,32 @@ function catKey(card: TarotCard): string {
   return card.arcana === 'major' ? 'major' : (card.suit ?? 'major')
 }
 
-// 카드 한 장을 여러 문단(섹션)으로 풀어 줍니다.
+// 카드 한 장을 딱 2섹션(이야기 · 조언)으로 간단히 풀어 줍니다.
 export function buildReading(
   drawn: DrawnCard,
   topic: TarotTopic,
-  opts?: { position?: string; withLead?: boolean },
+  opts?: { withLead?: boolean },
 ): ReadingSection[] {
   const { card, reversed } = drawn
   const dir = reversed ? 'rev' : 'up'
   const k = card.keywords[0]
-  const theme = cardTheme(card)
   const withLead = opts?.withLead ?? true
 
-  // 1) 이 카드는 (무대 + 키워드 + 방향)
-  const dirFrame = reversed
-    ? '지금은 이 기운이 살짝 뒤집혀 있어, 밖보다 안을 먼저 살피라는 신호예요.'
-    : '지금 이 기운이 바로 서서 당신을 향하고 있어요.'
-  const intro = `‘${card.name}’ 카드는 ${theme}예요. 키워드는 ${card.keywords.join(
-    ' · ',
-  )}. ${dirFrame}`
-
-  // 2) 지금의 메시지 (카드 고유 해석)
+  // 카드 고유 메시지 + 주제 이야기 → 하나의 '이야기'로 묶습니다.
   const message = reversed ? card.reversed : card.upright
-
-  // 3) 주제 이야기
   const story = topicStory[topic.key] ?? topicStory.today
   const topicText = `${withLead ? story.lead + ' ' : ''}${
     reversed ? story.rev(k) : story.up(k)
   }`
 
-  // 4) 조언
+  // 조언 + 부드러운 마무리 → 하나의 '조언'으로 묶습니다.
   const advice = (adviceStory[catKey(card)] ?? adviceStory.major)[dir]
-
-  // 5) 마무리 (카드 id 길이로 문구를 번갈아 고름)
   const variants = closingStory[dir]
   const closing = variants[card.id.length % variants.length]
 
   return [
-    { label: '🔮 이 카드는', text: intro },
-    { label: '📖 지금의 메시지', text: message },
-    { label: `${topic.emoji} ${topic.label} 이야기`, text: topicText },
-    { label: '🧭 조언', text: advice },
-    { label: '🌙 마무리', text: closing },
+    { label: '📖 카드 이야기', text: `${message} ${topicText}` },
+    { label: '🧭 조언', text: `${advice} ${closing}` },
   ]
 }
 
@@ -336,7 +303,6 @@ export function cardCategoryLabel(card: TarotCard): string {
 // 일기에 저장할 때 넣을 '타로 결과 글'을 예쁘게 만듭니다.
 export function formatReadingForDiary(
   topic: TarotTopic,
-  kind: SpreadKind,
   cards: DrawnCard[],
   slotLabel?: string,
 ): string {
@@ -345,13 +311,9 @@ export function formatReadingForDiary(
     : `🔮 오늘의 타로 — ${topic.label}`
   const lines: string[] = [head]
   cards.forEach((drawn, i) => {
-    const pos = kind === 'three' ? `${threePositions[i]} · ` : ''
     lines.push('')
-    lines.push(`· ${pos}${drawn.card.name} (${directionLabel(drawn)})`)
-    const sections = buildReading(drawn, topic, {
-      position: kind === 'three' ? threePositions[i] : undefined,
-      withLead: i === 0,
-    })
+    lines.push(`· ${drawn.card.name} (${directionLabel(drawn)})`)
+    const sections = buildReading(drawn, topic, { withLead: i === 0 })
     sections.forEach((s) => lines.push(`  ${s.text}`))
   })
   return lines.join('\n')
