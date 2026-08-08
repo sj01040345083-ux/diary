@@ -178,6 +178,48 @@ export function buildReading(
   ]
 }
 
+// 여러 장(3장)을 '하나의 풀이'로 조합합니다. (이야기 + 조언 2섹션)
+// 각 카드의 메시지를 흐름으로 엮고, 전체 방향(정/역 다수)으로 종합합니다.
+export function buildCombinedReading(
+  cards: DrawnCard[],
+  topic: TarotTopic,
+): ReadingSection[] {
+  if (cards.length === 0) return []
+  if (cards.length === 1) return buildReading(cards[0], topic)
+
+  const story = topicStory[topic.key] ?? topicStory.today
+  const connectors = ['먼저', '이어', '끝으로']
+  const upCount = cards.filter((c) => !c.reversed).length
+  const mostlyUp = upCount >= Math.ceil(cards.length / 2)
+  const k = cards[0].card.keywords[0]
+
+  // 이야기: 주제 인사 + 세 장을 순서대로 엮기 + 종합 한 줄
+  const woven = cards
+    .map((c, i) => {
+      const msg = c.reversed ? c.card.reversed : c.card.upright
+      return `${connectors[i] ?? '그리고'} ‘${c.card.name}’ — ${msg}`
+    })
+    .join(' ')
+  const synth = mostlyUp ? story.up(k) : story.rev(k)
+  const storyText = `${story.lead} 이번엔 세 장이 함께 나왔어요. ${woven} 세 장을 모아 보면, ${synth}`
+
+  // 조언: 각 카드의 조언을 모아 중복은 빼고(최대 2개) + 부드러운 마무리
+  const advices = cards.map(
+    (c) =>
+      (adviceStory[catKey(c.card)] ?? adviceStory.major)[
+        c.reversed ? 'rev' : 'up'
+      ],
+  )
+  const uniq = [...new Set(advices)].slice(0, 2)
+  const closing = (mostlyUp ? closingStory.up : closingStory.rev)[0]
+  const adviceText = `${uniq.join(' ')} ${closing}`
+
+  return [
+    { label: '📖 카드 이야기', text: storyText },
+    { label: '🧭 조언', text: adviceText },
+  ]
+}
+
 // 일기 저장용으로 섹션들을 문단 텍스트로 합칩니다.
 export function readingSectionsToText(sections: ReadingSection[]): string {
   return sections.map((s) => s.text).join('\n')
@@ -309,12 +351,14 @@ export function formatReadingForDiary(
   const head = slotLabel
     ? `🔮 오늘의 타로 — ${topic.label} (${slotLabel})`
     : `🔮 오늘의 타로 — ${topic.label}`
-  const lines: string[] = [head]
-  cards.forEach((drawn, i) => {
+  const cardLine = cards
+    .map((d) => `${d.card.name}(${directionLabel(d)})`)
+    .join(', ')
+  const lines: string[] = [head, '', `뽑은 카드: ${cardLine}`]
+  buildCombinedReading(cards, topic).forEach((s) => {
     lines.push('')
-    lines.push(`· ${drawn.card.name} (${directionLabel(drawn)})`)
-    const sections = buildReading(drawn, topic, { withLead: i === 0 })
-    sections.forEach((s) => lines.push(`  ${s.text}`))
+    lines.push(s.label)
+    lines.push(s.text)
   })
   return lines.join('\n')
 }

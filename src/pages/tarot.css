@@ -729,6 +729,36 @@
 }
 
 /* 여러 문단(섹션)으로 길게 풀어주는 해석 */
+/* 뽑은 세 장 요약 칩 (조합 풀이 위에) */
+.tarot-combo-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px dashed rgba(217, 180, 91, 0.5);
+}
+.tarot-combo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--tarot-ink);
+  background: rgba(217, 180, 91, 0.16);
+  border: 1px solid rgba(217, 180, 91, 0.45);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+}
+.tarot-combo-chip small {
+  font-weight: 400;
+  color: #6a5f48;
+}
+.tarot-combo-emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .tarot-reading-sections {
   display: flex;
   flex-direction: column;

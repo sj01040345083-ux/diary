@@ -3,9 +3,8 @@ import type { Session } from '@supabase/supabase-js'
 import {
   buildPool,
   neededCount,
-  buildReading,
+  buildCombinedReading,
   directionLabel,
-  cardCategoryLabel,
   formatReadingForDiary,
   drawSeeded,
   drawCards,
@@ -387,7 +386,7 @@ export default function TarotPage({ session, onBack }: Props) {
             </p>
             <p className="tarot-result-hint">
               {revealed
-                ? '고른 카드가 전하는 이야기예요.'
+                ? '세 장을 모아 하나로 풀어낸 이야기예요.'
                 : '카드를 펼치는 중…'}
             </p>
 
@@ -402,44 +401,33 @@ export default function TarotPage({ session, onBack }: Props) {
               ))}
             </div>
 
-            {/* 해석 */}
+            {/* 해석 — 세 장을 하나로 조합한 풀이 */}
             {revealed && (
               <div className="tarot-readings">
-                {cards.map((drawn, i) => (
-                  <article key={drawn.card.id} className="tarot-reading-card">
-                    <div className="tarot-reading-head">
-                      <span className="tarot-reading-emoji">
-                        {drawn.card.emoji}
+                <article className="tarot-reading-card">
+                  {/* 뽑은 세 장 요약 칩 */}
+                  <div className="tarot-combo-cards">
+                    {cards.map((drawn) => (
+                      <span key={drawn.card.id} className="tarot-combo-chip">
+                        <span className="tarot-combo-emoji">
+                          {drawn.card.emoji}
+                        </span>
+                        {drawn.card.name}
+                        <small>({directionLabel(drawn)})</small>
                       </span>
-                      <div className="tarot-reading-titles">
-                        <span className="tarot-reading-name">
-                          {drawn.card.name}
-                          <span className="tarot-reading-dir">
-                            {` (${directionLabel(drawn)})`}
-                          </span>
+                    ))}
+                  </div>
+                  <div className="tarot-reading-sections">
+                    {buildCombinedReading(cards, topic).map((s) => (
+                      <div key={s.label} className="tarot-reading-section">
+                        <span className="tarot-reading-section-label">
+                          {s.label}
                         </span>
-                        <span className="tarot-reading-keywords">
-                          {drawn.card.keywords.join(' · ')}
-                        </span>
+                        <p className="tarot-reading-section-text">{s.text}</p>
                       </div>
-                    </div>
-                    <p className="tarot-reading-cat">
-                      {cardCategoryLabel(drawn.card)}
-                    </p>
-                    <div className="tarot-reading-sections">
-                      {buildReading(drawn, topic, {
-                        withLead: i === 0,
-                      }).map((s) => (
-                        <div key={s.label} className="tarot-reading-section">
-                          <span className="tarot-reading-section-label">
-                            {s.label}
-                          </span>
-                          <p className="tarot-reading-section-text">{s.text}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </article>
-                ))}
+                    ))}
+                  </div>
+                </article>
               </div>
             )}
 
