@@ -119,13 +119,13 @@ export default function HomePage({
       <Header />
 
       <main className="home-container">
-        {/* 날짜 + 인사말 */}
-        <p className="home-date">{today}</p>
-        <h1 className="home-greeting">
-          {name}님,
-          <br />
-          오늘의 한 줄을 남겨보세요 🍀
-        </h1>
+        {/* 날짜 + 인사말 — 어떤 배경에서도 또렷하게 보이도록 반투명 판 위에 */}
+        <div className="home-hello">
+          <p className="home-date">{today}</p>
+          <h1 className="home-greeting">
+            {name}님, 오늘의 한 줄을 남겨보세요 🍀
+          </h1>
+        </div>
 
         {/* 주요 버튼 — 한 줄에 반반 (화면 위쪽에서 바로 보이게) */}
         <div className="home-actions">
