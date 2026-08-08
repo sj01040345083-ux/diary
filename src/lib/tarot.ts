@@ -201,7 +201,7 @@ export function buildCombinedReading(
     })
     .join(' ')
   const synth = mostlyUp ? story.up(k) : story.rev(k)
-  const storyText = `${story.lead} 이번엔 세 장이 함께 나왔어요. ${woven} 세 장을 모아 보면, ${synth}`
+  const storyText = `${story.lead} ${woven} 세 장을 모아 보면, ${synth}`
 
   // 조언: 각 카드의 조언을 모아 중복은 빼고(최대 2개) + 부드러운 마무리
   const advices = cards.map(
