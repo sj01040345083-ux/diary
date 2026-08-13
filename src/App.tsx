@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import AppShell from './components/AppShell'
+import InstallHelper from './components/InstallHelper'
 
 // 로그인 안 된 사용자가 볼 화면: 로그인 / 회원가입
 type View = 'login' | 'signup'
@@ -82,15 +83,22 @@ export default function App() {
     return <ResetPasswordPage onDone={() => setRecovering(false)} />
   }
 
-  // 로그인된 사용자만 앱 내부(보호된 화면)에 접근할 수 있습니다.
-  if (session) {
-    return <AppShell session={session} />
-  }
-
-  // 로그인하지 않은 사용자 → 로그인 / 회원가입 화면
-  return view === 'login' ? (
+  // 로그인 여부에 따라 보여줄 화면을 고릅니다.
+  const content = session ? (
+    // 로그인된 사용자만 앱 내부(보호된 화면)에 접근할 수 있습니다.
+    <AppShell session={session} />
+  ) : view === 'login' ? (
+    // 로그인하지 않은 사용자 → 로그인 / 회원가입 화면
     <LoginPage onGoSignup={() => setView('signup')} />
   ) : (
     <SignupPage onGoLogin={() => setView('login')} />
+  )
+
+  // 어느 화면이든 아래에 '홈 화면 설치' 안내를 함께 띄웁니다.
+  return (
+    <>
+      {content}
+      <InstallHelper />
+    </>
   )
 }

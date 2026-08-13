@@ -1,6 +1,6 @@
 {
-  "name": "Soso Diary",
-  "short_name": "Soso Diary",
+  "name": "소소 다이어리",
+  "short_name": "소소 다이어리",
   "description": "오늘의 마음 한 줄, 소비 한 줄 — 소소한 하루를 기록하는 감성 다이어리",
   "start_url": "/",
   "scope": "/",

@@ -1,0 +1,82 @@
+/* 홈 화면 설치 안내 배너 — 화면 아래에서 부드럽게 떠오릅니다. */
+.install-help {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 16px 18px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  animation: install-rise 0.35s ease-out;
+}
+
+@keyframes install-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.install-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #9a9a90;
+  font-size: 0.95rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.install-title {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #2f2f2b;
+}
+
+.install-text {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #55554e;
+}
+
+.install-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #3fa535;
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(63, 165, 53, 0.28);
+}
+
+.install-btn:active {
+  transform: translateY(1px);
+}
+
+.install-hint {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #8a8a80;
+}
