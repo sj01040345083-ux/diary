@@ -190,35 +190,17 @@ export function buildCombinedReading(
   const story = topicStory[topic.key] ?? topicStory.today
   const upCount = cards.filter((c) => !c.reversed).length
   const mostlyUp = upCount >= Math.ceil(cards.length / 2)
-  const last = cards.length - 1
-  const k1 = cards[0].card.keywords[0]
-  const kLast = cards[last].card.keywords[0]
 
-  // 이야기: 카드마다 '카드가 ~' 로 이어 붙여 한 편의 흐름으로 만듭니다.
-  // (카드 이름 뒤에는 항상 '카드'를 붙여 조사 오류를 피합니다)
-  const parts = cards.map((c, i) => {
-    const msg = c.reversed ? c.card.reversed : c.card.upright
-    if (i === 0) {
-      return `이야기의 문은 ‘${c.card.name}’ 카드가 열어요. ${msg}`
-    }
-    const turned = cards[i - 1].reversed !== c.reversed // 앞 카드와 방향이 바뀌었나
-    if (i === last) {
-      const head = turned
-        ? `그리고 끝에서 ‘${c.card.name}’ 카드가 살짝 다른 결을 건네요.`
-        : `끝으로 ‘${c.card.name}’ 카드가 오늘의 마침표를 찍어요.`
-      return `${head} ${msg}`
-    }
-    const head = turned
-      ? `그런데 ‘${c.card.name}’ 카드가 흐름을 한 번 틀어요.`
-      : `이어서 ‘${c.card.name}’ 카드가 그 위에 이야기를 얹어요.`
-    return `${head} ${msg}`
-  })
+  // 이야기: 카드 이름·자리 설명 없이, 각 카드의 '메시지'만 자연스럽게 이어 붙입니다.
+  const messages = cards.map((c) =>
+    c.reversed ? c.card.reversed : c.card.upright,
+  )
+  // 따뜻하고 '나에게 꼭 맞는 말'처럼 느껴지는 마무리 (방향 종합)
+  const closing = mostlyUp
+    ? '신기하게도 오늘 당신에게 꼭 필요한 말들이 이렇게 모였어요. 마음이 가리키는 방향을 믿고 한 걸음 나아가도 좋은 날이에요.'
+    : '신기하게도 오늘 당신의 마음을 콕 짚는 말들이 이렇게 모였어요. 잠시 숨을 고르며 천천히 돌아보면, 흐릿하던 것들이 스르르 제자리를 찾을 거예요.'
 
-  const synth = mostlyUp
-    ? `이 세 장을 하나로 모으면, ‘${k1}’에서 피어난 기운이 ‘${kLast}’ 쪽으로 자연스럽게 흘러가요. ${story.up(k1)}`
-    : `이 세 장을 하나로 모으면, 지금은 ‘${k1}’의 마음을 가만히 다독일 때예요. ‘${kLast}’ 쪽으로 천천히 무게를 옮겨 보세요. ${story.rev(k1)}`
-
-  const storyText = `${story.lead} ${parts.join(' ')} ${synth}`
+  const storyText = `${story.lead} ${messages.join(' ')} ${closing}`
 
   // 조언: 각 카드의 조언을 모아(중복 제거) 한 흐름으로 + 부드러운 마무리
   const advices = cards.map(
@@ -228,8 +210,8 @@ export function buildCombinedReading(
       ],
   )
   const uniq = [...new Set(advices)].slice(0, 2)
-  const closing = (mostlyUp ? closingStory.up : closingStory.rev)[0]
-  const adviceText = `그래서 오늘 마음에 담아 두면 좋은 건 이거예요. ${uniq.join(' ')} ${closing}`
+  const adviceClosing = (mostlyUp ? closingStory.up : closingStory.rev)[0]
+  const adviceText = `그래서 오늘 마음에 담아 두면 좋은 건 이거예요. ${uniq.join(' ')} ${adviceClosing}`
 
   return [
     { label: '📖 카드 이야기', text: storyText },
