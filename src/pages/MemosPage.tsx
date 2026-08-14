@@ -40,11 +40,11 @@ export default function MemosPage({ session, onBack }: Props) {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    getMyMemos()
+    getMyMemos(session.user.id)
       .then(setMemos)
       .catch(() => setMemos([]))
       .finally(() => setLoading(false))
-  }, [])
+  }, [session.user.id])
 
   // 새 메모 쓰기
   function openNew() {
@@ -81,11 +81,11 @@ export default function MemosPage({ session, onBack }: Props) {
     }
     try {
       if (editingId) {
-        await updateMemo(editingId, payload)
+        await updateMemo(session.user.id, editingId, payload)
       } else {
         await addMemo(session.user.id, payload)
       }
-      const fresh = await getMyMemos()
+      const fresh = await getMyMemos(session.user.id)
       setMemos(fresh)
       setMode('list')
     } catch {
@@ -99,7 +99,7 @@ export default function MemosPage({ session, onBack }: Props) {
     if (!confirmTarget) return
     setDeleting(true)
     try {
-      await deleteMemo(confirmTarget.id)
+      await deleteMemo(session.user.id, confirmTarget.id)
       setMemos((prev) => prev.filter((m) => m.id !== confirmTarget.id))
       // 지금 편집 중인 메모를 지웠다면 목록으로
       if (editingId === confirmTarget.id) {
