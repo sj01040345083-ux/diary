@@ -108,7 +108,8 @@ function CompareDonut({
   )
 }
 
-// 지출 내역: 큰 금액순 최대 5개, 각 항목은 텍스트 + 작은 비율 막대
+// 지출 내역: 큰 금액순 상위 5개 + '그 외 N개' 묶음 + 합계.
+// 화면에 보이는 금액의 합이 항상 '지출 총액'과 딱 맞도록(증빙) 나머지를 함께 표시합니다.
 function ExpenseList({
   items,
   total,
@@ -116,10 +117,12 @@ function ExpenseList({
   items: Item[]
   total: number
 }) {
-  const top = items.slice(0, 5)
-  if (top.length === 0) {
+  if (items.length === 0) {
     return <p className="fixed-empty">이번 달 지출 기록이 아직 없어요.</p>
   }
+  const top = items.slice(0, 5)
+  const rest = items.slice(5)
+  const restAmount = rest.reduce((s, it) => s + it.amount, 0)
   return (
     <div className="fixed-list">
       {top.map((it) => (
@@ -136,6 +139,26 @@ function ExpenseList({
           <span className="fixed-amt expense">{won(it.amount)}원</span>
         </div>
       ))}
+
+      {/* 상위 5개에 안 든 나머지 카테고리들을 하나로 묶어 표시 (합이 총액과 맞도록) */}
+      {rest.length > 0 && (
+        <div className="fixed-row" key="__rest">
+          <span className="fixed-name">🗂️ 그 외 {rest.length}개</span>
+          <span className="fixed-bar-track">
+            <span
+              className="fixed-bar-fill expense"
+              style={{ width: `${total ? (restAmount / total) * 100 : 0}%` }}
+            />
+          </span>
+          <span className="fixed-amt expense">{won(restAmount)}원</span>
+        </div>
+      )}
+
+      {/* 합계 — 위 항목들의 합이 '지출' 총액과 같은지 바로 확인 */}
+      <div className="fixed-total-row">
+        <span className="fixed-total-label">합계</span>
+        <span className="fixed-total-amt">{won(total)}원</span>
+      </div>
     </div>
   )
 }
