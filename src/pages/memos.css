@@ -72,25 +72,27 @@
   gap: 0.75rem;
 }
 
-/* 제목 입력 (위, 크게) */
+/* 제목 입력 (위, 크게) — 옅은 푸른 박스로 배경사진 위에서도 또렷하게 */
 .memo-title-input {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.7rem 0.2rem;
-  border: none;
-  border-bottom: 2px solid var(--line-soft, #e6e4da);
-  background: transparent;
-  font-size: 1.25rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid #c5d9ef;
+  border-radius: 13px;
+  background: rgba(233, 241, 252, 0.96);
+  font-size: 1.2rem;
   font-weight: 800;
-  color: var(--ink);
+  color: #263445;
   font-family: inherit;
+  box-shadow: 0 2px 8px rgba(49, 68, 92, 0.08);
 }
 .memo-title-input:focus {
   outline: none;
-  border-bottom-color: var(--accent, #3fa535);
+  border-color: #7ea6d6;
+  background: rgba(240, 246, 253, 0.99);
 }
 .memo-title-input::placeholder {
-  color: var(--ink-faint, #b7b7ad);
+  color: #8aa0bb;
   font-weight: 700;
 }
 
@@ -103,20 +105,25 @@
 .memo-content-input {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.85rem 0.95rem;
-  border: 1px solid var(--line-soft, #e6e4da);
+  padding: 0.9rem 0.95rem;
+  border: 1px solid #c5d9ef;
   border-radius: 14px;
-  background: var(--glass, rgba(255, 255, 255, 0.9));
+  background: rgba(240, 245, 252, 0.96);
   font-size: 0.98rem;
   line-height: 1.65;
-  color: var(--ink);
+  color: #263445;
   font-family: inherit;
   resize: vertical;
   min-height: 12rem;
+  box-shadow: 0 2px 8px rgba(49, 68, 92, 0.06);
 }
 .memo-content-input:focus {
   outline: none;
-  border-color: var(--accent, #3fa535);
+  border-color: #7ea6d6;
+  background: rgba(245, 249, 253, 0.99);
+}
+.memo-content-input::placeholder {
+  color: #8aa0bb;
 }
 
 /* 삭제 링크 */
