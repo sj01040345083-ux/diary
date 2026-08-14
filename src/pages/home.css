@@ -355,6 +355,11 @@
   transform: translateY(-1px);
 }
 
+/* 타로 카드 바로 아래 메모 바로가기 — 위 간격만 살짝 줄여 붙여줍니다 */
+.home-tarot.home-memo {
+  margin-top: -0.6rem;
+}
+
 .home-tarot-icon {
   font-size: 1.7rem;
   flex-shrink: 0;
