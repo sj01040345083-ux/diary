@@ -1973,6 +1973,25 @@
 .fixed-amt.expense {
   color: #c0674f;
 }
+/* 합계 줄 — 위 항목들의 합이 지출 총액과 같은지 확인 (증빙) */
+.fixed-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--line-soft);
+}
+.fixed-total-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.fixed-total-amt {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #c0674f;
+}
 .fixed-empty {
   font-size: 0.85rem;
   color: var(--ink-faint);
