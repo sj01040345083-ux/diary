@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { formatToday, getRandomQuote, formatEntryDate } from '../lib/today'
+import { getRandomQuote, formatEntryDate } from '../lib/today'
 import { getMyDiaries, deleteDiary, todayString } from '../lib/diaries'
 import type { Diary } from '../lib/diaries'
 import {
@@ -8,7 +8,6 @@ import {
   addFavorite,
   removeFavoriteByQuoteId,
 } from '../lib/favorites'
-import { getSettings, resolveDisplayName } from '../lib/settings'
 import Header from '../components/Header'
 import DiaryPhotos from '../components/DiaryPhotos'
 import './home.css'
@@ -33,16 +32,6 @@ export default function HomePage({
   onTarot,
   onMemos,
 }: Props) {
-  // 설정에서 정한 닉네임을 불러옵니다. (이름 표시에 사용)
-  const [nickname, setNickname] = useState<string | null>(null)
-  // 보여줄 이름: 닉네임 → 가입 때 이름 → 이메일 앞부분 (이메일 전체는 안 보임)
-  const name = resolveDisplayName(
-    nickname,
-    session.user.user_metadata?.name as string | undefined,
-    session.user.email,
-  )
-
-  const today = formatToday() // 오늘 날짜
   // 명언은 홈에 들어올 때(이 화면이 처음 그려질 때) 한 번만 랜덤으로 뽑습니다.
   // useState 초기값으로 뽑아야 이후 다른 동작(즐겨찾기 등)에 다시 안 바뀝니다.
   const [quote] = useState(getRandomQuote)
@@ -67,10 +56,6 @@ export default function HomePage({
       .then(setDiaries)
       .catch(() => setDiaries([]))
       .finally(() => setLoadingDiaries(false))
-    // 닉네임(불러줄 이름)도 불러옵니다.
-    getSettings()
-      .then((s) => setNickname(s.nickname))
-      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -121,13 +106,25 @@ export default function HomePage({
       <Header />
 
       <main className="home-container">
-        {/* 날짜 + 인사말 — 어떤 배경에서도 또렷하게 보이도록 반투명 판 위에 */}
-        <div className="home-hello">
-          <p className="home-date">{today}</p>
-          <h1 className="home-greeting">
-            {name}님, 오늘의 한 줄을 남겨보세요 🍀
-          </h1>
-        </div>
+        {/* 오늘의 명언 (맨 위) */}
+        <section className="quote-card">
+          <p className="quote-label">오늘의 명언</p>
+          <blockquote className="quote-text">“{quote.text}”</blockquote>
+          <p className="quote-author">— {quote.author}</p>
+
+          <div className="quote-actions">
+            <button
+              className={`quote-fav-btn ${isFav ? 'is-fav' : ''}`}
+              onClick={toggleFav}
+              disabled={favBusy}
+            >
+              {isFav ? '♥ 즐겨찾기 완료' : '♡ 즐겨찾기'}
+            </button>
+            <button className="quote-fav-link" onClick={onFavorites}>
+              ⭐ 즐겨찾은 명언 보기
+            </button>
+          </div>
+        </section>
 
         {/* 주요 버튼 — 한 줄에 반반 (화면 위쪽에서 바로 보이게) */}
         <div className="home-actions">
@@ -166,26 +163,6 @@ export default function HomePage({
             →
           </span>
         </button>
-
-        {/* 오늘의 명언 */}
-        <section className="quote-card">
-          <p className="quote-label">오늘의 명언</p>
-          <blockquote className="quote-text">“{quote.text}”</blockquote>
-          <p className="quote-author">— {quote.author}</p>
-
-          <div className="quote-actions">
-            <button
-              className={`quote-fav-btn ${isFav ? 'is-fav' : ''}`}
-              onClick={toggleFav}
-              disabled={favBusy}
-            >
-              {isFav ? '♥ 즐겨찾기 완료' : '♡ 즐겨찾기'}
-            </button>
-            <button className="quote-fav-link" onClick={onFavorites}>
-              ⭐ 즐겨찾은 명언 보기
-            </button>
-          </div>
-        </section>
 
         {/* 오늘의 일기 (지난 일기는 '기록' 탭에서 봅니다) */}
         <section className="diary-section">
