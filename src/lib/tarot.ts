@@ -73,35 +73,35 @@ const topicStory: Record<
   { lead: string; up: (k: string) => string; rev: (k: string) => string }
 > = {
   today: {
-    lead: '오늘 하루의 전반적인 흐름을 물으셨죠.',
+    lead: '오늘 하루의 전반적인 흐름.',
     up: (k) =>
       `전반적인 공기는 맑은 편이에요. ‘${k}’의 기운이 하루 곳곳에서 작은 신호로 나타나니, 서두르지 말고 그 결을 따라가 보세요.`,
     rev: (k) =>
       `다만 흐름이 조금 엉켜 있을 수 있어요. ‘${k}’에 억지로 매달리기보다, 한 박자 쉬어가며 나만의 페이스를 지키는 편이 좋겠습니다.`,
   },
   love: {
-    lead: '연애와 사람 사이의 마음을 물으셨죠.',
+    lead: '연애와 사람 사이의 마음.',
     up: (k) =>
       `지금은 마음을 열고 한 걸음 다가가도 좋은 흐름이에요. ‘${k}’의 온기가 두 사람 사이에 다정함을 더해 줍니다.`,
     rev: (k) =>
       `지금은 서로의 속도를 살필 때예요. ‘${k}’의 결이 오해로 엉키지 않도록, 솔직하고 부드러운 표현이 필요합니다.`,
   },
   work: {
-    lead: '일과 금전의 흐름을 물으셨죠.',
+    lead: '일과 금전의 흐름.',
     up: (k) =>
       `노력이 결실로 이어질 바탕이 마련돼 있어요. ‘${k}’ 하나를 방향키 삼아 한곳에 집중하면 성과가 뒤따라옵니다.`,
     rev: (k) =>
       `지금은 무리한 확장보다 정리가 먼저예요. ‘${k}’의 기운이 새어 나가지 않도록 우선순위를 다시 세워 보세요.`,
   },
   mind: {
-    lead: '지금 마음의 자리를 물으셨죠.',
+    lead: '지금 마음의 자리.',
     up: (k) =>
       `당신 안에는 이미 답의 실마리가 있어요. ‘${k}’의 자리를 가만히 바라보면, 흐릿하던 감정이 조금씩 또렷해질 거예요.`,
     rev: (k) =>
       `마음이 조금 무겁고 뒤엉켜 있을 수 있어요. ‘${k}’의 감정을 억누르기보다 이름 붙여 인정해 줄 때, 매듭이 풀리기 시작합니다.`,
   },
   relations: {
-    lead: '사람들과의 관계 흐름을 물으셨죠.',
+    lead: '사람들과의 관계 흐름.',
     up: (k) =>
       `곁을 나누고 함께 나아가기 좋은 때예요. ‘${k}’의 기운이 사람들 사이에 신뢰의 다리를 놓아 줍니다.`,
     rev: (k) =>
@@ -211,7 +211,7 @@ export function buildCombinedReading(
   )
   const uniq = [...new Set(advices)].slice(0, 2)
   const adviceClosing = (mostlyUp ? closingStory.up : closingStory.rev)[0]
-  const adviceText = `그래서 오늘 마음에 담아 두면 좋은 건 이거예요. ${uniq.join(' ')} ${adviceClosing}`
+  const adviceText = `오늘은 이런 마음을 곁에 두어 보세요. ${uniq.join(' ')} ${adviceClosing}`
 
   return [
     { label: '📖 카드 이야기', text: storyText },
