@@ -68,11 +68,43 @@ export default function NewsPage({ onBack }: Props) {
             {data!.stocks.length > 0 && (
               <section className="news-block">
                 <h2 className="news-block-title">📈 주식·기업 현황</h2>
-                <ul className="news-brief-list">
+                <ul className="news-stock-list">
                   {data!.stocks.map((s, i) => (
-                    <li className="news-brief-item" key={i}>
-                      <p className="news-brief-summary">{s.summary}</p>
-                      {s.why && <p className="news-brief-why">→ {s.why}</p>}
+                    <li className="news-stock-item" key={i}>
+                      <p className="news-stock-body">
+                        <span className="news-stock-name">[{s.name}]</span>{' '}
+                        {s.body}
+                      </p>
+                      {s.impact && (
+                        <p className="news-stock-impact">
+                          <span
+                            className={`impact-badge impact-${
+                              s.impact === '호재'
+                                ? 'up'
+                                : s.impact === '악재'
+                                  ? 'down'
+                                  : 'flat'
+                            }`}
+                          >
+                            {s.impact}
+                          </span>
+                          {s.impactReason && (
+                            <span className="news-stock-reason">
+                              {s.impactReason}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {s.link && (
+                        <a
+                          href={s.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="news-stock-link"
+                        >
+                          관련 기사 보기 →
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
