@@ -288,6 +288,14 @@
   text-align: center;
 }
 
+/* 설정 항목 도움말 (작은 회색 안내문) */
+.settings-help {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-soft, #6b6b62);
+}
+
 /* 주요 버튼 2개를 한 줄에 반반으로 */
 .home-actions {
   display: flex;

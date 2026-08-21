@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { formatToday } from '../lib/today'
-import { getNewsBriefing } from '../lib/news'
-import type { NewsBriefing } from '../lib/news'
+import {
+  getRawNews,
+  summarizeBriefing,
+  fallbackBriefing,
+} from '../lib/news'
+import type { Briefing } from '../lib/news'
+import { getNewsKey } from '../lib/newsKey'
 import './news.css'
 
 type Props = {
@@ -9,14 +14,26 @@ type Props = {
 }
 
 export default function NewsPage({ onBack }: Props) {
-  const [data, setData] = useState<NewsBriefing | null>(null)
+  const [data, setData] = useState<Briefing | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   function load() {
     setLoading(true)
     setError(false)
-    getNewsBriefing()
+    getRawNews()
+      .then(async (raw) => {
+        const key = getNewsKey()
+        if (key) {
+          // 열쇠가 있으면 요약, 실패하면 헤드라인 모드로 대체
+          try {
+            return await summarizeBriefing(raw, key)
+          } catch {
+            return fallbackBriefing(raw)
+          }
+        }
+        return fallbackBriefing(raw)
+      })
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -141,8 +158,8 @@ export default function NewsPage({ onBack }: Props) {
 
             {data!.mode === 'simple' && (
               <p className="news-foot">
-                지금은 헤드라인만 보여주고 있어요. 무료 AI를 연결하면 ‘왜
-                중요한지’까지 요약해 드려요.
+                지금은 기사 제목만 보여주고 있어요. <b>설정 → 뉴스 AI 열쇠</b>에
+                무료 열쇠를 넣으면 ‘요약 + 호재/악재’까지 나와요.
               </p>
             )}
           </>

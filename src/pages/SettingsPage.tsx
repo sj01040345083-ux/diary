@@ -15,6 +15,7 @@ import {
 } from '../lib/settings'
 import type { Settings } from '../lib/settings'
 import { fileToBackgroundDataUrl } from '../lib/imageCompress'
+import { getNewsKey, setNewsKey } from '../lib/newsKey'
 import { supabase } from '../lib/supabase'
 import './home.css'
 
@@ -32,8 +33,12 @@ export default function SettingsPage({ session }: Props) {
   const [bgBusy, setBgBusy] = useState(false)
   const [bgError, setBgError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+  // 뉴스 AI(제미나이) 열쇠 — 이 기기에만 저장
+  const [newsKey, setNewsKeyState] = useState('')
+  const [newsKeyNotice, setNewsKeyNotice] = useState('')
 
   useEffect(() => {
+    setNewsKeyState(getNewsKey())
     setCustomBgState(getCustomBg())
     getSettings()
       .then((s) => {
@@ -119,6 +124,16 @@ export default function SettingsPage({ session }: Props) {
 
   async function handleLogout() {
     await supabase.auth.signOut()
+  }
+
+  // 뉴스 AI 열쇠 저장 (이 기기에만 보관)
+  function handleSaveNewsKey() {
+    setNewsKey(newsKey)
+    setNewsKeyNotice(
+      newsKey.trim()
+        ? '뉴스 AI 열쇠를 저장했어요 🌿 이제 아침 뉴스가 요약돼서 나와요.'
+        : '뉴스 AI 열쇠를 지웠어요. (뉴스는 제목만 표시돼요)',
+    )
   }
 
   return (
@@ -234,6 +249,32 @@ export default function SettingsPage({ session }: Props) {
                 </button>
               ))}
             </div>
+
+            <p className="report-section-title">뉴스 AI 열쇠 (선택)</p>
+            <p className="settings-help">
+              무료 열쇠를 넣으면 ‘아침 뉴스 브리핑’이 요약 + 호재/악재 형태로
+              나와요. (구글 AI 스튜디오에서 무료 발급 · 이 기기에만 저장)
+            </p>
+            <input
+              className="tx-input"
+              type="password"
+              placeholder="여기에 열쇠를 붙여넣으세요"
+              value={newsKey}
+              onChange={(e) => {
+                setNewsKeyState(e.target.value)
+                setNewsKeyNotice('')
+              }}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="opt-btn"
+              onClick={handleSaveNewsKey}
+              style={{ marginTop: '0.6rem' }}
+            >
+              뉴스 열쇠 저장
+            </button>
+            {newsKeyNotice && <p className="home-notice">{newsKeyNotice}</p>}
 
             <button
               className="home-cta"
