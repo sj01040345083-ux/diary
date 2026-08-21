@@ -5,12 +5,37 @@ import {
   summarizeBriefing,
   fallbackBriefing,
 } from '../lib/news'
-import type { Briefing } from '../lib/news'
+import type { Briefing, Impact, NewsItem } from '../lib/news'
 import { getNewsKey } from '../lib/newsKey'
 import './news.css'
 
 type Props = {
   onBack: () => void
+}
+
+function impactClass(impact: Impact): string {
+  if (impact === '호재') return 'impact-up'
+  if (impact === '악재') return 'impact-down'
+  return 'impact-flat'
+}
+
+// 링크 있는 한 줄 뉴스 (주요 뉴스·문화연예 공용)
+function NewsLine({ item }: { item: NewsItem }) {
+  return (
+    <li className="news-brief-item">
+      <p className="news-brief-summary">{item.body}</p>
+      {item.link && (
+        <a
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="news-stock-link"
+        >
+          관련 기사 보기 →
+        </a>
+      )}
+    </li>
+  )
 }
 
 export default function NewsPage({ onBack }: Props) {
@@ -25,7 +50,6 @@ export default function NewsPage({ onBack }: Props) {
       .then(async (raw) => {
         const key = getNewsKey()
         if (key) {
-          // 열쇠가 있으면 요약, 실패하면 헤드라인 모드로 대체
           try {
             return await summarizeBriefing(raw, key)
           } catch {
@@ -47,9 +71,9 @@ export default function NewsPage({ onBack }: Props) {
 
   const hasAny =
     !!data &&
-    (data.stocks.length > 0 ||
-      data.entertainment.length > 0 ||
-      data.essentials.length > 0)
+    (data.sectors.length > 0 ||
+      data.mainNews.length > 0 ||
+      data.culture.length > 0)
 
   return (
     <div className="home-screen">
@@ -81,12 +105,12 @@ export default function NewsPage({ onBack }: Props) {
           </div>
         ) : (
           <>
-            {/* 주식·기업 현황 */}
-            {data!.stocks.length > 0 && (
+            {/* 1. 업종별 이슈 */}
+            {data!.sectors.length > 0 && (
               <section className="news-block">
-                <h2 className="news-block-title">📈 주식·기업 현황</h2>
+                <h2 className="news-block-title">📊 업종별 이슈</h2>
                 <ul className="news-stock-list">
-                  {data!.stocks.map((s, i) => (
+                  {data!.sectors.map((s, i) => (
                     <li className="news-stock-item" key={i}>
                       <p className="news-stock-body">
                         <span className="news-stock-name">[{s.name}]</span>{' '}
@@ -95,13 +119,7 @@ export default function NewsPage({ onBack }: Props) {
                       {s.impact && (
                         <p className="news-stock-impact">
                           <span
-                            className={`impact-badge impact-${
-                              s.impact === '호재'
-                                ? 'up'
-                                : s.impact === '악재'
-                                  ? 'down'
-                                  : 'flat'
-                            }`}
+                            className={`impact-badge ${impactClass(s.impact)}`}
                           >
                             {s.impact}
                           </span>
@@ -128,29 +146,25 @@ export default function NewsPage({ onBack }: Props) {
               </section>
             )}
 
-            {/* 연예계 핫이슈 */}
-            {data!.entertainment.length > 0 && (
+            {/* 2. 오늘의 주요 뉴스 */}
+            {data!.mainNews.length > 0 && (
               <section className="news-block">
-                <h2 className="news-block-title">🎬 연예계 핫이슈</h2>
+                <h2 className="news-block-title">📌 오늘의 주요 뉴스</h2>
                 <ul className="news-brief-list">
-                  {data!.entertainment.map((t, i) => (
-                    <li className="news-brief-item" key={i}>
-                      <p className="news-brief-summary">{t}</p>
-                    </li>
+                  {data!.mainNews.map((m, i) => (
+                    <NewsLine item={m} key={i} />
                   ))}
                 </ul>
               </section>
             )}
 
-            {/* 오늘 꼭 알아야 할 것 */}
-            {data!.essentials.length > 0 && (
+            {/* 3. 문화·연예 */}
+            {data!.culture.length > 0 && (
               <section className="news-block">
-                <h2 className="news-block-title">📌 오늘 꼭 알아야 할 것</h2>
+                <h2 className="news-block-title">🎬 문화·연예</h2>
                 <ul className="news-brief-list">
-                  {data!.essentials.map((t, i) => (
-                    <li className="news-brief-item" key={i}>
-                      <p className="news-brief-summary">{t}</p>
-                    </li>
+                  {data!.culture.map((c, i) => (
+                    <NewsLine item={c} key={i} />
                   ))}
                 </ul>
               </section>
