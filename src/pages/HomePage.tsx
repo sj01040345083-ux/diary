@@ -19,7 +19,7 @@ type Props = {
   onEditDiary: (date: string) => void // 일기 카드 "수정" → 작성(수정) 화면으로
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
-  onTarot: () => void // "오늘의 타로" 바로가기
+  onNews: () => void // "아침 뉴스 브리핑" 바로가기
   onMemos: () => void // "메모장" 바로가기
 }
 
@@ -29,7 +29,7 @@ export default function HomePage({
   onEditDiary,
   onTransactions,
   onFavorites,
-  onTarot,
+  onNews,
   onMemos,
 }: Props) {
   // 명언은 홈에 들어올 때(이 화면이 처음 그려질 때) 한 번만 랜덤으로 뽑습니다.
@@ -136,14 +136,14 @@ export default function HomePage({
           </button>
         </div>
 
-        {/* 오늘의 타로 바로가기 */}
-        <button className="home-tarot" onClick={onTarot}>
+        {/* 아침 뉴스 브리핑 바로가기 */}
+        <button className="home-tarot" onClick={onNews}>
           <span className="home-tarot-icon" aria-hidden>
-            🔮
+            📰
           </span>
           <span className="home-tarot-text">
-            <span className="home-tarot-title">오늘의 타로</span>
-            <span className="home-tarot-desc">카드 한 장으로 마음을 들여다봐요</span>
+            <span className="home-tarot-title">아침 뉴스 브리핑</span>
+            <span className="home-tarot-desc">경제·사회·연예 소식을 모아봐요</span>
           </span>
           <span className="home-tarot-arrow" aria-hidden>
             →
