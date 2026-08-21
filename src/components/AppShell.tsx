@@ -10,7 +10,7 @@ import FavoritesPage from '../pages/FavoritesPage'
 import StatsPage from '../pages/StatsPage'
 import SettingsPage from '../pages/SettingsPage'
 import RecordsPage from '../pages/RecordsPage'
-import TarotPage from '../pages/TarotPage'
+import NewsPage from '../pages/NewsPage'
 import MemosPage from '../pages/MemosPage'
 
 // 로그인한 사용자가 보는 전체 틀입니다.
@@ -20,7 +20,7 @@ type Props = {
 }
 
 // 탭바 위에 전체 화면으로 덮이는 화면들
-type Overlay = null | 'write' | 'transactions' | 'favorites' | 'tarot' | 'memos'
+type Overlay = null | 'write' | 'transactions' | 'favorites' | 'news' | 'memos'
 
 export default function AppShell({ session }: Props) {
   const [tab, setTab] = useState<Tab>('home')
@@ -80,9 +80,9 @@ export default function AppShell({ session }: Props) {
     return <FavoritesPage onBack={() => setOverlay(null)} />
   }
 
-  // 오늘의 타로 화면 (운세형)
-  if (overlay === 'tarot') {
-    return <TarotPage session={session} onBack={() => setOverlay(null)} />
+  // 아침 뉴스 브리핑 화면
+  if (overlay === 'news') {
+    return <NewsPage onBack={() => setOverlay(null)} />
   }
 
   // 월별 메모 기록장
@@ -99,7 +99,7 @@ export default function AppShell({ session }: Props) {
           onEditDiary={openEdit}
           onTransactions={() => setOverlay('transactions')}
           onFavorites={() => setOverlay('favorites')}
-          onTarot={() => setOverlay('tarot')}
+          onNews={() => setOverlay('news')}
           onMemos={() => setOverlay('memos')}
         />
       )}

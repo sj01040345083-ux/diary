@@ -1,0 +1,104 @@
+/* 아침 뉴스 브리핑 스타일 */
+
+.news-hello {
+  margin-bottom: 1.1rem;
+  padding: 0.9rem 1.05rem;
+  border-radius: 16px;
+  background: var(--glass, rgba(255, 255, 255, 0.9));
+  box-shadow: var(--shadow-card, 0 6px 18px rgba(0, 0, 0, 0.08));
+}
+.news-date {
+  margin: 0 0 0.2rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.news-greeting {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft, #6b6b62);
+}
+
+/* 주제 묶음 */
+.news-topic {
+  margin-bottom: 1.3rem;
+}
+.news-topic-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 0.7rem;
+}
+
+/* 기사 목록 */
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  counter-reset: news;
+}
+.news-item {
+  counter-increment: news;
+}
+.news-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding: 0.85rem 1rem 0.85rem 2.4rem;
+  position: relative;
+  border-radius: 14px;
+  background: var(--glass, rgba(255, 255, 255, 0.92));
+  box-shadow: var(--shadow-card, 0 5px 14px rgba(0, 0, 0, 0.07));
+  text-decoration: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.news-link::before {
+  content: counter(news);
+  position: absolute;
+  left: 0.95rem;
+  top: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--accent, #3fa535);
+}
+.news-link:active {
+  transform: translateY(1px);
+}
+.news-item-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.news-item-source {
+  font-size: 0.78rem;
+  color: var(--ink-faint, #9a9a90);
+}
+
+.news-empty {
+  font-size: 0.85rem;
+  color: var(--ink-faint, #9a9a90);
+  margin: 0;
+}
+
+.news-retry {
+  margin-top: 0.8rem;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent, #3fa535);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.news-foot {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--ink-faint, #b7b7ad);
+  margin: 0.5rem 0 0.5rem;
+}
