@@ -34,7 +34,7 @@
   margin: 0 0 0.6rem;
 }
 
-/* 요약 항목 목록 */
+/* 연예·필수 항목 목록 (한 줄) */
 .news-brief-list {
   list-style: none;
   margin: 0;
@@ -54,11 +54,71 @@
   line-height: 1.45;
   color: var(--ink);
 }
-.news-brief-why {
-  margin: 0.15rem 0 0;
-  font-size: 0.82rem;
-  line-height: 1.4;
+
+/* 주식·기업 항목 (2~3문장 + 영향 + 링크) */
+.news-stock-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+.news-stock-item {
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--accent, #3fa535);
+}
+.news-stock-body {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.news-stock-name {
+  font-weight: 800;
+  color: var(--accent-strong, #2f7a28);
+}
+.news-stock-impact {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0;
+}
+.impact-badge {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+.impact-up {
+  color: #b3261e;
+  background: rgba(217, 74, 74, 0.13);
+}
+.impact-down {
+  color: #1f5fbf;
+  background: rgba(51, 110, 220, 0.13);
+}
+.impact-flat {
+  color: #6b6b62;
+  background: rgba(120, 120, 110, 0.13);
+}
+.news-stock-reason {
+  font-size: 0.83rem;
+  line-height: 1.45;
   color: var(--ink-soft, #6b6b62);
+}
+.news-stock-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-strong, #2f7a28);
+  text-decoration: none;
+}
+.news-stock-link:active {
+  opacity: 0.7;
 }
 
 .news-retry {
