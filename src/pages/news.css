@@ -1,8 +1,8 @@
-/* 아침 뉴스 브리핑 스타일 */
+/* 아침 뉴스 브리핑 스타일 (요약형) */
 
 .news-hello {
-  margin-bottom: 1.1rem;
-  padding: 0.9rem 1.05rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1.05rem;
   border-radius: 16px;
   background: var(--glass, rgba(255, 255, 255, 0.9));
   box-shadow: var(--shadow-card, 0 6px 18px rgba(0, 0, 0, 0.08));
@@ -19,69 +19,46 @@
   color: var(--ink-soft, #6b6b62);
 }
 
-/* 주제 묶음 */
-.news-topic {
-  margin-bottom: 1.3rem;
+/* 주제 블록 (카드) */
+.news-block {
+  margin-bottom: 0.9rem;
+  padding: 0.9rem 1.05rem 1rem;
+  border-radius: 16px;
+  background: var(--glass, rgba(255, 255, 255, 0.92));
+  box-shadow: var(--shadow-card, 0 5px 14px rgba(0, 0, 0, 0.07));
 }
-.news-topic-title {
-  font-size: 1.05rem;
+.news-block-title {
+  font-size: 1rem;
   font-weight: 800;
   color: var(--ink);
-  margin: 0 0 0.7rem;
+  margin: 0 0 0.6rem;
 }
 
-/* 기사 목록 */
-.news-list {
+/* 요약 항목 목록 */
+.news-brief-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  counter-reset: news;
+  gap: 0.6rem;
 }
-.news-item {
-  counter-increment: news;
+.news-brief-item {
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--accent, #3fa535);
 }
-.news-link {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
-  padding: 0.85rem 1rem 0.85rem 2.4rem;
-  position: relative;
-  border-radius: 14px;
-  background: var(--glass, rgba(255, 255, 255, 0.92));
-  box-shadow: var(--shadow-card, 0 5px 14px rgba(0, 0, 0, 0.07));
-  text-decoration: none;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.news-link::before {
-  content: counter(news);
-  position: absolute;
-  left: 0.95rem;
-  top: 0.85rem;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--accent, #3fa535);
-}
-.news-link:active {
-  transform: translateY(1px);
-}
-.news-item-title {
-  font-size: 0.95rem;
+.news-brief-summary {
+  margin: 0;
+  font-size: 0.92rem;
   font-weight: 600;
   line-height: 1.45;
   color: var(--ink);
 }
-.news-item-source {
-  font-size: 0.78rem;
-  color: var(--ink-faint, #9a9a90);
-}
-
-.news-empty {
-  font-size: 0.85rem;
-  color: var(--ink-faint, #9a9a90);
-  margin: 0;
+.news-brief-why {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ink-soft, #6b6b62);
 }
 
 .news-retry {
@@ -98,7 +75,8 @@
 
 .news-foot {
   text-align: center;
-  font-size: 0.76rem;
-  color: var(--ink-faint, #b7b7ad);
-  margin: 0.5rem 0 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-faint, #9a9a90);
+  margin: 0.6rem 0 0.5rem;
 }
