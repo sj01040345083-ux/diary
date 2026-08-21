@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react'
 import { formatToday } from '../lib/today'
-import {
-  getRawNews,
-  summarizeBriefing,
-  fallbackBriefing,
-} from '../lib/news'
+import { getBriefing } from '../lib/news'
 import type { Briefing, Impact, NewsItem } from '../lib/news'
 import { getNewsKey } from '../lib/newsKey'
 import './news.css'
@@ -42,22 +38,12 @@ export default function NewsPage({ onBack }: Props) {
   const [data, setData] = useState<Briefing | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const hasKey = !!getNewsKey()
 
   function load() {
     setLoading(true)
     setError(false)
-    getRawNews()
-      .then(async (raw) => {
-        const key = getNewsKey()
-        if (key) {
-          try {
-            return await summarizeBriefing(raw, key)
-          } catch {
-            return fallbackBriefing(raw)
-          }
-        }
-        return fallbackBriefing(raw)
-      })
+    getBriefing(getNewsKey())
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -170,10 +156,17 @@ export default function NewsPage({ onBack }: Props) {
               </section>
             )}
 
-            {data!.mode === 'simple' && (
+            {data!.mode === 'simple' && !hasKey && (
               <p className="news-foot">
                 지금은 기사 제목만 보여주고 있어요. <b>설정 → 뉴스 AI 열쇠</b>에
                 무료 열쇠를 넣으면 ‘요약 + 호재/악재’까지 나와요.
+              </p>
+            )}
+            {data!.mode === 'simple' && hasKey && (
+              <p className="news-foot">
+                AI 요약을 시도했지만 실패해서 제목만 보여드려요. 열쇠가 올바른지
+                <b> 설정 → 뉴스 AI 열쇠</b>에서 확인해주세요.
+                {data!.aiError ? ` (${data!.aiError})` : ''}
               </p>
             )}
           </>
