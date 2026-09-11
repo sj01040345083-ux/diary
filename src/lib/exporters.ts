@@ -119,10 +119,10 @@ export function exportStatsXlsx(data: ExportData): void {
 
 // ── 워드(.docx) 내보내기 (일기 — 제목/날짜 + 본문 + 사진 포함) ──
 
-// 워드 문서 안 사진 크기 — 3:4(세로) 비율의 아담한 박스 안에 비율을 유지하며 맞춥니다.
-// (기존엔 가로 480px로 너무 컸음 → 3x4 사진처럼 작게)
-const DOC_IMG_BOX_W = 240
-const DOC_IMG_BOX_H = 320
+// 워드 문서 안 사진 크기 — 모든 사진을 4x6(세로 2:3) '같은 크기'로 통일합니다.
+// 원본 비율이 달라도 가운데 기준으로 꽉 채워 잘라내어(crop) 크기를 맞춥니다.
+const DOC_IMG_W = 240
+const DOC_IMG_H = 360
 
 type DocImage = {
   data: Uint8Array
@@ -132,34 +132,51 @@ type DocImage = {
 }
 
 // 이미지 주소(서명 URL 또는 base64 Data URL)를 워드에 넣을 형태로 가져옵니다.
-// - 원본 크기를 읽어 문서 폭(DOC_IMG_MAX_W)에 맞게 비율을 유지하며 줄입니다.
+// - 모든 사진을 4x6(2:3) 같은 크기로 만들기 위해, 가운데 기준으로 꽉 채워 잘라(crop) 냅니다.
 // - 실패하면 null (그 사진만 건너뜀)
 async function fetchImageForDoc(url: string): Promise<DocImage | null> {
   try {
     const res = await fetch(url)
     if (!res.ok) return null
     const blob = await res.blob()
-    const buf = await blob.arrayBuffer()
 
-    let w = DOC_IMG_BOX_W
-    let h = DOC_IMG_BOX_H
     try {
       const bmp = await createImageBitmap(blob)
-      // 3:4 박스 안에 들어가도록 비율 유지하며 축소 (가로/세로 중 더 빡빡한 쪽 기준)
-      const scale = Math.min(
-        DOC_IMG_BOX_W / bmp.width,
-        DOC_IMG_BOX_H / bmp.height,
-        1,
-      )
-      w = Math.max(1, Math.round(bmp.width * scale))
-      h = Math.max(1, Math.round(bmp.height * scale))
+      // 4x6 박스를 꽉 채우도록 확대/축소 후, 넘치는 부분은 가운데 기준으로 잘라냅니다.
+      const scale = Math.max(DOC_IMG_W / bmp.width, DOC_IMG_H / bmp.height)
+      const dw = bmp.width * scale
+      const dh = bmp.height * scale
+      const canvas = document.createElement('canvas')
+      canvas.width = DOC_IMG_W
+      canvas.height = DOC_IMG_H
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, DOC_IMG_W, DOC_IMG_H)
+        ctx.drawImage(bmp, (DOC_IMG_W - dw) / 2, (DOC_IMG_H - dh) / 2, dw, dh)
+        bmp.close()
+        const outBlob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.85),
+        )
+        if (outBlob) {
+          const buf = await outBlob.arrayBuffer()
+          return {
+            data: new Uint8Array(buf),
+            width: DOC_IMG_W,
+            height: DOC_IMG_H,
+            type: 'jpg',
+          }
+        }
+      }
       bmp.close()
     } catch {
-      // 크기를 못 읽으면 기본 3:4 박스 크기로 둡니다.
+      // 자르기에 실패하면 원본을 고정 크기로 넣습니다(비율이 조금 어긋날 수 있음).
     }
 
+    // 대체: 원본 이미지를 4x6 크기로 넣기
+    const buf = await blob.arrayBuffer()
     const type: DocImage['type'] = blob.type.includes('png') ? 'png' : 'jpg'
-    return { data: new Uint8Array(buf), width: w, height: h, type }
+    return { data: new Uint8Array(buf), width: DOC_IMG_W, height: DOC_IMG_H, type }
   } catch {
     return null
   }
