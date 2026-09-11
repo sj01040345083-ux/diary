@@ -81,12 +81,27 @@ export default function RecordsPage({ onEditDiary }: Props) {
       </header>
 
       <main className="home-container">
-        {/* 달력 */}
+        {/* 달력 — 박스 맨 아래에 '워드 내보내기' 버튼을 함께 넣습니다 */}
         {!loading && diaries.length > 0 && (
           <DiaryCalendar
             diaries={diaries}
             selectedDate={selectedDate}
             onSelect={setSelectedDate}
+            footer={
+              filtered.length > 0 ? (
+                <button
+                  className="export-btn"
+                  onClick={exportAll}
+                  disabled={exportingId !== null}
+                >
+                  {exportingId === 'all'
+                    ? '만드는 중…'
+                    : selectedDate
+                      ? '📝 이 날짜 워드로 내보내기'
+                      : `📝 전체 일기 워드로 내보내기 (${filtered.length}편)`}
+                </button>
+              ) : null
+            }
           />
         )}
 
@@ -164,22 +179,6 @@ export default function RecordsPage({ onEditDiary }: Props) {
           </div>
         )}
 
-        {/* 일기 워드 내보내기 (한 파일로 모아서) */}
-        {!loading && filtered.length > 0 && (
-          <div className="export-row" style={{ marginTop: '1.5rem' }}>
-            <button
-              className="export-btn"
-              onClick={exportAll}
-              disabled={exportingId !== null}
-            >
-              {exportingId === 'all'
-                ? '만드는 중…'
-                : selectedDate
-                  ? '📝 이 날짜 워드로 내보내기'
-                  : `📝 전체 일기 워드로 내보내기 (${filtered.length}편)`}
-            </button>
-          </div>
-        )}
       </main>
 
       {/* 삭제 확인창 */}

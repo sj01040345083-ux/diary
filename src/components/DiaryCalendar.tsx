@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import type { Diary } from '../lib/diaries'
 import { emotions, moodColorByEmoji } from '../config/emotions'
 
@@ -22,12 +23,14 @@ type Props = {
   diaries: Diary[]
   selectedDate: string | null
   onSelect: (date: string | null) => void
+  footer?: ReactNode // 박스 맨 아래에 넣을 내용 (예: 워드 내보내기 버튼)
 }
 
 export default function DiaryCalendar({
   diaries,
   selectedDate,
   onSelect,
+  footer,
 }: Props) {
   // 일기가 있는 가장 최근 달을 기본으로 보여줍니다.
   const initialMonth = useMemo(() => {
@@ -130,6 +133,9 @@ export default function DiaryCalendar({
           </span>
         ))}
       </div>
+
+      {/* 박스 맨 아래 슬롯 (워드 내보내기 버튼 등) */}
+      {footer && <div className="cal-footer">{footer}</div>}
     </div>
   )
 }

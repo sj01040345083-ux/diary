@@ -119,8 +119,10 @@ export function exportStatsXlsx(data: ExportData): void {
 
 // ── 워드(.docx) 내보내기 (일기 — 제목/날짜 + 본문 + 사진 포함) ──
 
-// 워드 문서 안에서 이미지의 최대 가로 너비(px). A4/Letter 여백(약 2.5cm)을 뺀 값에 맞춥니다.
-const DOC_IMG_MAX_W = 480
+// 워드 문서 안 사진 크기 — 3:4(세로) 비율의 아담한 박스 안에 비율을 유지하며 맞춥니다.
+// (기존엔 가로 480px로 너무 컸음 → 3x4 사진처럼 작게)
+const DOC_IMG_BOX_W = 240
+const DOC_IMG_BOX_H = 320
 
 type DocImage = {
   data: Uint8Array
@@ -139,16 +141,21 @@ async function fetchImageForDoc(url: string): Promise<DocImage | null> {
     const blob = await res.blob()
     const buf = await blob.arrayBuffer()
 
-    let w = DOC_IMG_MAX_W
-    let h = Math.round(DOC_IMG_MAX_W * 0.66)
+    let w = DOC_IMG_BOX_W
+    let h = DOC_IMG_BOX_H
     try {
       const bmp = await createImageBitmap(blob)
-      const scale = Math.min(1, DOC_IMG_MAX_W / bmp.width)
+      // 3:4 박스 안에 들어가도록 비율 유지하며 축소 (가로/세로 중 더 빡빡한 쪽 기준)
+      const scale = Math.min(
+        DOC_IMG_BOX_W / bmp.width,
+        DOC_IMG_BOX_H / bmp.height,
+        1,
+      )
       w = Math.max(1, Math.round(bmp.width * scale))
       h = Math.max(1, Math.round(bmp.height * scale))
       bmp.close()
     } catch {
-      // 크기를 못 읽으면 기본 비율로 둡니다.
+      // 크기를 못 읽으면 기본 3:4 박스 크기로 둡니다.
     }
 
     const type: DocImage['type'] = blob.type.includes('png') ? 'png' : 'jpg'
