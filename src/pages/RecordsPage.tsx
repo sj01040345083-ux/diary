@@ -7,7 +7,7 @@ import DiaryCalendar from '../components/DiaryCalendar'
 import './home.css'
 
 type Props = {
-  onEditDiary: (date: string) => void
+  onEditDiary: (id: string) => void
 }
 
 export default function RecordsPage({ onEditDiary }: Props) {
@@ -150,7 +150,7 @@ export default function RecordsPage({ onEditDiary }: Props) {
                 <div className="diary-item-actions">
                   <button
                     className="diary-edit-btn"
-                    onClick={() => onEditDiary(d.entry_date)}
+                    onClick={() => onEditDiary(d.id)}
                     aria-label="일기 수정"
                   >
                     수정

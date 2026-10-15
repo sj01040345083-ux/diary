@@ -16,7 +16,7 @@ import './home.css'
 type Props = {
   session: Session
   onWrite: () => void // "오늘 일기 쓰기" 버튼 → 작성 화면으로
-  onEditDiary: (date: string) => void // 일기 카드 "수정" → 작성(수정) 화면으로
+  onEditDiary: (id: string) => void // 일기 카드 "수정" → 수정 화면으로 (id)
   onTransactions: () => void // "소비·수입" 바로가기
   onFavorites: () => void // "명언 즐겨찾기 모음" 바로가기
   onNews: () => void // "아침 뉴스 브리핑" 바로가기
@@ -193,7 +193,7 @@ export default function HomePage({
                   <div className="diary-item-actions">
                     <button
                       className="diary-edit-btn"
-                      onClick={() => onEditDiary(d.entry_date)}
+                      onClick={() => onEditDiary(d.id)}
                       aria-label="일기 수정"
                     >
                       수정
@@ -212,6 +212,13 @@ export default function HomePage({
                 </article>
               ))}
             </div>
+          )}
+
+          {/* 같은 날 일기를 하나 더 추가 */}
+          {!loadingDiaries && todayDiaries.length > 0 && (
+            <button className="diary-add-btn" onClick={onWrite}>
+              ➕ 일기 추가 작성
+            </button>
           )}
         </section>
       </main>

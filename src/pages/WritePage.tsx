@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { formatEntryDate } from '../lib/today'
-import { getDiaryByDate, saveDiary, todayString } from '../lib/diaries'
+import { getDiaryById, createDiary, updateDiaryById, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
 import { compressImage } from '../lib/imageCompress'
 import { uploadPhoto, getPhotosByDate, deletePhoto } from '../lib/photos'
@@ -29,6 +29,9 @@ const stickerEmojis = [
   '🌸',
   '🌵',
   '💚',
+  '💕',
+  '🐈‍⬛',
+  '🐈',
   '☔',
   '☁️',
   '⛄',
@@ -46,25 +49,25 @@ type Props = {
   session: Session
   onDone: () => void // 저장 후 (홈/기록으로)
   onCancel: () => void // 뒤로 (저장 안 함)
-  targetDate?: string // 수정할 날짜 (없으면 오늘)
+  editId?: string // 수정할 일기 id (없으면 '새 일기 추가')
 }
 
 export default function WritePage({
   session,
   onDone,
   onCancel,
-  targetDate,
+  editId,
 }: Props) {
-  // 작성/수정 대상 날짜. 새 일기(targetDate 없음)일 때는 달력으로 바꿀 수 있습니다.
-  const [workDate, setWorkDate] = useState(targetDate ?? todayString())
+  const isEditing = !!editId
+  // 작성/수정 대상 날짜. 새 일기일 때는 달력으로 바꿀 수 있습니다.
+  const [workDate, setWorkDate] = useState(todayString())
   const isToday = workDate === todayString()
-  const canPickDate = targetDate === undefined // 기록에서 특정 날짜 수정으로 들어온 게 아니면 날짜 선택 가능
+  const canPickDate = !isEditing // 새 일기만 날짜 선택 가능 (수정은 그 일기의 날짜 고정)
   const [showPicker, setShowPicker] = useState(false)
 
   const [content, setContent] = useState('')
   const [mood, setMood] = useState('') // '' = 기분 선택 안 함
   const [loadingInitial, setLoadingInitial] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -82,31 +85,32 @@ export default function WritePage({
   const selectedEmotion = emotions.find((e) => e.emoji === mood)
 
   useEffect(() => {
-    // 날짜가 바뀔 때마다 내용을 초기화하고 그 날 일기를 다시 불러옵니다.
+    // 수정이면 그 일기를 불러와 채우고, 새 일기면 빈 화면(오늘 날짜)으로 시작합니다.
+    if (!editId) {
+      setLoadingInitial(false)
+      return
+    }
     setLoadingInitial(true)
-    setIsEditing(false)
-    setContent('')
-    setMood('')
-    // 해당 날짜 일기가 이미 있으면 불러와 채워둡니다 (수정)
-    getDiaryByDate(workDate)
+    getDiaryById(editId)
       .then((diary) => {
         if (diary) {
           setContent(diary.content)
           setMood(diary.mood ?? '')
-          setIsEditing(true)
+          setWorkDate(diary.entry_date)
         }
       })
       .catch(() => {})
       .finally(() => setLoadingInitial(false))
-  }, [workDate])
+  }, [editId])
 
   useEffect(() => {
-    // 날짜가 바뀌면 이전 날짜의 사진 선택 기록을 비우고 새로 불러옵니다.
+    // 사진: 수정일 때만 그 날짜의 저장된 사진을 불러옵니다.
+    // (새 일기는 빈 상태로 시작 — 같은 날 다른 일기 사진을 실수로 지우지 않도록)
     let alive = true
     setPhotos([])
     removedPaths.current = []
     pickedSigs.current = new Set()
-    // 이 날짜에 이미 저장된 사진(서버)을 불러와 미리보기로 채웁니다.
+    if (!editId) return
     getPhotosByDate(workDate)
       .then((recs) => {
         if (!alive) return
@@ -122,7 +126,7 @@ export default function WritePage({
     return () => {
       alive = false
     }
-  }, [workDate])
+  }, [workDate, editId])
 
   // 사진 파일 선택 → 압축해서 미리보기에 추가
   async function handleFiles(fileList: FileList | null) {
@@ -211,7 +215,11 @@ export default function WritePage({
     }
     setSaving(true)
     try {
-      await saveDiary(session.user.id, workDate, content.trim(), mood || null)
+      if (editId) {
+        await updateDiaryById(editId, content.trim(), mood || null)
+      } else {
+        await createDiary(session.user.id, workDate, content.trim(), mood || null)
+      }
       // 사진 반영: 삭제된 기존 사진 제거 + 새로 고른 사진 서버(Storage) 업로드
       try {
         for (const path of removedPaths.current) await deletePhoto(path)
@@ -224,9 +232,16 @@ export default function WritePage({
         // 사진 저장 실패는 일기 저장을 막지 않습니다.
       }
       onDone()
-    } catch {
+    } catch (e) {
       setSaving(false)
-      setError('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
+      // 같은 날 두 번째 일기 저장이 막힌 경우(유일 제약) 안내
+      if ((e as { code?: string })?.code === '23505') {
+        setError(
+          '같은 날 여러 개 저장을 위해 설정이 필요해요. 받은 안내(SQL)를 Supabase에서 한 번 실행해주세요.',
+        )
+      } else {
+        setError('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
+      }
     }
   }
 
