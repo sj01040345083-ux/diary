@@ -213,13 +213,6 @@ export default function HomePage({
               ))}
             </div>
           )}
-
-          {/* 같은 날 일기를 하나 더 추가 */}
-          {!loadingDiaries && todayDiaries.length > 0 && (
-            <button className="diary-add-btn" onClick={onWrite}>
-              ➕ 일기 추가 작성
-            </button>
-          )}
         </section>
       </main>
 

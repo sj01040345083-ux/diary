@@ -288,26 +288,6 @@
   text-align: center;
 }
 
-/* 같은 날 일기 추가 작성 버튼 */
-.diary-add-btn {
-  width: 100%;
-  margin-top: 0.8rem;
-  padding: 0.75rem;
-  border: 1.5px dashed var(--glass-border, #cfe0c6);
-  border-radius: 14px;
-  background: var(--glass, rgba(255, 255, 255, 0.85));
-  color: #4f6b4a;
-  font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease;
-}
-.diary-add-btn:hover {
-  background: #eef3e8;
-  border-color: #b9d2ae;
-}
-
 /* 설정 항목 도움말 (작은 회색 안내문) */
 .settings-help {
   margin: 0 0 0.5rem;
