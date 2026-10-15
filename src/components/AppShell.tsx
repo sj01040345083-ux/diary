@@ -25,8 +25,8 @@ type Overlay = null | 'write' | 'transactions' | 'favorites' | 'news' | 'memos'
 export default function AppShell({ session }: Props) {
   const [tab, setTab] = useState<Tab>('home')
   const [overlay, setOverlay] = useState<Overlay>(null)
-  // 일기 작성/수정 대상 날짜 (null = 오늘 새로 쓰기)
-  const [editDate, setEditDate] = useState<string | null>(null)
+  // 일기 수정 대상 id (null = 새 일기 추가)
+  const [editId, setEditId] = useState<string | null>(null)
 
   useEffect(() => {
     // 1) 로컬 캐시가 있으면 먼저 즉시 적용 (서버 응답을 기다리지 않고 배경 유지)
@@ -38,15 +38,15 @@ export default function AppShell({ session }: Props) {
       .catch(() => {})
   }, [])
 
-  // 새 일기 쓰기 (오늘)
+  // 새 일기 추가 (오늘)
   function openWrite() {
-    setEditDate(null)
+    setEditId(null)
     setOverlay('write')
   }
 
-  // 기록에서 특정 날짜 일기 수정
-  function openEdit(date: string) {
-    setEditDate(date)
+  // 기존 일기 수정 (id로)
+  function openEdit(id: string) {
+    setEditId(id)
     setOverlay('write')
   }
 
@@ -55,16 +55,16 @@ export default function AppShell({ session }: Props) {
     return (
       <WritePage
         session={session}
-        targetDate={editDate ?? undefined}
+        editId={editId ?? undefined}
         onDone={() => {
           setOverlay(null)
-          // 오늘 새로 쓴 경우 홈으로(목록 새로고침), 과거 수정은 있던 탭 유지
-          if (editDate === null) setTab('home')
-          setEditDate(null)
+          // 새로 쓴 경우 홈으로(목록 새로고침), 수정은 있던 탭 유지
+          if (editId === null) setTab('home')
+          setEditId(null)
         }}
         onCancel={() => {
           setOverlay(null)
-          setEditDate(null)
+          setEditId(null)
         }}
       />
     )

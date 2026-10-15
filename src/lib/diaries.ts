@@ -29,12 +29,23 @@ export async function getMyDiaries(): Promise<Diary[]> {
   return data ?? []
 }
 
-// 특정 날짜의 일기를 가져옵니다. (없으면 null)
-export async function getDiaryByDate(date: string): Promise<Diary | null> {
+// 특정 날짜의 일기들을 가져옵니다. (같은 날 여러 개일 수 있음)
+export async function getDiariesByDate(date: string): Promise<Diary[]> {
   const { data, error } = await supabase
     .from('diaries')
     .select('*')
     .eq('entry_date', date)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+// id로 일기 하나를 가져옵니다. (수정 화면에서 사용)
+export async function getDiaryById(id: string): Promise<Diary | null> {
+  const { data, error } = await supabase
+    .from('diaries')
+    .select('*')
+    .eq('id', id)
     .maybeSingle()
   if (error) throw error
   return data
@@ -46,23 +57,31 @@ export async function deleteDiary(id: string): Promise<void> {
   if (error) throw error
 }
 
-// 특정 날짜의 일기를 저장합니다. (기분도 함께)
-// 같은 날짜 일기가 이미 있으면 새로 쌓지 않고 기존 것을 수정합니다. (upsert)
-export async function saveDiary(
+// 새 일기를 추가합니다. (같은 날에도 별도 일기로 저장 → id를 돌려줍니다)
+export async function createDiary(
   userId: string,
   entryDate: string,
   content: string,
   mood: string | null,
+): Promise<string> {
+  const { data, error } = await supabase
+    .from('diaries')
+    .insert({ user_id: userId, entry_date: entryDate, content, mood })
+    .select('id')
+    .single()
+  if (error) throw error
+  return data.id as string
+}
+
+// 기존 일기(id)를 수정합니다.
+export async function updateDiaryById(
+  id: string,
+  content: string,
+  mood: string | null,
 ): Promise<void> {
-  const { error } = await supabase.from('diaries').upsert(
-    {
-      user_id: userId,
-      entry_date: entryDate,
-      content,
-      mood,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id,entry_date' },
-  )
+  const { error } = await supabase
+    .from('diaries')
+    .update({ content, mood, updated_at: new Date().toISOString() })
+    .eq('id', id)
   if (error) throw error
 }
