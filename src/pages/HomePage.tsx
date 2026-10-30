@@ -40,6 +40,13 @@ export default function HomePage({
   const [loadingDiaries, setLoadingDiaries] = useState(true)
   // 홈에는 '오늘 쓴 일기'만 보여줍니다. 지난 일기는 '기록' 탭에서 봅니다.
   const todayDiaries = diaries.filter((d) => d.entry_date === todayString())
+  // 같은 날 '첫 일기'(가장 먼저 쓴 것)에만 예전(날짜 폴더) 사진을 함께 보여줍니다.
+  const earliestTodayId =
+    todayDiaries.length > 0
+      ? [...todayDiaries].sort((a, b) =>
+          a.created_at.localeCompare(b.created_at),
+        )[0].id
+      : null
 
   // 오늘의 명언 즐겨찾기 상태
   const [isFav, setIsFav] = useState(false)
@@ -188,7 +195,10 @@ export default function HomePage({
                       {formatEntryDate(d.entry_date)}
                     </p>
                     <p className="diary-item-content">{d.content}</p>
-                    <DiaryPhotos date={d.entry_date} />
+                    <DiaryPhotos
+                      diaryId={d.id}
+                      legacyDate={d.id === earliestTodayId ? d.entry_date : undefined}
+                    />
                   </div>
                   <div className="diary-item-actions">
                     <button

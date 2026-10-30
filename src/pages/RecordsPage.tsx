@@ -36,6 +36,24 @@ export default function RecordsPage({ onEditDiary }: Props) {
     return diaries
   }, [diaries, selectedDate])
 
+  // 날짜별 '첫 일기'(가장 먼저 쓴 것) id → 예전(날짜 폴더) 사진은 그 일기에만 보여줍니다.
+  const earliestByDate = useMemo(() => {
+    const byDate = new Map<string, Diary[]>()
+    for (const d of filtered) {
+      const arr = byDate.get(d.entry_date) ?? []
+      arr.push(d)
+      byDate.set(d.entry_date, arr)
+    }
+    const m = new Map<string, string>()
+    byDate.forEach((arr, date) => {
+      const first = [...arr].sort((a, b) =>
+        a.created_at.localeCompare(b.created_at),
+      )[0]
+      m.set(date, first.id)
+    })
+    return m
+  }, [filtered])
+
   async function handleDelete() {
     if (!confirmTarget) return
     setDeleting(true)
@@ -145,7 +163,14 @@ export default function RecordsPage({ onEditDiary }: Props) {
                     {formatEntryDate(d.entry_date)}
                   </p>
                   <p className="diary-item-content">{d.content}</p>
-                  <DiaryPhotos date={d.entry_date} />
+                  <DiaryPhotos
+                    diaryId={d.id}
+                    legacyDate={
+                      earliestByDate.get(d.entry_date) === d.id
+                        ? d.entry_date
+                        : undefined
+                    }
+                  />
                 </div>
                 <div className="diary-item-actions">
                   <button
