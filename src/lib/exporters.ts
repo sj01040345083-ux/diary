@@ -14,7 +14,7 @@ import {
 } from 'docx'
 import type { Diary } from './diaries'
 import type { Transaction } from './transactions'
-import { getPhotosByDate } from './photos'
+import { getPhotosByDate, getPhotosByDiary } from './photos'
 import { formatEntryDate } from './today'
 
 export type ExportData = {
@@ -183,7 +183,11 @@ async function fetchImageForDoc(url: string): Promise<DocImage | null> {
 }
 
 // 일기 한 편을 문서 문단들로 변환합니다. (제목/날짜 → 본문 여러 줄 → 사진들)
-async function diaryToParagraphs(d: Diary): Promise<Paragraph[]> {
+// legacyDate: 그 날의 '첫 일기'면 예전(날짜 폴더) 사진도 함께 넣습니다.
+async function diaryToParagraphs(
+  d: Diary,
+  legacyDate?: string,
+): Promise<Paragraph[]> {
   const out: Paragraph[] = []
 
   // 제목 + 날짜 (기분 이모지 포함)
@@ -206,9 +210,11 @@ async function diaryToParagraphs(d: Diary): Promise<Paragraph[]> {
     out.push(new Paragraph({ children: [new TextRun({ text: line })] }))
   }
 
-  // 첨부 사진 — 서버(Storage)에서 불러와 문서에 삽입
+  // 첨부 사진 — 이 일기(id) 폴더 + (첫 일기면) 예전 날짜 폴더 사진
   try {
-    const photos = await getPhotosByDate(d.entry_date)
+    const own = await getPhotosByDiary(d.id)
+    const legacy = legacyDate ? await getPhotosByDate(legacyDate) : []
+    const photos = [...legacy, ...own]
     for (const p of photos) {
       const img = await fetchImageForDoc(p.url)
       if (!img) continue
@@ -265,8 +271,16 @@ export async function exportDiariesDocx(
     }),
   ]
 
+  // 날짜별 '첫 일기' id (예전 날짜 폴더 사진은 그 일기에만 넣습니다)
+  const earliestByDate = new Map<string, string>()
   for (const d of sorted) {
-    const paras = await diaryToParagraphs(d)
+    if (!earliestByDate.has(d.entry_date)) earliestByDate.set(d.entry_date, d.id)
+  }
+
+  for (const d of sorted) {
+    const legacyDate =
+      earliestByDate.get(d.entry_date) === d.id ? d.entry_date : undefined
+    const paras = await diaryToParagraphs(d, legacyDate)
     children.push(...paras)
   }
 

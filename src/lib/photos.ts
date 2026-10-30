@@ -19,13 +19,14 @@ async function currentUserId(): Promise<string | null> {
 }
 
 // 사진 한 장 업로드 (압축된 Blob)
+// key = 일기 id (예전 사진은 날짜로 저장돼 있어 getPhotosByDate 로 함께 보여줍니다)
 export async function uploadPhoto(
   userId: string,
-  date: string,
+  key: string,
   blob: Blob,
 ): Promise<void> {
   const rand = Math.random().toString(36).slice(2, 8)
-  const path = `${userId}/${date}/${Date.now()}-${rand}.jpg`
+  const path = `${userId}/${key}/${Date.now()}-${rand}.jpg`
   const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
     contentType: 'image/jpeg',
     upsert: false,
@@ -33,11 +34,11 @@ export async function uploadPhoto(
   if (error) throw error
 }
 
-// 특정 날짜의 사진 목록 (생성순) → 표시용 서명 URL 포함
-export async function getPhotosByDate(date: string): Promise<StoredPhoto[]> {
+// 특정 '폴더 키'(일기 id 또는 날짜)의 사진 목록 (생성순) → 표시용 서명 URL 포함
+async function listPhotos(key: string): Promise<StoredPhoto[]> {
   const userId = await currentUserId()
   if (!userId) return []
-  const prefix = `${userId}/${date}`
+  const prefix = `${userId}/${key}`
   const { data, error } = await supabase.storage.from(BUCKET).list(prefix, {
     limit: 100,
     sortBy: { column: 'name', order: 'asc' },
@@ -53,6 +54,16 @@ export async function getPhotosByDate(date: string): Promise<StoredPhoto[]> {
   return signed
     .filter((s) => s.signedUrl)
     .map((s) => ({ path: s.path ?? '', url: s.signedUrl as string }))
+}
+
+// 일기 id 폴더의 사진
+export async function getPhotosByDiary(diaryId: string): Promise<StoredPhoto[]> {
+  return listPhotos(diaryId)
+}
+
+// 예전(날짜 폴더) 사진 — 기존 일기 호환용
+export async function getPhotosByDate(date: string): Promise<StoredPhoto[]> {
+  return listPhotos(date)
 }
 
 // 사진 한 장 삭제 (경로로)

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { formatEntryDate } from '../lib/today'
-import { getDiaryById, createDiary, updateDiaryById, todayString } from '../lib/diaries'
+import { getDiaryById, getDiariesByDate, createDiary, updateDiaryById, todayString } from '../lib/diaries'
 import { emotions } from '../config/emotions'
 import { compressImage } from '../lib/imageCompress'
-import { uploadPhoto, getPhotosByDate, deletePhoto } from '../lib/photos'
+import { uploadPhoto, getPhotosByDiary, getPhotosByDate, deletePhoto } from '../lib/photos'
 import { collageClass } from '../components/PhotoCollage'
 import DatePickerCalendar from '../components/DatePickerCalendar'
 import './home.css'
@@ -103,25 +103,37 @@ export default function WritePage({
   }, [editId])
 
   useEffect(() => {
-    // 사진: 수정일 때만 그 날짜의 저장된 사진을 불러옵니다.
-    // (새 일기는 빈 상태로 시작 — 같은 날 다른 일기 사진을 실수로 지우지 않도록)
+    // 사진 불러오기 (수정일 때만).
+    // - 이 일기 폴더(id)의 사진을 불러오고,
+    // - 이 일기가 그 날의 '첫 일기'면 예전(날짜 폴더) 사진도 함께 관리 대상에 넣습니다.
     let alive = true
     setPhotos([])
     removedPaths.current = []
     pickedSigs.current = new Set()
     if (!editId) return
-    getPhotosByDate(workDate)
-      .then((recs) => {
+    ;(async () => {
+      try {
+        const own = await getPhotosByDiary(editId)
+        let legacy: { path: string; url: string }[] = []
+        const sameDay = await getDiariesByDate(workDate)
+        const earliest = [...sameDay].sort((a, b) =>
+          a.created_at.localeCompare(b.created_at),
+        )[0]
+        if (earliest && earliest.id === editId) {
+          legacy = await getPhotosByDate(workDate)
+        }
         if (!alive) return
         setPhotos(
-          recs.map((r) => ({
+          [...legacy, ...own].map((r) => ({
             key: r.path,
             url: r.url,
             existingPath: r.path,
           })),
         )
-      })
-      .catch(() => {})
+      } catch {
+        // 무시
+      }
+    })()
     return () => {
       alive = false
     }
@@ -214,17 +226,24 @@ export default function WritePage({
     }
     setSaving(true)
     try {
+      // 저장 후 사진을 넣을 '일기 id'를 확보합니다. (새 일기는 방금 만든 id)
+      let diaryId = editId
       if (editId) {
         await updateDiaryById(editId, content.trim(), mood || null)
       } else {
-        await createDiary(session.user.id, workDate, content.trim(), mood || null)
+        diaryId = await createDiary(
+          session.user.id,
+          workDate,
+          content.trim(),
+          mood || null,
+        )
       }
-      // 사진 반영: 삭제된 기존 사진 제거 + 새로 고른 사진 서버(Storage) 업로드
+      // 사진 반영: 삭제된 기존 사진 제거 + 새로 고른 사진을 '이 일기(id) 폴더'에 업로드
       try {
         for (const path of removedPaths.current) await deletePhoto(path)
         for (const p of photos) {
-          if (!p.existingPath && p.blob) {
-            await uploadPhoto(session.user.id, workDate, p.blob)
+          if (!p.existingPath && p.blob && diaryId) {
+            await uploadPhoto(session.user.id, diaryId, p.blob)
           }
         }
       } catch {
