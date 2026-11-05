@@ -17,7 +17,6 @@ export type Briefing = {
   mode: 'ai' | 'simple'
   sectors: SectorItem[]
   mainNews: NewsItem[]
-  culture: NewsItem[]
   aiError?: string // 열쇠가 있는데 요약이 실패했을 때 이유
 }
 

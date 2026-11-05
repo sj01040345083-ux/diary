@@ -1,5 +1,5 @@
 // 매일 아침 뉴스 브리핑 - 수집 + 요약 서버 함수 (Vercel 무료 서버리스 함수)
-// 1) 구글 뉴스 RSS(무료)에서 업종 전반+보유종목 / 주요뉴스 / 문화연예 기사(제목+링크)를 모으고
+// 1) 구글 뉴스 RSS(무료)에서 업종 전반+보유종목 / 주요뉴스 기사(제목+링크)를 모으고
 // 2) 요청 헤더로 받은 제미나이 열쇠가 있으면 서버에서 요약해 돌려줍니다.
 //    (열쇠는 앱 설정에서 사용자가 넣은 값을 그때그때 헤더로 전달 — 서버에 저장하지 않음)
 //    브라우저에서 구글 AI를 직접 부를 때 생기는 CORS 문제를 피하려고 서버가 대신 호출합니다.
@@ -14,13 +14,13 @@ const SECTORS = [
   },
   {
     name: 'IT·플랫폼',
-    holdings: ['네이버', '카카오'],
-    query: '플랫폼 OR 네이버 OR 카카오',
+    holdings: ['네이버', '카카오', 'LG씨앤에스'],
+    query: '플랫폼 OR 네이버 OR 카카오 OR LG씨앤에스 OR "LG CNS"',
   },
   {
-    name: '2차전지·에너지',
-    holdings: ['삼성SDI', 'OCI홀딩스'],
-    query: '2차전지 OR 배터리 OR 삼성SDI OR OCI홀딩스',
+    name: '2차전지·에너지·화학',
+    holdings: ['삼성SDI', 'OCI홀딩스', '효성화학'],
+    query: '2차전지 OR 배터리 OR 석유화학 OR 삼성SDI OR OCI홀딩스 OR 효성화학',
   },
   {
     name: '자동차·건설',
@@ -34,7 +34,12 @@ const SECTORS = [
   },
 ]
 
-const GEMINI_MODEL = 'gemini-2.0-flash'
+// 구글이 모델을 바꿔도 멈추지 않도록, 앞에서부터 시도하고 404(없는 모델)면 다음 것으로.
+const GEMINI_MODELS = [
+  'gemini-flash-latest',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+]
 
 function decodeText(s) {
   return s
@@ -86,7 +91,7 @@ async function fetchArticles(query, limit) {
   }
 }
 
-function fallbackBriefing(sectors, mainNews, culture) {
+function fallbackBriefing(sectors, mainNews) {
   const outSectors = []
   for (const s of sectors) {
     if (s.articles.length) {
@@ -102,11 +107,34 @@ function fallbackBriefing(sectors, mainNews, culture) {
   return {
     sectors: outSectors,
     mainNews: mainNews.slice(0, 4).map((a) => ({ body: a.title, link: a.link })),
-    culture: culture.slice(0, 3).map((a) => ({ body: a.title, link: a.link })),
   }
 }
 
-async function summarize(apiKey, sectors, mainNews, culture) {
+// 제미나이 호출 — 모델 목록을 앞에서부터 시도, 404면 다음 모델로.
+async function callGemini(apiKey, body) {
+  let lastErr = ''
+  for (const model of GEMINI_MODELS) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+        apiKey,
+      )}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(20000),
+        body: JSON.stringify(body),
+      },
+    )
+    if (res.ok) return await res.json()
+    const t = await res.text().catch(() => '')
+    lastErr = `제미나이 오류 ${res.status}${t ? ' · ' + t.slice(0, 120) : ''}`
+    // 404(모델 없음)면 다음 모델 시도, 그 외 오류면 즉시 중단
+    if (res.status !== 404) throw new Error(lastErr)
+  }
+  throw new Error(lastErr || '사용 가능한 제미나이 모델이 없어요')
+}
+
+async function summarize(apiKey, sectors, mainNews) {
   const linkById = {}
   const lines = ['[업종별 최근 기사 제목]']
   sectors.forEach((s, si) => {
@@ -124,19 +152,13 @@ async function summarize(apiKey, sectors, mainNews, culture) {
     linkById[id] = a.link
     lines.push(`- (${id}) ${a.title}`)
   })
-  lines.push('[문화·연예 후보]')
-  culture.forEach((a, j) => {
-    const id = `C#${j}`
-    linkById[id] = a.link
-    lines.push(`- (${id}) ${a.title}`)
-  })
 
   const prompt = `너는 아침 뉴스 브리핑 편집자야. 아래는 오늘의 한국 뉴스 기사 제목 모음이야. 이걸 바탕으로 스마트폰 한 화면 분량의 브리핑을 한국어로 만들어.
 
 ${lines.join('\n')}
 
 [1. sectors — 업종별 이슈]
-- 5개 업종(반도체 / IT·플랫폼 / 2차전지·에너지 / 자동차·건설 / 바이오·뷰티) 중, 오늘 '시장에 영향을 주는 이슈'가 있는 업종만 골라(없으면 빼). 업종당 1~2개.
+- 5개 업종(반도체 / IT·플랫폼 / 2차전지·에너지·화학 / 자동차·건설 / 바이오·뷰티) 중, 오늘 '시장에 영향을 주는 이슈'가 있는 업종만 골라(없으면 빼). 업종당 1~2개.
 - 업종 전반 뉴스(수출 규제, 업황, 정책, 유가, 환율 등)를 우선하고, 보유종목이 관련되면 함께 언급해.
 - 개별 기업의 사소한 뉴스(전시회, 행사, 개인전 등)는 제외.
 - 각 항목: name(업종명), body(무슨 일인지 2~3문장으로 풀어서 요약, 기사 제목 복사 금지), impact("호재"/"악재"/"중립"), impactReason(이유 한 줄), articleId(근거 기사 id 예: S0#2).
@@ -145,75 +167,47 @@ ${lines.join('\n')}
 - 시사·경제(금리·환율·정책)·사회에서 오늘 꼭 알아야 할 것. 추측성·미확인 소문 제외, 사실만.
 - 각 항목: body(2~3문장 요약), articleId(예: M#1).
 
-[3. culture — 문화·연예 2~3개]
-- 영화·연예계 화제. 각 항목: body(한두 줄), articleId(예: C#0).
-
 전체 규칙: 이슈 없으면 억지로 채우지 마. 제목만 있고 본문은 없으니 제목에서 확인되는 사실만 쓰고 지어내지 마.`
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(
-      apiKey,
-    )}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(20000),
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: 'object',
-            properties: {
-              sectors: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string' },
-                    body: { type: 'string' },
-                    impact: { type: 'string', enum: ['호재', '악재', '중립'] },
-                    impactReason: { type: 'string' },
-                    articleId: { type: 'string' },
-                  },
-                  required: ['name', 'body', 'impact', 'impactReason', 'articleId'],
-                },
+  const data = await callGemini(apiKey, {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.4,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'object',
+        properties: {
+          sectors: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                body: { type: 'string' },
+                impact: { type: 'string', enum: ['호재', '악재', '중립'] },
+                impactReason: { type: 'string' },
+                articleId: { type: 'string' },
               },
-              mainNews: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    body: { type: 'string' },
-                    articleId: { type: 'string' },
-                  },
-                  required: ['body', 'articleId'],
-                },
-              },
-              culture: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    body: { type: 'string' },
-                    articleId: { type: 'string' },
-                  },
-                  required: ['body', 'articleId'],
-                },
-              },
+              required: ['name', 'body', 'impact', 'impactReason', 'articleId'],
             },
-            required: ['sectors', 'mainNews', 'culture'],
+          },
+          mainNews: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                body: { type: 'string' },
+                articleId: { type: 'string' },
+              },
+              required: ['body', 'articleId'],
+            },
           },
         },
-      }),
+        required: ['sectors', 'mainNews'],
+      },
     },
-  )
-  if (!res.ok) {
-    const t = await res.text().catch(() => '')
-    throw new Error(`제미나이 오류 ${res.status}${t ? ' · ' + t.slice(0, 120) : ''}`)
-  }
-  const data = await res.json()
+  })
+
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
   if (!text) throw new Error('제미나이가 빈 응답을 보냈어요')
   const parsed = JSON.parse(text)
@@ -238,15 +232,11 @@ ${lines.join('\n')}
       body: m.body,
       link: linkById[m.articleId] || '',
     })),
-    culture: (parsed.culture || []).map((c) => ({
-      body: c.body,
-      link: linkById[c.articleId] || '',
-    })),
   }
 }
 
 export default async function handler(req, res) {
-  const [sectors, mainEcon, mainSociety, culture] = await Promise.all([
+  const [sectors, mainEcon, mainSociety] = await Promise.all([
     Promise.all(
       SECTORS.map(async (s) => ({
         name: s.name,
@@ -256,7 +246,6 @@ export default async function handler(req, res) {
     ),
     fetchArticles('경제 금리 환율 정책', 6),
     fetchArticles('사회 사건 정치', 5),
-    fetchArticles('연예 OR 영화 OR 문화', 6),
   ])
   const mainNews = [...mainEcon, ...mainSociety]
   const date = new Date().toISOString()
@@ -267,18 +256,18 @@ export default async function handler(req, res) {
   const apiKey = req.headers['x-gemini-key']
   if (apiKey) {
     try {
-      const b = await summarize(apiKey, sectors, mainNews, culture)
+      const b = await summarize(apiKey, sectors, mainNews)
       return res.status(200).json({ date, mode: 'ai', ...b })
     } catch (e) {
       return res.status(200).json({
         date,
         mode: 'simple',
-        ...fallbackBriefing(sectors, mainNews, culture),
+        ...fallbackBriefing(sectors, mainNews),
         aiError: String((e && e.message) || e),
       })
     }
   }
   res
     .status(200)
-    .json({ date, mode: 'simple', ...fallbackBriefing(sectors, mainNews, culture) })
+    .json({ date, mode: 'simple', ...fallbackBriefing(sectors, mainNews) })
 }
