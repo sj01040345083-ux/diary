@@ -56,10 +56,7 @@ export default function NewsPage({ onBack }: Props) {
   const today = formatToday()
 
   const hasAny =
-    !!data &&
-    (data.sectors.length > 0 ||
-      data.mainNews.length > 0 ||
-      data.culture.length > 0)
+    !!data && (data.sectors.length > 0 || data.mainNews.length > 0)
 
   return (
     <div className="home-screen">
@@ -139,18 +136,6 @@ export default function NewsPage({ onBack }: Props) {
                 <ul className="news-brief-list">
                   {data!.mainNews.map((m, i) => (
                     <NewsLine item={m} key={i} />
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* 3. 문화·연예 */}
-            {data!.culture.length > 0 && (
-              <section className="news-block">
-                <h2 className="news-block-title">🎬 문화·연예</h2>
-                <ul className="news-brief-list">
-                  {data!.culture.map((c, i) => (
-                    <NewsLine item={c} key={i} />
                   ))}
                 </ul>
               </section>
