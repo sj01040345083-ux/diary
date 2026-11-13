@@ -139,7 +139,7 @@ export default function HomePage({
             ✏️ 오늘 일기 쓰기
           </button>
           <button className="home-shortcut" onClick={onTransactions}>
-            💰 소비·수입 기록
+            💳 가계부
           </button>
         </div>
 

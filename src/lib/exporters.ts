@@ -117,6 +117,55 @@ export function exportStatsXlsx(data: ExportData): void {
   )
 }
 
+// ── 월 가계부 엑셀 (가계부 화면 전용) ─────────
+// 컬럼: 날짜 · 지출 목록 · 금액 · 현금 · 카드(업체) · 할부  (+ 합계)
+export function exportGakebuXlsx(
+  month: string,
+  transactions: Transaction[],
+): void {
+  const CARD_SET = new Set(['삼성', '우리', '카카오체크', '롯데', '하나체크'])
+  const monthTx = transactions
+    .filter((t) => t.type === 'expense' && t.tx_date.startsWith(month))
+    .sort((a, b) => a.tx_date.localeCompare(b.tx_date))
+
+  const rows: (string | number)[][] = [
+    ['날짜', '지출 목록', '금액', '현금', '카드(업체)', '할부'],
+  ]
+  let total = 0
+  for (const t of monthTx) {
+    const pay = t.category ?? ''
+    total += Number(t.amount)
+    rows.push([
+      t.tx_date,
+      t.memo ?? '',
+      Number(t.amount),
+      pay === '현금' ? 'O' : '',
+      CARD_SET.has(pay) ? pay : '',
+      t.installment > 0 ? `${t.installment}개월` : '일시불',
+    ])
+  }
+  rows.push(['합계', '', total, '', '', ''])
+
+  const ws = XLSX.utils.aoa_to_sheet(rows)
+  ws['!cols'] = [
+    { wch: 12 },
+    { wch: 20 },
+    { wch: 12 },
+    { wch: 6 },
+    { wch: 12 },
+    { wch: 8 },
+  ]
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, `${month} 가계부`)
+  const out = XLSX.write(wb, { type: 'array', bookType: 'xlsx' })
+  download(
+    new Blob([out], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+    `soso-diary-가계부-${month}.xlsx`,
+  )
+}
+
 // ── 워드(.docx) 내보내기 (일기 — 제목/날짜 + 본문 + 사진 포함) ──
 
 // 워드 문서 안 사진 크기 — 모든 사진을 4x6(세로 2:3) '같은 크기'로 통일합니다.
